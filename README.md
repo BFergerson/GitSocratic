@@ -3,7 +3,7 @@
 
 [![asciicast](https://asciinema.org/a/4uCMnG7FcG89XE01RyFxg2Pnh.svg)](https://asciinema.org/a/4uCMnG7FcG89XE01RyFxg2Pnh)
 
-GitSocratic provides a pain-free interface for querying source code. GitSocratic uses the omnilingual parser [Babelfish](https://github.com/bblfsh/bblfshd) to extract universal abstract syntax trees which are annotated with their semantic meanings. This wealth of knowledge is then imported in the knowledge graph powered by [Grakn](https://github.com/graknlabs/grakn). This enables source code to be queried using Graql (with more query languages coming soon), allowing for a wide range of modern source code analyses.
+GitSocratic provides a pain-free interface for querying source code. GitSocratic uses the omnilingual parser [Babelfish](https://github.com/bblfsh/bblfshd) to extract universal abstract syntax trees which are annotated with their semantic meanings. This wealth of knowledge is then imported in a knowledge graph powered by [Grakn](https://github.com/graknlabs/grakn). This enables source code to be queried using Graql (with more query languages coming soon), allowing for a wide range of modern source code analyses.
 
 ## Setup
 
