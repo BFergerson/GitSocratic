@@ -59,12 +59,12 @@ More information: [COMMANDS](https://github.com/CodeBrig/GitSocratic/blob/master
 #### Get all functions named "main"
 ```graql 
 match
-($function) isa IS_FUNCTION;
-($function) isa IS_DECLARATION;
+($function) isa FUNCTION;
+($function) isa DECLARATION;
 (is_parent: $function, is_child: $functionName);
-($functionName) isa IS_FUNCTION;
-($functionName) isa IS_NAME;
-($functionName) isa IS_IDENTIFIER;
+($functionName) isa FUNCTION;
+($functionName) isa NAME;
+($functionName) isa IDENTIFIER;
 $functionName has token "main";
 get $function;
 ```
