@@ -1,5 +1,17 @@
 # Commands
 
+ - add-local-repo
+ - add-remote-repo
+ - config
+   - Display configuration
+   - Get config option
+   - Set config option
+ - console
+ - init
+ - logs
+ - query
+ - question
+
 ## add-local-repo
 
 Add local source code repository to the knowledge graph
@@ -13,7 +25,7 @@ Param(s):
 
 ```
 repoLocation
-    - String
+    - string
 ```
 
 Example(s):
@@ -35,7 +47,7 @@ Param(s):
 
 ```
 repoName
-    - String
+    - string
 ```
 
 Example(s):
@@ -111,7 +123,7 @@ option
     )
 
 value
-    - String
+    - string
 ```
 
 Example(s):
@@ -120,29 +132,120 @@ gitsocratic config docker_host 192.168.99.100
 gitsocratic config use_docker_grakn false
 ```
 
-## remove-repo
+## console
 
-Remove repository from the knowledge graph
+Open interactive source code query console
 
 Usage:
 ```
-$ gitsocratic remove-repo [repo_name]
+gitsocratic console [-hV] <console>
 ```
 
 Param(s):
 
 ```
-repo_name
-    - String
+console
+    - enum (graql)
 ```
 
 Example(s):
 ```
-$ gitsocratic remove-repo bfergerson/myproject
+gitsocratic console graql
 ```
 
-## configure
+## init
 
-Configure stuff
+Initialize services necessary to use GitSocratic
 
-availble stuff
+Usage:
+```
+gitsocratic init [-bghvV]
+```
+
+Example(s):
+```
+gitsocratic init
+```
+
+## logs
+
+View logs for initialized services
+
+Usage:
+```
+gitsocratic logs [-htV] <service>
+```
+
+Param(s):
+
+```
+service
+    - enum (babelfish, grakn)
+```
+
+Example(s):
+```
+gitsocratic logs grakn
+gitsocratic logs babelfish
+```
+
+## query
+
+Execute single source code query
+
+Usage:
+```
+gitsocratic query [-hV] [COMMAND]
+```
+
+Param(s):
+```
+COMMAND
+    - enum (graql)
+```
+
+### query (Graql)
+
+Usage:
+```
+gitsocratic query graql [-hV] <query>
+```
+
+Param(s):
+```
+query
+    - string
+```
+
+Example(s):
+```
+gitsocratic query graql 'match $x; get;`
+```
+
+## question
+
+Execute single source code question
+
+Usage:
+```
+gitsocratic question [-hV] <question>
+```
+
+Param(s):
+
+```
+question
+    - enum (
+            how many [language] methods are named [name]
+            how many [language] methods total
+            how many methods are named [name]
+            how many methods are named like [name]
+            how many methods total
+    )
+```
+
+Example(s):
+```
+gitsocratic question "how many java methods are named main"
+gitsocratic question "how many methods are named like closeBuffer"
+```
