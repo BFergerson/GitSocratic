@@ -23,7 +23,6 @@ gitsocratic add-local-repo [-hV] <repoLocation>
 ```
 
 Param(s):
-
 ```
 repoLocation
     - string
@@ -45,7 +44,6 @@ gitsocratic add-remote-repo [-hV] <repoName>
 ```
 
 Param(s):
-
 ```
 repoName
     - string
@@ -90,7 +88,6 @@ gitsocratic config [-hV] [<option>]
 ```
 
 Param(s):
-
 ```
 option
     - enum (
@@ -114,7 +111,6 @@ gitsocratic config [-hV] [<option>] [<value>]
 ```
 
 Param(s):
-
 ```
 option
     - enum (
@@ -143,7 +139,6 @@ gitsocratic console [-hV] <console>
 ```
 
 Param(s):
-
 ```
 console
     - enum (graql)
@@ -178,7 +173,6 @@ gitsocratic logs [-htV] <service>
 ```
 
 Param(s):
-
 ```
 service
     - enum (babelfish, grakn)
@@ -233,7 +227,6 @@ gitsocratic question [-hV] <question>
 ```
 
 Param(s):
-
 ```
 question
     - enum (
