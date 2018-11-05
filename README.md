@@ -99,7 +99,5 @@ $functionName has token "main";
 get $function;
 ```
 
-More information: [QUERIES](https://github.com/CodeBrig/GitSocratic/blob/master/QUERIES.md)
-
 ## License
 [Apache 2.0](https://github.com/CodeBrig/GitSocratic/LICENSE)
