@@ -1,0 +1,6 @@
+match
+$function isa SourceArtifact;
+{($function) isa DECLARATION_FUNCTION;}
+or
+{($function) isa DECLARATION_FUNCTION_VISIBILITY_WORLD;};
+aggregate count $function;

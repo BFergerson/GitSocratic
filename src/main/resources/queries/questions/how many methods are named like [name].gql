@@ -1,0 +1,10 @@
+match
+{($function) isa DECLARATION_FUNCTION;}
+or
+{($function) isa DECLARATION_FUNCTION_VISIBILITY_WORLD;};
+(is_parent: $function, is_child: $functionName);
+($functionName) isa FUNCTION;
+($functionName) isa NAME;
+($functionName) isa IDENTIFIER;
+$functionName has token contains "<name>";
+aggregate count $function;
