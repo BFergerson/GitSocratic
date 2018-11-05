@@ -1,8 +1,8 @@
 package io.gitsocratic.command.impl
 
 import com.codebrig.omnisrc.SourceLanguage
-import com.codebrig.phenomena.ParsedSourceFile
 import com.codebrig.phenomena.Phenomena
+import com.codebrig.phenomena.code.ParsedSourceFile
 import gopkg.in.bblfsh.sdk.v1.uast.generated.Node
 import groovyx.gpars.GParsPool
 import io.gitsocratic.command.config.ConfigOption

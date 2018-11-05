@@ -24,7 +24,7 @@ dependencies {
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.0.1.201806211838-r'
     compile "com.github.rholder:guava-retrying:2.0.0"
     compile group: 'com.github.docker-java', name: 'docker-java', version: '3.1.0-rc-5'
-    implementation 'com.github.codebrig:phenomena:cb00c27300'
+    implementation 'com.github.codebrig:phenomena:4294a1eeae'
     implementation 'com.github.codebrig:omnisrc:fea09feaaf'
     implementation "org.bblfsh:bblfsh-client:$babelfishVersion"
     implementation group: 'ai.grakn', name: 'grakn-core', version: "$graknVersion"
