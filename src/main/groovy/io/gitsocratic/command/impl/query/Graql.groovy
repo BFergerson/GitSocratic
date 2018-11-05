@@ -14,7 +14,7 @@ import java.util.concurrent.Callable
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
 @CommandLine.Command(name = "graql",
-        description = "Todo",
+        description = "Execute a single Graql query",
         mixinStandardHelpOptions = true,
         descriptionHeading = "%nDescription:%n%n",
         parameterListHeading = "%nParameters:%n",

@@ -25,15 +25,12 @@ class GraknClient {
     GraknClient() {
         if (Boolean.valueOf(ConfigOption.use_docker_grakn.value)) {
             this.host = ConfigOption.docker_host.value
-            this.port = ConfigOption.grakn_port.value as int
-            this.keyspace = ConfigOption.grakn_keyspace.value
-            session = new Grakn(new SimpleURI("$host:$port")).session(Keyspace.of(keyspace))
         } else {
             this.host = ConfigOption.grakn_host.value
-            this.port = ConfigOption.grakn_port.value as int
-            this.keyspace = ConfigOption.grakn_keyspace.value
-            session = new Grakn(new SimpleURI("$host:$port")).session(Keyspace.of(keyspace))
         }
+        this.port = ConfigOption.grakn_port.value as int
+        this.keyspace = ConfigOption.grakn_keyspace.value
+        session = new Grakn(new SimpleURI("$host:$port")).session(Keyspace.of(keyspace))
     }
 
     GraknClient(String host, int port, String keyspace) {

@@ -17,13 +17,13 @@ class GitSocraticVersion implements CommandLine.IVersionProvider {
     @Override
     String[] getVersion() throws Exception {
         def dockerVersion = GitSocraticCLI.dockerClient.versionCmd().exec().apiVersion
-        def strList = new ArrayList<String>()
-        strList.add("GitSocratic")
-        strList.add(" CLI:\t\t" + buildBundle.getString("version") + " [Build: " + buildBundle.getString("build_date") + "]")
-        strList.add(" Docker: \t" + dockerVersion)
-        strList.add(" Phenomena:\t" + Phenomena.PHENOMENA_VERSION + " [Schema: OmniSRC_Omnilingual_Schema-1.0]")
-        strList.add(" Babelfish:\t" + buildBundle.getString("babelfish_version"))
-        strList.add(" Grakn:\t\t" + buildBundle.getString("grakn_version"))
-        return strList.toArray(new String[0])
+        def versionList = new ArrayList<String>()
+        versionList.add("GitSocratic")
+        versionList.add(" CLI:\t\t" + buildBundle.getString("version") + " [Build: " + buildBundle.getString("build_date") + "]")
+        versionList.add(" Docker: \t" + dockerVersion)
+        versionList.add(" Phenomena:\t" + Phenomena.PHENOMENA_VERSION + " [Schema: OmniSRC_Omnilingual_Schema-1.0]")
+        versionList.add(" Babelfish:\t" + buildBundle.getString("babelfish_version"))
+        versionList.add(" Grakn:\t\t" + buildBundle.getString("grakn_version"))
+        return versionList.toArray(new String[0])
     }
 }
