@@ -27,7 +27,7 @@ GitSocratic requires access to two services:
 apt install openjdk-8-jre-headless
 apt install unzip
 apt install docker.io
-wget http://codebrig.com/gitsocratic-0.1.zip
+wget https://github.com/CodeBrig/GitSocratic/releases/download/v0.1-alpha/gitsocratic-0.1.zip
 unzip gitsocratic-0.1.zip
 cd gitsocratic-0.1/bin/
 ./gitsocratic init
