@@ -227,7 +227,7 @@ query
 
 Example(s):
 ```
-gitsocratic query graql 'match $x; get;`
+gitsocratic query graql 'match $x; get;'
 ```
 
 ## question
