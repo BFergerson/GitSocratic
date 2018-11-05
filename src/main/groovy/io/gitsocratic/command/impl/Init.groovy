@@ -236,6 +236,15 @@ class Init implements Callable<Integer> {
     @Override
     Integer call() throws Exception {
         def status = 0
+        if (initBabelfish) {
+            if (Boolean.valueOf(ConfigOption.use_docker_babelfish.getValue())) {
+                status = initDockerBabelfish()
+                if (status != 0) return status
+            } else {
+                status = validateExternalBabelfish()
+                if (status != 0) return status
+            }
+        }
         if (initGrakn) {
             if (Boolean.valueOf(ConfigOption.use_docker_grakn.getValue())) {
                 status = initDockerGrakn()
@@ -245,15 +254,6 @@ class Init implements Callable<Integer> {
                 if (status != 0) return status
             }
             println()
-        }
-        if (initBabelfish) {
-            if (Boolean.valueOf(ConfigOption.use_docker_babelfish.getValue())) {
-                status = initDockerBabelfish()
-                if (status != 0) return status
-            } else {
-                status = validateExternalBabelfish()
-                if (status != 0) return status
-            }
         }
         return status
     }
