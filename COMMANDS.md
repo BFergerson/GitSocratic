@@ -158,6 +158,13 @@ Usage:
 gitsocratic init [-bghvV]
 ```
 
+Options:
+```
+-b, --babelfish   Initialize Babelfish
+-g, --grakn       Initialize Grakn
+-v, --verbose     Verbose logging
+```
+
 Example(s):
 ```
 gitsocratic init
@@ -176,6 +183,11 @@ Param(s):
 ```
 service
     - enum (babelfish, grakn)
+```
+
+Options:
+```
+-t, -f, --tail   Tail logs
 ```
 
 Example(s):
