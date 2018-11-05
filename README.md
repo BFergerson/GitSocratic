@@ -90,7 +90,7 @@ get $function;
 ```
 
 ### Java + Go (AST)
-#### Get all Java or Go functions named "main"
+#### Get all Java and Go functions named "main"
 ```graql
 match
 {$function isa JavaMethodDeclarationArtifact;} or { $function isa GoFuncDeclArtifact; };
