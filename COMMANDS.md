@@ -168,6 +168,7 @@ Options:
 Example(s):
 ```
 gitsocratic init
+gitsocratic init -vg false
 ```
 
 ## logs
