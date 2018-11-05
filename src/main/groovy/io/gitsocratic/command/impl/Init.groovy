@@ -244,6 +244,7 @@ class Init implements Callable<Integer> {
                 status = validateExternalBabelfish()
                 if (status != 0) return status
             }
+            println()
         }
         if (initGrakn) {
             if (Boolean.valueOf(ConfigOption.use_docker_grakn.getValue())) {
@@ -253,7 +254,6 @@ class Init implements Callable<Integer> {
                 status = validateExternalGrakn()
                 if (status != 0) return status
             }
-            println()
         }
         return status
     }
