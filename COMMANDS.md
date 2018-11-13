@@ -160,8 +160,8 @@ gitsocratic init [-bghvV]
 
 Options:
 ```
--b, --babelfish   Initialize Babelfish
--g, --grakn       Initialize Grakn
+-b, --babelfish   Initialize Babelfish (Default: true)
+-g, --grakn       Initialize Grakn (Default: true)
 -v, --verbose     Verbose logging
 ```
 
