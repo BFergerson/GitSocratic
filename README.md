@@ -14,8 +14,8 @@ GitSocratic provides a pain-free interface for querying source code. GitSocratic
 ## Setup
 
 GitSocratic requires access to two services:
- - Grakn
- - Babelfish
+ - [Grakn](https://github.com/graknlabs/grakn)
+ - [Babelfish](https://github.com/bblfsh/bblfshd)
  
  GitSocratic is able to install these services automatically using [Docker](https://www.docker.com/).
  If you do no wish to use Docker you may suppy the host and ports for these services through the config file or command.
