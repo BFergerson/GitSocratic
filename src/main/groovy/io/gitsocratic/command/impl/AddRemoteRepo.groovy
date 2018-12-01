@@ -2,6 +2,7 @@ package io.gitsocratic.command.impl
 
 import com.codebrig.omnisrc.SourceLanguage
 import com.codebrig.omnisrc.observe.filter.MultiFilter
+import com.codebrig.omnisrc.observe.filter.RoleFilter
 import com.codebrig.phenomena.ParseException
 import com.codebrig.phenomena.Phenomena
 import com.codebrig.phenomena.code.CodeObserver
@@ -55,6 +56,7 @@ class AddRemoteRepo implements Callable<Integer> {
         //setup observers
         def codeObservers = new ArrayList<CodeObserver>()
         def necessaryStructureFilter = new MultiFilter(MultiFilter.MatchStyle.ANY)
+        necessaryStructureFilter.accept(new RoleFilter("FILE"))
 //
 //        //dependence observers
 //        if (Boolean.valueOf(ConfigOption.identifier_access.value)) {
