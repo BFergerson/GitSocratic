@@ -46,7 +46,7 @@ gitsocratic [-hV] [-c=<configFile>] [COMMAND]
 
 [![asciicast](https://asciinema.org/a/4uCMnG7FcG89XE01RyFxg2Pnh.svg)](https://asciinema.org/a/4uCMnG7FcG89XE01RyFxg2Pnh)
 
-## Commands
+### Commands
 
 ```
 add-local-repo   Add local source code repository to the knowledge graph
