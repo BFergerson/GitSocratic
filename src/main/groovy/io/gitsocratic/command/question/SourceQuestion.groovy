@@ -23,7 +23,15 @@ enum SourceQuestion {
             [new QuestionValue("name", new NopValueConverter())]),
     how_many_methods_are_named_like_x("how many methods are named like [name]", "(?:how many methods are named like )([^\\s]+)",
             [new QuestionValue("name", new NopValueConverter())]),
-    how_many_methods_total("how many methods total")
+    how_many_methods_total("how many methods total"),
+    what_are_the_x_most_complex_x_methods("what are the [limit] most complex [language] methods", "(?:what are the )([^\\s]+)(?: most complex )([^\\s]+)( methods)",
+            [new QuestionValue("limit", new NopValueConverter()),
+             new QuestionValue("language", new SourceLanguageQualifiedNameValue())]),
+    what_are_the_x_most_complex_methods("what are the [limit] most complex methods", "(?:what are the )([^\\s]+)(?: most complex methods)",
+            [new QuestionValue("limit", new NopValueConverter())]),
+    what_is_the_most_complex_x_method("what is the most complex [language] method", "(?:what is the most complex )([^\\s]+)( method)",
+            [new QuestionValue("language", new SourceLanguageQualifiedNameValue())]),
+    what_is_the_most_complex_method("what is the most complex method")
 
     private final String formattedQuestion
     private String matchRegex

@@ -4,6 +4,7 @@ import ai.grakn.graql.answer.Value
 import io.gitsocratic.client.GraknClient
 import picocli.CommandLine
 
+import java.time.Duration
 import java.util.concurrent.Callable
 
 /**
@@ -30,23 +31,36 @@ class Graql implements Callable<Integer> {
             System.err.println("Missing Graql query")
             return -1
         }
-
         def startTime = System.currentTimeMillis()
         def graknClient = new GraknClient()
+        def tx = graknClient.makeReadSession()
+
         try {
             println "# Query: $query"
             println "# Result:"
-            def result = graknClient.executeQuery(query)
-            if (result.get(0) instanceof Value) {
-                def number = (result.get(0) as Value).number()
-                println number
+            def result = graknClient.executeQuery(tx, query)
+            if (result.size() == 1 && result.get(0) instanceof Value) {
+                println((result.get(0) as Value).number())
+            } else if (!result.isEmpty()) {
+                result.each {
+                    it.forEach({ key, value ->
+                        println key.toString() + " = " + value.asAttribute().value().toString()
+                    })
+                }
             } else {
-                println result
+                println "N/A"
             }
-            println "# Query time: " + (System.currentTimeMillis() - startTime) + "ms"
+            println "\n# Query time: " + humanReadableFormat(Duration.ofMillis(System.currentTimeMillis() - startTime))
             return 0
         } finally {
+            tx.close()
             graknClient.close()
         }
+    }
+
+    static String humanReadableFormat(Duration duration) {
+        return duration.toString().substring(2)
+                .replaceAll('(\\d[HMS])(?!$)', '$1 ')
+                .toLowerCase()
     }
 }

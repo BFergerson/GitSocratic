@@ -1,6 +1,7 @@
 package io.gitsocratic.client
 
 import ai.grakn.GraknSession
+import ai.grakn.GraknTx
 import ai.grakn.GraknTxType
 import ai.grakn.Keyspace
 import ai.grakn.client.Grakn
@@ -40,14 +41,35 @@ class GraknClient {
         session = new Grakn(new SimpleURI("$host:$port")).session(Keyspace.of(keyspace))
     }
 
-    List<ConceptMap> executeQuery(String query) {
-        def tx = session.transaction(GraknTxType.WRITE)
+    List<ConceptMap> executeReadQuery(String query) {
+        def tx = makeReadSession()
         try {
-            def graql = tx.graql()
-            return graql.parse(query).execute() as List<ConceptMap>
+            executeQuery(tx, query)
         } finally {
             tx.close()
         }
+    }
+
+    List<ConceptMap> executeWriteQuery(String query) {
+        def tx = makeWriteSession()
+        try {
+            executeQuery(tx, query)
+        } finally {
+            tx.close()
+        }
+    }
+
+    static List<ConceptMap> executeQuery(GraknTx tx, String query) {
+        def graql = tx.graql()
+        return graql.parse(query).execute() as List<ConceptMap>
+    }
+
+    GraknTx makeWriteSession() {
+        return session.transaction(GraknTxType.WRITE)
+    }
+
+    GraknTx makeReadSession() {
+        return session.transaction(GraknTxType.READ)
     }
 
     void close() {
