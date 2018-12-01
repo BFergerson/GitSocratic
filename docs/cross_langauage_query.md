@@ -36,4 +36,12 @@ for (var k = 10; k >= 1; k--) {
 
 ## Queries
 
-### Sum of `k` varaible declarations
+### Sum of `k` variable declarations
+
+#### Query
+```graql
+```
+
+#### Result
+```
+```
