@@ -1,6 +1,7 @@
 package io.gitsocratic.command.impl
 
 import com.codebrig.omnisrc.SourceLanguage
+import com.codebrig.omnisrc.observe.filter.FunctionFilter
 import com.codebrig.omnisrc.observe.filter.MultiFilter
 import com.codebrig.omnisrc.observe.filter.RoleFilter
 import com.codebrig.phenomena.ParseException
@@ -47,7 +48,29 @@ class AddRemoteRepo implements Callable<Integer> {
         new File("/tmp/gitsocratic/out/").deleteDir()
         cloneRepo(repoName, new File("/tmp/gitsocratic/out/"))
 
-        //setup phenomena
+        //import source code into grakn
+        def phenomena = setupPhenomena()
+        def processedCount = new AtomicInteger(0)
+        def failCount = new AtomicInteger(0)
+        GParsPool.withPool {
+            if (parallelProcessing) {
+                phenomena.sourceFilesInScanPath.eachParallel { File file ->
+                    handleSourceCodeFile(phenomena, file, processedCount, failCount)
+                }
+            } else {
+                phenomena.sourceFilesInScanPath.each { File file ->
+                    handleSourceCodeFile(phenomena, file, processedCount, failCount)
+                }
+            }
+        }
+        println "Processed files: $processedCount"
+        println "Failed files: $failCount"
+        println "Processing time: " + humanReadableFormat(Duration.ofMillis(System.currentTimeMillis() - startTime))
+        phenomena.close()
+        return 0
+    }
+
+    private static Phenomena setupPhenomena() {
         def phenomena = new Phenomena()
         phenomena.graknHost = ConfigOption.grakn_host.value
         phenomena.graknPort = ConfigOption.grakn_port.value as int
@@ -60,7 +83,6 @@ class AddRemoteRepo implements Callable<Integer> {
         //setup observers
         def codeObservers = new ArrayList<CodeObserver>()
         def necessaryStructureFilter = new MultiFilter(MultiFilter.MatchStyle.ANY)
-        //necessaryStructureFilter.accept(new RoleFilter("FILE"))
 //
 //        //dependence observers
 //        if (Boolean.valueOf(ConfigOption.identifier_access.value)) {
@@ -83,32 +105,35 @@ class AddRemoteRepo implements Callable<Integer> {
         }
 
         //structure observer
-        if (ConfigOption.source_schema.value == "necessary") {
+        if (ConfigOption.source_schema.value.contains("necessary")) {
+            if (ConfigOption.source_schema.value.contains("files")) {
+                necessaryStructureFilter.accept(new RoleFilter("FILE"))
+            }
+            if (ConfigOption.source_schema.value.contains("functions")) {
+                necessaryStructureFilter.accept(new FunctionFilter())
+            }
+
             codeObservers.add(new CodeStructureObserver(necessaryStructureFilter))
         } else {
-            codeObservers.add(new CodeStructureObserver())
-        }
-        phenomena.init(codeObservers)
+            def hasFilter = false
+            def filter = new MultiFilter(MultiFilter.MatchStyle.ANY)
+            if (ConfigOption.source_schema.value.contains("files")) {
+                filter.accept(new RoleFilter("FILE"))
+                hasFilter = true
+            }
+            if (ConfigOption.source_schema.value.contains("functions")) {
+                filter.accept(new FunctionFilter())
+                hasFilter = true
+            }
 
-        //import source code into grakn
-        def processedCount = new AtomicInteger(0)
-        def failCount = new AtomicInteger(0)
-        GParsPool.withPool {
-            if (parallelProcessing) {
-                phenomena.sourceFilesInScanPath.eachParallel { File file ->
-                    handleSourceCodeFile(phenomena, file, processedCount, failCount)
-                }
+            if (hasFilter) {
+                codeObservers.add(new CodeStructureObserver(filter))
             } else {
-                phenomena.sourceFilesInScanPath.each { File file ->
-                    handleSourceCodeFile(phenomena, file, processedCount, failCount)
-                }
+                codeObservers.add(new CodeStructureObserver())
             }
         }
-        println "Processed files: $processedCount"
-        println "Failed files: $failCount"
-        println "Processing time: " + humanReadableFormat(Duration.ofMillis(System.currentTimeMillis() - startTime))
-        phenomena.close()
-        return 0
+        phenomena.init(codeObservers)
+        return phenomena
     }
 
     static void handleSourceCodeFile(Phenomena phenomena, File file,
