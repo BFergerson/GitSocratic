@@ -1,16 +1,18 @@
 package io.gitsocratic.command.impl
 
 import com.codebrig.omnisrc.SourceLanguage
+import com.codebrig.omnisrc.observe.filter.MultiFilter
+import com.codebrig.phenomena.ParseException
 import com.codebrig.phenomena.Phenomena
-import com.codebrig.phenomena.code.ParsedSourceFile
-import gopkg.in.bblfsh.sdk.v1.uast.generated.Node
+import com.codebrig.phenomena.code.CodeObserver
+import com.codebrig.phenomena.code.analysis.metric.CyclomaticComplexity
+import com.codebrig.phenomena.code.structure.CodeStructureObserver
 import groovyx.gpars.GParsPool
 import io.gitsocratic.command.config.ConfigOption
-import org.bblfsh.client.BblfshClient
 import org.eclipse.jgit.api.Git
 import picocli.CommandLine
-import scala.collection.JavaConverters
 
+import java.time.Duration
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
 
@@ -34,11 +36,13 @@ class AddRemoteRepo implements Callable<Integer> {
 
     @Override
     Integer call() throws Exception {
+        long startTime = System.currentTimeMillis()
+
         //clone repo
         new File("/tmp/gitsocratic/out/").deleteDir()
         cloneRepo(repoName, new File("/tmp/gitsocratic/out/"))
 
-        //scan repo for source code
+        //setup phenomena
         def phenomena = new Phenomena()
         phenomena.graknHost = ConfigOption.grakn_host.value
         phenomena.graknPort = ConfigOption.grakn_port.value as int
@@ -47,51 +51,67 @@ class AddRemoteRepo implements Callable<Integer> {
         phenomena.babelfishPort = ConfigOption.babelfish_port.value as int
         phenomena.scanPath = new ArrayList<>()
         phenomena.scanPath.add("/tmp/gitsocratic/out/")
-        phenomena.init()
 
-        //import into grakn
-        def successCount = 0
+        //setup observers
+        def codeObservers = new ArrayList<CodeObserver>()
+        def necessaryStructureFilter = new MultiFilter(MultiFilter.MatchStyle.ANY)
+//
+//        //dependence observers
+//        if (Boolean.valueOf(ConfigOption.identifier_access.value)) {
+//            println "Installing identifier access schema"
+//            phenomena.setupOntology(IdentifierAccessObserver.fullSchema)
+//            println "Identifier access schema installed"
+//        }
+//        if (Boolean.valueOf(ConfigOption.method_call.value)) {
+//            println "Installing identifier access schema"
+//            phenomena.setupOntology(MethodCallObserver.fullSchema)
+//            println "Identifier access schema installed"
+//        }
+
+        //metric observers
+        if (Boolean.valueOf(ConfigOption.cyclomatic_complexity.value)) {
+            def observer = new CyclomaticComplexity()
+            necessaryStructureFilter.accept(observer.getFilter())
+            codeObservers.add(observer)
+            println "Observing cyclomatic complexity"
+        }
+
+        //structure observer
+        if (ConfigOption.source_schema.value == "necessary") {
+            codeObservers.add(new CodeStructureObserver(necessaryStructureFilter))
+        } else {
+            codeObservers.add(new CodeStructureObserver())
+        }
+        phenomena.init(codeObservers)
+
+        //import source code into grakn
+        def processedCount = 0
         def failCount = 0
-        def parsedFiles = new ArrayList<ParsedSourceFile>()
         GParsPool.withPool {
-            phenomena.sourceFilesInScanPath.eachParallel {
+            phenomena.sourceFilesInScanPath.eachParallel { File file ->
                 try {
-                    def resp = phenomena.parseSourceFile(it, SourceLanguage.getSourceLangauge(it))
-                    def parsedSourceFile = new ParsedSourceFile()
-                    parsedSourceFile.sourceFile = it
-                    parsedSourceFile.parseResponse = resp
-                    parsedFiles.add(parsedSourceFile)
-                } catch (Exception e) {
-                    println "Failed on file: " + it
-                    e.printStackTrace()
-                }
-            }
-
-            def doneList = new ArrayList<ArrayList<Node>>()
-            parsedFiles.each {
-                def uastList = new ArrayList<Node>()
-                asJavaIterator(BblfshClient.iterator(it.parseResponse.uast, BblfshClient.PostOrder())).each {
-                    uastList.add(it)
-                }
-                doneList.add(uastList)
-            }
-            doneList.eachWithIndexParallel { uast, i ->
-                def file = parsedFiles.get(i).sourceFile
-                try {
-                    def rootId = phenomena.processUAST(uast, SourceLanguage.getSourceLangauge(file))
-                    println "Saved UAST of $file - Root id: " + rootId
-                    parsedFiles.get(i).rootNodeId = rootId
-                    successCount++
-                } catch (Exception e) {
+                    def processedFile = phenomena.processSourceFile(file, SourceLanguage.getSourceLanguage(file))
+                    def sourceFile = processedFile.sourceFile
+                    if (processedFile.parseResponse.status().isOk()) {
+                        println "Processed $sourceFile - Root node id: " + processedFile.rootNodeId
+                        processedCount++
+                    } else {
+                        failCount++
+                        System.err.println("Failed to parse file: $sourceFile - Reason: " + processedFile.parseResponse.errors().toString())
+                    }
+                } catch (ParseException e) {
                     failCount++
-                    println "Failed on file: " + file
-                    e.printStackTrace()
+                    System.err.println("Failed to parse file: " + e.sourceFile + " - Reason: " + e.parseResponse.errors().toString())
+                } catch (all) {
+                    all.printStackTrace()
+                    failCount++
                 }
             }
         }
-
-        println "Success files: $successCount"
+        println "Processed files: $processedCount"
         println "Failed files: $failCount"
+        println "Processing time: " + humanReadableFormat(Duration.ofMillis(System.currentTimeMillis() - startTime))
+        phenomena.close()
         return 0
     }
 
@@ -115,7 +135,9 @@ class AddRemoteRepo implements Callable<Integer> {
         println "Cloned: $githubRepository"
     }
 
-    private static <T> Iterator<T> asJavaIterator(scala.collection.Iterator<T> scalaIterator) {
-        return JavaConverters.asJavaIteratorConverter(scalaIterator).asJava()
+    static String humanReadableFormat(Duration duration) {
+        return duration.toString().substring(2)
+                .replaceAll('(\\d[HMS])(?!$)', '$1 ')
+                .toLowerCase()
     }
 }

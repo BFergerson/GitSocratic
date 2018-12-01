@@ -11,6 +11,7 @@ import io.gitsocratic.GitSocraticCLI
  */
 enum ConfigOption {
 
+    //environment
     use_docker_grakn("true"),
     docker_host("localhost"),
     docker_port("2376"),
@@ -19,7 +20,19 @@ enum ConfigOption {
     grakn_keyspace("grakn"),
     use_docker_babelfish("true"),
     babelfish_host("localhost"),
-    babelfish_port("9432")
+    babelfish_port("9432"),
+
+    //phenomena
+    source_schema("full"),
+    individual_semantic_roles("false"),
+    actual_semantic_roles("false"),
+
+    //observers - dependence
+    identifier_access("false"),
+    method_call("false"),
+
+    //observers - metric
+    cyclomatic_complexity("false")
 
     public final String defaultValue
 

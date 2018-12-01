@@ -16,16 +16,16 @@ ext {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.25'
-    compile 'org.codehaus.groovy:groovy-all:2.3.11'
-    compile group: 'info.picocli', name: 'picocli', version: '3.7.0'
-    compile group: 'org.codehaus.gpars', name: 'gpars', version: '1.2.1'
-    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.0.1.201806211838-r'
-    compile "com.github.rholder:guava-retrying:2.0.0"
-    compile group: 'com.github.docker-java', name: 'docker-java', version: '3.1.0-rc-5'
-    implementation 'com.github.codebrig:phenomena:4294a1eeae'
-    implementation 'com.github.codebrig:omnisrc:fea09feaaf'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    implementation group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.25'
+    implementation 'org.codehaus.groovy:groovy-all:2.5.4'
+    implementation group: 'info.picocli', name: 'picocli', version: '3.7.0'
+    implementation group: 'org.codehaus.gpars', name: 'gpars', version: '1.2.1'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.0.1.201806211838-r'
+    implementation "com.github.rholder:guava-retrying:2.0.0"
+    implementation group: 'com.github.docker-java', name: 'docker-java', version: '3.1.0-rc-5'
+    implementation 'com.github.codebrig:phenomena:a390ef2f1a'
+    implementation 'com.github.codebrig:omnisrc:a4983641f7'
     implementation "org.bblfsh:bblfsh-client:$babelfishVersion"
     implementation group: 'ai.grakn', name: 'grakn-core', version: "$graknVersion"
     implementation group: 'ai.grakn', name: 'grakn-graql', version: "$graknVersion"

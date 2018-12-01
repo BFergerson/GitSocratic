@@ -1,7 +1,10 @@
 package io.gitsocratic.command.impl
 
+import com.codebrig.omnisrc.SourceLanguage
 import com.codebrig.phenomena.Phenomena
-import com.codebrig.phenomena.code.structure.CodeStructureObserver
+import com.codebrig.phenomena.code.analysis.dependence.IdentifierAccessObserver
+import com.codebrig.phenomena.code.analysis.dependence.MethodCallObserver
+import com.codebrig.phenomena.code.analysis.metric.CyclomaticComplexity
 import com.github.dockerjava.api.command.CreateContainerResponse
 import com.github.dockerjava.api.command.ExecCreateCmdResponse
 import com.github.dockerjava.api.model.*
@@ -47,18 +50,13 @@ class Init implements Callable<Integer> {
         println " Host: $host"
         println " Port: $port"
 
-        Socket s1 = new Socket()
         try {
-            s1.setSoTimeout(200)
-            s1.connect(new InetSocketAddress(host, port), 200)
             setupGraknOntology()
             return 0
         } catch (all) {
             println "Failed to connect to Grakn"
             all.printStackTrace()
             return -1
-        } finally {
-            s1.close()
         }
     }
 
@@ -69,15 +67,13 @@ class Init implements Callable<Integer> {
         callback.awaitCompletion()
 
         Container graknContainer
-        boolean foundContainer = false
         GitSocraticCLI.dockerClient.listContainersCmd().withShowAll(true).exec().each {
             if (GitSocraticService.grakn.command == it.command) {
                 graknContainer = it
-                foundContainer = true
             }
         }
 
-        if (foundContainer) {
+        if (graknContainer != null) {
             println "Found Grakn container"
             println " Id: " + graknContainer.id
 
@@ -120,14 +116,30 @@ class Init implements Callable<Integer> {
     private static void setupGraknOntology() {
         Callable<Boolean> setupOntology = new Callable<Boolean>() {
             Boolean call() throws Exception {
-                println "Attempting to setup ontology"
                 def phenomena = new Phenomena()
                 phenomena.graknHost = ConfigOption.grakn_host.value
                 phenomena.graknPort = ConfigOption.grakn_port.value as int
                 phenomena.graknKeyspace = ConfigOption.grakn_keyspace.value
                 phenomena.connectToGrakn()
-                phenomena.setupOntology(new CodeStructureObserver())
-                println "Ontology successfully setup"
+                println "Successfully connected to Grakn"
+
+                println "Installing base structure"
+                phenomena.setupOntology(SourceLanguage.OmniSRC.getBaseStructureSchemaDefinition())
+                println "Base structure installed"
+
+                if (Boolean.valueOf(ConfigOption.individual_semantic_roles.value)) {
+                    println "Installing individual semantic roles"
+                    phenomena.setupOntology(SourceLanguage.OmniSRC.getIndividualSemanticRolesSchemaDefinition())
+                    println "Individual semantic roles installed"
+                }
+                if (Boolean.valueOf(ConfigOption.actual_semantic_roles.value)) {
+                    println "Installing actual semantic roles"
+                    phenomena.setupOntology(SourceLanguage.OmniSRC.getActualSemanticRolesSchemaDefinition())
+                    println "Actual semantic roles installed"
+                }
+
+                installObserverSchemas(phenomena)
+                phenomena.close()
                 return true
             }
         }
@@ -145,14 +157,35 @@ class Init implements Callable<Integer> {
         }).build().call(setupOntology)
     }
 
+    private static void installObserverSchemas(Phenomena phenomena) {
+        //dependence observers
+        if (Boolean.valueOf(ConfigOption.identifier_access.value)) {
+            println "Installing identifier access schema"
+            phenomena.setupOntology(IdentifierAccessObserver.fullSchema)
+            println "Identifier access schema installed"
+        }
+        if (Boolean.valueOf(ConfigOption.method_call.value)) {
+            println "Installing identifier access schema"
+            phenomena.setupOntology(MethodCallObserver.fullSchema)
+            println "Identifier access schema installed"
+        }
+
+        //metric observers
+        if (Boolean.valueOf(ConfigOption.cyclomatic_complexity.value)) {
+            println "Installing cyclomatic complexity schema"
+            phenomena.setupOntology(CyclomaticComplexity.fullSchema)
+            println "Cyclomatic complexity schema installed"
+        }
+    }
+
     private static int validateExternalBabelfish() {
         println "Validating external Babelfish installation"
         def host = ConfigOption.babelfish_host.value
         def port = ConfigOption.babelfish_port.value as int
-        println "Connecting to Babelfish"
         println " Host: $host"
         println " Port: $port"
 
+        println "Connecting to Babelfish"
         Socket s1 = new Socket()
         try {
             s1.setSoTimeout(200)
@@ -176,15 +209,13 @@ class Init implements Callable<Integer> {
         callback.awaitCompletion()
 
         Container babelfishContainer
-        boolean foundContainer = false
         GitSocraticCLI.dockerClient.listContainersCmd().withShowAll(true).exec().each {
             if (GitSocraticService.babelfish.command == it.command) {
                 babelfishContainer = it
-                foundContainer = true
             }
         }
 
-        if (foundContainer) {
+        if (babelfishContainer != null) {
             println "Found Babelfish container"
             println " Id: " + babelfishContainer.id
 
