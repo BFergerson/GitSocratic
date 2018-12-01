@@ -25,7 +25,7 @@ GitSocratic requires access to two services:
  gitsocratic init
  ```
  
- Notes: This command may take several minutes on the first use.
+ Note: This command may take several minutes on the first use.
  
  ### Bare-bones installation
  ```
