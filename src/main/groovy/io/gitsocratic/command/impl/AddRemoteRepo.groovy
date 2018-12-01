@@ -113,7 +113,13 @@ class AddRemoteRepo implements Callable<Integer> {
                 necessaryStructureFilter.accept(new FunctionFilter())
             }
 
-            codeObservers.add(new CodeStructureObserver(necessaryStructureFilter))
+            def codeStructureObserver = new CodeStructureObserver(necessaryStructureFilter)
+            codeStructureObserver.includeIndividualSemanticRoles = Boolean.valueOf(
+                    ConfigOption.individual_semantic_roles.value)
+            codeStructureObserver.includeActualSemanticRoles = Boolean.valueOf(
+                    ConfigOption.actual_semantic_roles.value)
+
+            codeObservers.add(codeStructureObserver)
         } else {
             def hasFilter = false
             def filter = new MultiFilter(MultiFilter.MatchStyle.ANY)
@@ -127,9 +133,21 @@ class AddRemoteRepo implements Callable<Integer> {
             }
 
             if (hasFilter) {
-                codeObservers.add(new CodeStructureObserver(filter))
+                def codeStructureObserver = new CodeStructureObserver(filter)
+                codeStructureObserver.includeIndividualSemanticRoles = Boolean.valueOf(
+                        ConfigOption.individual_semantic_roles.value)
+                codeStructureObserver.includeActualSemanticRoles = Boolean.valueOf(
+                        ConfigOption.actual_semantic_roles.value)
+
+                codeObservers.add(codeStructureObserver)
             } else {
-                codeObservers.add(new CodeStructureObserver())
+                def codeStructureObserver = new CodeStructureObserver()
+                codeStructureObserver.includeIndividualSemanticRoles = Boolean.valueOf(
+                        ConfigOption.individual_semantic_roles.value)
+                codeStructureObserver.includeActualSemanticRoles = Boolean.valueOf(
+                        ConfigOption.actual_semantic_roles.value)
+
+                codeObservers.add(codeStructureObserver)
             }
         }
         phenomena.init(codeObservers)
