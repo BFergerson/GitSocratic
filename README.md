@@ -5,7 +5,7 @@
 
 GitSocratic provides a pain-free interface for querying source code. GitSocratic uses the omnilingual parser [Babelfish](https://github.com/bblfsh/bblfshd) to extract universal abstract syntax trees which are annotated with their semantic meanings. This data is then imported into a knowledge graph powered by [Grakn](https://github.com/graknlabs/grakn). This enables source code to be queried using Graql (more query languages coming soon), allowing for a wide range of modern source code analyses.
 
-## Features
+### Features
  - Supports question/answer source code queries (todo: link)
  - [Cross-language source code querying](https://github.com/CodeBrig/GitSocratic/blob/v0.2-alpha/docs/cross_langauage_query.md)
  - [Semantic role querying](https://github.com/CodeBrig/GitSocratic/blob/v0.2-alpha/docs/semantic_querying.md)
