@@ -5,8 +5,6 @@
 
 GitSocratic provides a pain-free interface for querying source code. GitSocratic uses the omnilingual parser [Babelfish](https://github.com/bblfsh/bblfshd) to extract universal abstract syntax trees which are annotated with their semantic meanings. This data is then imported into a knowledge graph powered by [Grakn](https://github.com/graknlabs/grakn). This enables source code to be queried using Graql (more query languages coming soon), allowing for a wide range of modern source code analyses.
 
-[![asciicast](https://asciinema.org/a/4uCMnG7FcG89XE01RyFxg2Pnh.svg)](https://asciinema.org/a/4uCMnG7FcG89XE01RyFxg2Pnh)
-
 ## Setup
 
 GitSocratic requires access to two services:
@@ -39,6 +37,8 @@ cd gitsocratic-0.1/bin/
 ```
 gitsocratic [-hV] [-c=<configFile>] [COMMAND]
 ```
+
+[![asciicast](https://asciinema.org/a/4uCMnG7FcG89XE01RyFxg2Pnh.svg)](https://asciinema.org/a/4uCMnG7FcG89XE01RyFxg2Pnh)
 
 ## Commands
 
