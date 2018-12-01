@@ -73,10 +73,6 @@ enum SourceQuestion {
             int matchIndex = 1
             valueConverters.each {
                 def value = matches[0][matchIndex++] as String
-                if (value == " methods are named ") {
-                    //todo: fix this; because I don't understand how regex matchers work apparently
-                    value = matches[0][matchIndex] as String
-                }
                 questionQuery = questionQuery.replace("<" + it.key + ">", it.value.convert(value))
             }
         }
