@@ -8,6 +8,8 @@ GitSocratic provides a pain-free interface for querying source code. GitSocratic
 ## Features
  - Supports question/answer source code queries (todo: link)
  - [Cross-language source code querying](https://github.com/CodeBrig/GitSocratic/blob/v0.2-alpha/docs/cross_langauage_query.md)
+ - [Semantic role querying](https://github.com/CodeBrig/GitSocratic/blob/v0.2-alpha/docs/semantic_querying.md)
+ - [UAST structure querying](https://github.com/CodeBrig/GitSocratic/blob/v0.2-alpha/docs/uast_querying.md)
 
 ## Setup
 
