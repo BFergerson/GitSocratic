@@ -1,6 +1,7 @@
 # GitSocratic
 > Source code query command line interface
 
+![gitsocratic architecture](https://user-images.githubusercontent.com/3278877/49333867-db166900-f583-11e8-8925-091e751a0e24.jpg)
 [![asciicast](https://asciinema.org/a/4uCMnG7FcG89XE01RyFxg2Pnh.svg)](https://asciinema.org/a/4uCMnG7FcG89XE01RyFxg2Pnh)
 
 GitSocratic provides a pain-free interface for querying source code. GitSocratic uses the omnilingual parser [Babelfish](https://github.com/bblfsh/bblfshd) to extract universal abstract syntax trees which are annotated with their semantic meanings. This data is then imported into a knowledge graph powered by [Grakn](https://github.com/graknlabs/grakn). This enables source code to be queried using Graql (more query languages coming soon), allowing for a wide range of modern source code analyses.
