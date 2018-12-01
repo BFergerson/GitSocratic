@@ -14,6 +14,7 @@ import picocli.CommandLine
 
 import java.time.Duration
 import java.util.concurrent.Callable
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * todo: description
@@ -32,6 +33,9 @@ class AddLocalRepo implements Callable<Integer> {
 
     @CommandLine.Parameters(index = "0", description = "The repository to add")
     private File repoLocation
+
+    @CommandLine.Option(names = ["-p", "--parallel"], description = "Use parallel source code processing")
+    private boolean parallelProcessing = false
 
     @Override
     Integer call() throws Exception {
@@ -54,7 +58,7 @@ class AddLocalRepo implements Callable<Integer> {
         //setup observers
         def codeObservers = new ArrayList<CodeObserver>()
         def necessaryStructureFilter = new MultiFilter(MultiFilter.MatchStyle.ANY)
-        necessaryStructureFilter.accept(new RoleFilter("FILE"))
+        //necessaryStructureFilter.accept(new RoleFilter("FILE"))
 //
 //        //dependence observers
 //        if (Boolean.valueOf(ConfigOption.identifier_access.value)) {
@@ -85,26 +89,16 @@ class AddLocalRepo implements Callable<Integer> {
         phenomena.init(codeObservers)
 
         //import source code into grakn
-        def processedCount = 0
-        def failCount = 0
+        def processedCount = new AtomicInteger(0)
+        def failCount = new AtomicInteger(0)
         GParsPool.withPool {
-            phenomena.sourceFilesInScanPath.eachParallel { File file ->
-                try {
-                    def processedFile = phenomena.processSourceFile(file, SourceLanguage.getSourceLanguage(file))
-                    def sourceFile = processedFile.sourceFile
-                    if (processedFile.parseResponse.status().isOk()) {
-                        println "Processed $sourceFile - Root node id: " + processedFile.rootNodeId
-                        processedCount++
-                    } else {
-                        failCount++
-                        System.err.println("Failed to parse file: $sourceFile - Reason: " + processedFile.parseResponse.errors().toString())
-                    }
-                } catch (ParseException e) {
-                    failCount++
-                    System.err.println("Failed to parse file: " + e.sourceFile + " - Reason: " + e.parseResponse.errors().toString())
-                } catch (all) {
-                    all.printStackTrace()
-                    failCount++
+            if (parallelProcessing) {
+                phenomena.sourceFilesInScanPath.eachParallel { File file ->
+                    handleSourceCodeFile(phenomena, file, processedCount, failCount)
+                }
+            } else {
+                phenomena.sourceFilesInScanPath.each { File file ->
+                    handleSourceCodeFile(phenomena, file, processedCount, failCount)
                 }
             }
         }
@@ -113,6 +107,27 @@ class AddLocalRepo implements Callable<Integer> {
         println "Processing time: " + humanReadableFormat(Duration.ofMillis(System.currentTimeMillis() - startTime))
         phenomena.close()
         return 0
+    }
+
+    static void handleSourceCodeFile(Phenomena phenomena, File file,
+                                     AtomicInteger processedCount, AtomicInteger failCount) {
+        try {
+            def processedFile = phenomena.processSourceFile(file, SourceLanguage.getSourceLanguage(file))
+            def sourceFile = processedFile.sourceFile
+            if (processedFile.parseResponse.status().isOk()) {
+                println "Processed $sourceFile - Root node id: " + processedFile.rootNodeId
+                processedCount.getAndIncrement()
+            } else {
+                failCount.getAndIncrement()
+                System.err.println("Failed to parse file: $sourceFile - Reason: " + processedFile.parseResponse.errors().toString())
+            }
+        } catch (ParseException e) {
+            failCount.getAndIncrement()
+            System.err.println("Failed to parse file: " + e.sourceFile + " - Reason: " + e.parseResponse.errors().toString())
+        } catch (all) {
+            all.printStackTrace()
+            failCount.getAndIncrement()
+        }
     }
 
     static String humanReadableFormat(Duration duration) {
