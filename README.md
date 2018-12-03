@@ -55,8 +55,8 @@ config           Configure GitSocratic
 console          Open interactive source code query console
 init             Initialize services necessary to use GitSocratic
 logs             View logs for initialized services
-query            Execute single source code query
-question         Execute single source code question
+query            Execute a single source code query
+question         Execute a single source code question
 ```
 
 More information: [COMMANDS](https://github.com/CodeBrig/GitSocratic/blob/master/COMMANDS.md)
