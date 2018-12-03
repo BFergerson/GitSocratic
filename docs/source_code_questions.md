@@ -8,7 +8,7 @@ gitsocratic question "how many methods total"
 ```
 # Question: how many methods total
 # Result:
-100
+1030
 ```
 ## what are the [limit] most complex [language] methods?
 #### Example:
