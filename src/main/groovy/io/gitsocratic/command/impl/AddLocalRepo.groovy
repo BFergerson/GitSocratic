@@ -18,7 +18,8 @@ import java.util.concurrent.Callable
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * todo: description
+ * Represents the `add-local-repo` command.
+ * Used to add local source code repository to the knowledge graph.
  *
  * @version 0.2
  * @since 0.1

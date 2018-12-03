@@ -3,7 +3,7 @@ package io.gitsocratic.command.question.converters
 import io.gitsocratic.command.question.QuestionValueConverter
 
 /**
- * todo: description
+ * Performs no-operation on user-input value.
  *
  * @version 0.2
  * @since 0.1

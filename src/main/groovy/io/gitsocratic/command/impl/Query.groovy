@@ -6,14 +6,15 @@ import picocli.CommandLine
 import java.util.concurrent.Callable
 
 /**
- * todo: description
+ * Represents the `query` command.
+ * Used to execute a single source code query.
  *
  * @version 0.2
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
 @CommandLine.Command(name = "query",
-        description = "Execute single source code query",
+        description = "Execute a single source code query",
         mixinStandardHelpOptions = true,
         descriptionHeading = "%nDescription:%n%n",
         parameterListHeading = "%nParameters:%n",

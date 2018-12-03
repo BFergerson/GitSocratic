@@ -1,7 +1,7 @@
 package io.gitsocratic.command.question
 
 /**
- * todo: description
+ * Used to convert user-input values for source code question variables.
  *
  * @version 0.2
  * @since 0.1

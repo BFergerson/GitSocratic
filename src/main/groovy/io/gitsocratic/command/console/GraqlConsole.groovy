@@ -9,7 +9,7 @@ import io.gitsocratic.GitSocraticService
 import java.util.concurrent.Callable
 
 /**
- * todo: description
+ * Attaches and opens a Graql console on the Grakn service running in Docker.
  *
  * @version 0.2
  * @since 0.1

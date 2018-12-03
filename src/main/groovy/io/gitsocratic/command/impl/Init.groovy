@@ -20,7 +20,8 @@ import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
 
 /**
- * todo: description
+ * Represents the `init` command.
+ * Used to initialize services necessary to use GitSocratic.
  *
  * @version 0.2
  * @since 0.1

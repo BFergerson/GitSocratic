@@ -20,7 +20,8 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * todo: description
+ * Represents the `add-remote-repo` command.
+ * Used to add remote source code repository to the knowledge graph.
  *
  * @version 0.2
  * @since 0.1

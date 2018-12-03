@@ -10,7 +10,7 @@ import ai.grakn.util.SimpleURI
 import io.gitsocratic.command.config.ConfigOption
 
 /**
- * todo: description
+ * Used to execute queries/questions on the Grakn knowledge graph.
  *
  * @version 0.2
  * @since 0.1

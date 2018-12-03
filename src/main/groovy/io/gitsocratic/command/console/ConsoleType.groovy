@@ -1,7 +1,7 @@
 package io.gitsocratic.command.console
 
 /**
- * todo: description
+ * Represents the console types which GitSocratic supports.
  *
  * @version 0.2
  * @since 0.1

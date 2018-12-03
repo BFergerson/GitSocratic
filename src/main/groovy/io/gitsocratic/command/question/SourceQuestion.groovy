@@ -6,7 +6,8 @@ import io.gitsocratic.command.question.converters.NopValueConverter
 import io.gitsocratic.command.question.converters.SourceLanguageQualifiedNameValue
 
 /**
- * todo: description
+ * Represents source code questions GitSocratic understands.
+ * Likely to be replaced by DialogFlow in 0.3.
  *
  * @version 0.2
  * @since 0.1

@@ -3,7 +3,7 @@ package io.gitsocratic.command.question
 import groovy.transform.Canonical
 
 /**
- * todo: description
+ * Represents a user-input value in a source code question.
  *
  * @version 0.2
  * @since 0.1

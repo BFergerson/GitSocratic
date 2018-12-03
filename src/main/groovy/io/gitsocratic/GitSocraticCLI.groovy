@@ -12,7 +12,7 @@ import picocli.CommandLine
 import java.util.concurrent.Callable
 
 /**
- * todo: description
+ * Main entry point of GitSocratic CLI implementation.
  *
  * @version 0.2
  * @since 0.1
@@ -54,7 +54,7 @@ class GitSocraticCLI implements Callable<Integer> {
     }
 
     static DockerClient getDockerClient() {
-        if (dockerClient == null){
+        if (dockerClient == null) {
             NettyDockerCmdExecFactory factory = new NettyDockerCmdExecFactory()
             def config = DefaultDockerClientConfig.createDefaultConfigBuilder()
             if (SystemUtils.IS_OS_WINDOWS) {

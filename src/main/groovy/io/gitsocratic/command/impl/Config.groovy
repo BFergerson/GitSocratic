@@ -6,7 +6,8 @@ import picocli.CommandLine
 import java.util.concurrent.Callable
 
 /**
- * todo: description
+ * Represents the `config` command.
+ * Used to configure GitSocratic.
  *
  * @version 0.2
  * @since 0.1

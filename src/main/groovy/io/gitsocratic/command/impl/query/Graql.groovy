@@ -8,7 +8,8 @@ import java.time.Duration
 import java.util.concurrent.Callable
 
 /**
- * todo: description
+ * Represents the `graql` command.
+ * Used to execute a single Graql query.
  *
  * @version 0.2
  * @since 0.1

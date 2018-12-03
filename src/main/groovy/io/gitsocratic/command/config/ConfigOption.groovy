@@ -3,7 +3,7 @@ package io.gitsocratic.command.config
 import io.gitsocratic.GitSocraticCLI
 
 /**
- * todo: description
+ * Represents the configuration options which GitSocratic supports.
  *
  * @version 0.2
  * @since 0.1

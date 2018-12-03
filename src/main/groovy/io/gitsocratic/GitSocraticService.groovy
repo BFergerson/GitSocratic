@@ -1,7 +1,7 @@
 package io.gitsocratic
 
 /**
- * todo: description
+ * Services GitSocratic is able to initialize and control.
  *
  * @version 0.2
  * @since 0.1
@@ -9,7 +9,8 @@ package io.gitsocratic
  */
 enum GitSocraticService {
 
-    babelfish("bblfshd"), grakn("grakn-docker-entrypoint")
+    babelfish("bblfshd"),
+    grakn("grakn-docker-entrypoint")
 
     private String command
 

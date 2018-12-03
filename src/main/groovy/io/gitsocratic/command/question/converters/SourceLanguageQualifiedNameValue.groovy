@@ -4,7 +4,7 @@ import com.codebrig.omnisrc.SourceLanguage
 import io.gitsocratic.command.question.QuestionValueConverter
 
 /**
- * todo: description
+ * Converts user-input value into SourceLanguage.qualifiedName.
  *
  * @version 0.2
  * @since 0.1

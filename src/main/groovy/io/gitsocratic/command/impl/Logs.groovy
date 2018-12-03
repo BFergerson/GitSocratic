@@ -10,14 +10,15 @@ import java.util.concurrent.Callable
 import static io.gitsocratic.GitSocraticCLI.dockerClient
 
 /**
- * todo: description
+ * Represents the `logs` command.
+ * Used to view logs of initialized services.
  *
  * @version 0.2
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
 @CommandLine.Command(name = "logs",
-        description = "View logs for initialized services",
+        description = "View logs of initialized services",
         mixinStandardHelpOptions = true,
         descriptionHeading = "%nDescription:%n%n",
         parameterListHeading = "%nParameters:%n",

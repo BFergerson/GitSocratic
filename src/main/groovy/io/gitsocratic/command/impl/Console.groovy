@@ -7,7 +7,8 @@ import picocli.CommandLine
 import java.util.concurrent.Callable
 
 /**
- * todo: description
+ * Represents the `console` command.
+ * Used to open interactive source code query console.
  *
  * @version 0.2
  * @since 0.1
