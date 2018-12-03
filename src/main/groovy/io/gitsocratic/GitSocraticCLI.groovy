@@ -12,7 +12,7 @@ import picocli.CommandLine
 import java.util.concurrent.Callable
 
 /**
- * Main entry point of GitSocratic CLI implementation.
+ * Main entry point of the GitSocratic CLI implementation.
  *
  * @version 0.2
  * @since 0.1
