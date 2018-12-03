@@ -51,15 +51,15 @@ class AddLocalRepo implements Callable<Integer> {
         def phenomena = setupPhenomena()
         def processedCount = new AtomicInteger(0)
         def failCount = new AtomicInteger(0)
-        GParsPool.withPool {
-            if (parallelProcessing) {
+        if (parallelProcessing) {
+            GParsPool.withPool {
                 phenomena.sourceFilesInScanPath.eachParallel { File file ->
                     handleSourceCodeFile(phenomena, file, processedCount, failCount)
                 }
-            } else {
-                phenomena.sourceFilesInScanPath.each { File file ->
-                    handleSourceCodeFile(phenomena, file, processedCount, failCount)
-                }
+            }
+        } else {
+            phenomena.sourceFilesInScanPath.each { File file ->
+                handleSourceCodeFile(phenomena, file, processedCount, failCount)
             }
         }
         println "Processed files: $processedCount"
