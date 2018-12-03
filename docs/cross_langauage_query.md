@@ -1,6 +1,6 @@
 This document demonstrates how it's possible to perform cross-language querying. Presented below are several source code snippets as well as the queries and results performed on this collection of various source code langauges using GitSocratic.
 
-## Source code
+## Example source code repository
 
 ### Go
 ```go
@@ -32,7 +32,7 @@ for (var k = 10; k >= 1; k--) {
 }
 ```
 
-## Queries
+## Example source code queries
 
 ### Sum of `k` variable declarations
 
