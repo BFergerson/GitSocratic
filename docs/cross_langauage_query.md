@@ -1,5 +1,3 @@
-## Information
-
 This document demonstrates how it's possible to perform cross-language querying. Presented below are several source code snippets (in various languages) as well as the queries and results performed on this collection of source code.
 
 ## Source code
