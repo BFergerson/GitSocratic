@@ -25,14 +25,15 @@ import java.util.concurrent.atomic.AtomicInteger
 class PhenomenaClient implements Closeable {
 
     private final String repoLocation
-    private Phenomena phenomena
+    private final Phenomena phenomena
 
     PhenomenaClient(String repoLocation) {
         this.repoLocation = repoLocation
+        this.phenomena = setupPhenomena()
     }
 
     private Phenomena setupPhenomena() {
-        phenomena = new Phenomena()
+        def phenomena = new Phenomena()
         phenomena.graknHost = ConfigOption.grakn_host.value
         phenomena.graknPort = ConfigOption.grakn_port.value as int
         phenomena.graknKeyspace = ConfigOption.grakn_keyspace.value
@@ -117,7 +118,6 @@ class PhenomenaClient implements Closeable {
 
     void processRepoLocation(boolean parallelProcessing) {
         long startTime = System.currentTimeMillis()
-        def phenomena = setupPhenomena()
         def processedCount = new AtomicInteger(0)
         def failCount = new AtomicInteger(0)
         if (parallelProcessing) {
