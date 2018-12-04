@@ -108,19 +108,19 @@ class PhenomenaClient implements Closeable {
         return phenomena
     }
 
-    void processSourceCode(boolean parallelProcessing) {
+    void processSourceCodeRepository(boolean parallelProcessing) {
         long startTime = System.currentTimeMillis()
         def processedCount = new AtomicInteger(0)
         def failCount = new AtomicInteger(0)
         if (parallelProcessing) {
             GParsPool.withPool {
                 phenomena.sourceFilesInScanPath.eachParallel { File file ->
-                    handleSourceCodeFile(file, processedCount, failCount)
+                    processSourceCodeFile(file, processedCount, failCount)
                 }
             }
         } else {
             phenomena.sourceFilesInScanPath.each { File file ->
-                handleSourceCodeFile(file, processedCount, failCount)
+                processSourceCodeFile(file, processedCount, failCount)
             }
         }
         println "Processed files: $processedCount"
@@ -128,7 +128,7 @@ class PhenomenaClient implements Closeable {
         println "Processing time: " + humanReadableFormat(Duration.ofMillis(System.currentTimeMillis() - startTime))
     }
 
-    private void handleSourceCodeFile(File file, AtomicInteger processedCount, AtomicInteger failCount) {
+    private void processSourceCodeFile(File file, AtomicInteger processedCount, AtomicInteger failCount) {
         try {
             def processedFile = phenomena.processSourceFile(file, SourceLanguage.getSourceLanguage(file))
             def sourceFile = processedFile.sourceFile
