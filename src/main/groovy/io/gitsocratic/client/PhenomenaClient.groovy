@@ -10,10 +10,11 @@ import com.codebrig.phenomena.code.CodeObserver
 import com.codebrig.phenomena.code.analysis.metric.CyclomaticComplexity
 import com.codebrig.phenomena.code.structure.CodeStructureObserver
 import groovyx.gpars.GParsPool
-import io.gitsocratic.command.config.ConfigOption
 
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicInteger
+
+import static io.gitsocratic.command.config.ConfigOption.*
 
 /**
  * todo: description
@@ -34,11 +35,11 @@ class PhenomenaClient implements Closeable {
 
     private Phenomena setupPhenomena() {
         def phenomena = new Phenomena()
-        phenomena.graknHost = ConfigOption.grakn_host.value
-        phenomena.graknPort = ConfigOption.grakn_port.value as int
-        phenomena.graknKeyspace = ConfigOption.grakn_keyspace.value
-        phenomena.babelfishHost = ConfigOption.babelfish_host.value
-        phenomena.babelfishPort = ConfigOption.babelfish_port.value as int
+        phenomena.graknHost = grakn_host.value
+        phenomena.graknPort = grakn_port.value as int
+        phenomena.graknKeyspace = grakn_keyspace.value
+        phenomena.babelfishHost = babelfish_host.value
+        phenomena.babelfishPort = babelfish_port.value as int
         phenomena.scanPath = new ArrayList<>()
         phenomena.scanPath.add(repoLocation)
 
@@ -59,7 +60,7 @@ class PhenomenaClient implements Closeable {
 //        }
 
         //metric observers
-        if (Boolean.valueOf(ConfigOption.cyclomatic_complexity.value)) {
+        if (Boolean.valueOf(cyclomatic_complexity.value)) {
             def observer = new CyclomaticComplexity()
             necessaryStructureFilter.accept(observer.getFilter())
             codeObservers.add(observer)
@@ -67,48 +68,39 @@ class PhenomenaClient implements Closeable {
         }
 
         //structure observer
-        if (ConfigOption.source_schema.value.contains("necessary")) {
-            if (ConfigOption.source_schema.value.contains("files")) {
+        if (source_schema.value.contains("necessary")) {
+            if (source_schema.value.contains("files")) {
                 necessaryStructureFilter.accept(new RoleFilter("FILE"))
             }
-            if (ConfigOption.source_schema.value.contains("functions")) {
+            if (source_schema.value.contains("functions")) {
                 necessaryStructureFilter.accept(new FunctionFilter())
             }
 
             def codeStructureObserver = new CodeStructureObserver(necessaryStructureFilter)
-            codeStructureObserver.includeIndividualSemanticRoles = Boolean.valueOf(
-                    ConfigOption.individual_semantic_roles.value)
-            codeStructureObserver.includeActualSemanticRoles = Boolean.valueOf(
-                    ConfigOption.actual_semantic_roles.value)
-
+            codeStructureObserver.includeIndividualSemanticRoles = Boolean.valueOf(individual_semantic_roles.value)
+            codeStructureObserver.includeActualSemanticRoles = Boolean.valueOf(actual_semantic_roles.value)
             codeObservers.add(codeStructureObserver)
         } else {
             def hasFilter = false
             def filter = new MultiFilter(MultiFilter.MatchStyle.ANY)
-            if (ConfigOption.source_schema.value.contains("files")) {
+            if (source_schema.value.contains("files")) {
                 filter.accept(new RoleFilter("FILE"))
                 hasFilter = true
             }
-            if (ConfigOption.source_schema.value.contains("functions")) {
+            if (source_schema.value.contains("functions")) {
                 filter.accept(new FunctionFilter())
                 hasFilter = true
             }
 
             if (hasFilter) {
                 def codeStructureObserver = new CodeStructureObserver(filter)
-                codeStructureObserver.includeIndividualSemanticRoles = Boolean.valueOf(
-                        ConfigOption.individual_semantic_roles.value)
-                codeStructureObserver.includeActualSemanticRoles = Boolean.valueOf(
-                        ConfigOption.actual_semantic_roles.value)
-
+                codeStructureObserver.includeIndividualSemanticRoles = Boolean.valueOf(individual_semantic_roles.value)
+                codeStructureObserver.includeActualSemanticRoles = Boolean.valueOf(actual_semantic_roles.value)
                 codeObservers.add(codeStructureObserver)
             } else {
                 def codeStructureObserver = new CodeStructureObserver()
-                codeStructureObserver.includeIndividualSemanticRoles = Boolean.valueOf(
-                        ConfigOption.individual_semantic_roles.value)
-                codeStructureObserver.includeActualSemanticRoles = Boolean.valueOf(
-                        ConfigOption.actual_semantic_roles.value)
-
+                codeStructureObserver.includeIndividualSemanticRoles = Boolean.valueOf(individual_semantic_roles.value)
+                codeStructureObserver.includeActualSemanticRoles = Boolean.valueOf(actual_semantic_roles.value)
                 codeObservers.add(codeStructureObserver)
             }
         }
@@ -123,12 +115,12 @@ class PhenomenaClient implements Closeable {
         if (parallelProcessing) {
             GParsPool.withPool {
                 phenomena.sourceFilesInScanPath.eachParallel { File file ->
-                    handleSourceCodeFile(phenomena, file, processedCount, failCount)
+                    handleSourceCodeFile(file, processedCount, failCount)
                 }
             }
         } else {
             phenomena.sourceFilesInScanPath.each { File file ->
-                handleSourceCodeFile(phenomena, file, processedCount, failCount)
+                handleSourceCodeFile(file, processedCount, failCount)
             }
         }
         println "Processed files: $processedCount"
@@ -136,13 +128,7 @@ class PhenomenaClient implements Closeable {
         println "Processing time: " + humanReadableFormat(Duration.ofMillis(System.currentTimeMillis() - startTime))
     }
 
-    @Override
-    void close() {
-        phenomena?.close()
-    }
-
-    private static void handleSourceCodeFile(Phenomena phenomena, File file,
-                                             AtomicInteger processedCount, AtomicInteger failCount) {
+    private void handleSourceCodeFile(File file, AtomicInteger processedCount, AtomicInteger failCount) {
         try {
             def processedFile = phenomena.processSourceFile(file, SourceLanguage.getSourceLanguage(file))
             def sourceFile = processedFile.sourceFile
@@ -162,6 +148,11 @@ class PhenomenaClient implements Closeable {
             all.printStackTrace()
             failCount.getAndIncrement()
         }
+    }
+
+    @Override
+    void close() {
+        phenomena?.close()
     }
 
     private static String humanReadableFormat(Duration duration) {
