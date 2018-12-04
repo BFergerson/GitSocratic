@@ -108,7 +108,7 @@ class PhenomenaClient implements Closeable {
         return phenomena
     }
 
-    void processRepoLocation(boolean parallelProcessing) {
+    void processSourceCode(boolean parallelProcessing) {
         long startTime = System.currentTimeMillis()
         def processedCount = new AtomicInteger(0)
         def failCount = new AtomicInteger(0)

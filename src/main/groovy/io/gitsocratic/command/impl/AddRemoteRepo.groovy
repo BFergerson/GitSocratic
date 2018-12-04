@@ -36,7 +36,7 @@ class AddRemoteRepo extends AddLocalRepo {
 
         //import source code into grakn with phenomena
         new PhenomenaClient("/tmp/gitsocratic/out/").withCloseable {
-            it.processRepoLocation(parallelProcessing)
+            it.processSourceCode(parallelProcessing)
         }
         return 0
     }

@@ -36,7 +36,7 @@ class AddLocalRepo implements Callable<Integer> {
 
         //import source code into grakn with phenomena
         new PhenomenaClient(repoLocation.absolutePath).withCloseable {
-            it.processRepoLocation(parallelProcessing)
+            it.processSourceCode(parallelProcessing)
         }
         return 0
     }
