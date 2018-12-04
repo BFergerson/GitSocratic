@@ -32,7 +32,7 @@ class GraqlConsole implements Callable<Integer> {
             return -1
         }
 
-        //attach to grakn console
+        //attach to graql console
         ExecCreateCmdResponse execCreateCmdResponse =
                 GitSocraticCLI.dockerClient.execCreateCmd(graknContainer.id).withAttachStdout(true)
                         .withAttachStdin(true)
