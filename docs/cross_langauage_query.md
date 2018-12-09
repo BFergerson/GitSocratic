@@ -38,8 +38,18 @@ for (var k = 10; k >= 1; k--) {
 
 #### Query
 ```graql
+match
+($kDeclaration) isa DECLARATION;
+$kIdentifier has token "k";
+($kIdentifier) isa IDENTIFIER;
+$kNumber has numberValue $kNumberValue;
+($kNumber) isa NUMBER;
+(is_parent: $kDeclaration, is_child: $kIdentifier);
+(is_parent: $kDeclaration, is_child: $kNumber);
+aggregate sum $kNumberValue;
 ```
 
 #### Result
 ```
+30.0
 ```
