@@ -7,7 +7,8 @@ import com.codebrig.omnisrc.observe.filter.RoleFilter
 import com.codebrig.phenomena.ParseException
 import com.codebrig.phenomena.Phenomena
 import com.codebrig.phenomena.code.CodeObserver
-import com.codebrig.phenomena.code.analysis.metric.CyclomaticComplexity
+import com.codebrig.phenomena.code.analysis.DependenceAnalysis
+import com.codebrig.phenomena.code.analysis.MetricAnalysis
 import com.codebrig.phenomena.code.structure.CodeStructureObserver
 import groovyx.gpars.GParsPool
 
@@ -45,35 +46,38 @@ class PhenomenaClient implements Closeable {
 
         //setup observers
         def codeObservers = new ArrayList<CodeObserver>()
-        def necessaryStructureFilter = new MultiFilter(MultiFilter.MatchStyle.ANY)
-//
-//        //dependence observers
-//        if (Boolean.valueOf(ConfigOption.identifier_access.value)) {
-//            println "Installing identifier access schema"
-//            phenomena.setupOntology(IdentifierAccessObserver.fullSchema)
-//            println "Identifier access schema installed"
-//        }
-//        if (Boolean.valueOf(ConfigOption.method_call.value)) {
-//            println "Installing identifier access schema"
-//            phenomena.setupOntology(MethodCallObserver.fullSchema)
-//            println "Identifier access schema installed"
-//        }
+
+        //dependence observers
+        def dependenceAnalyses = new ArrayList<DependenceAnalysis>()
+        if (Boolean.valueOf(identifier_access.value)) {
+            dependenceAnalyses.add(DependenceAnalysis.Identifier_Access)
+            println "Observing identifier access"
+        }
+        if (Boolean.valueOf(method_call.value)) {
+            dependenceAnalyses.add(DependenceAnalysis.Method_Call)
+            println "Observing method calls"
+        }
+        codeObservers.addAll(DependenceAnalysis.getCodeObserversByAnalysis(phenomena, dependenceAnalyses))
 
         //metric observers
+        def metricAnalyses = new ArrayList<MetricAnalysis>()
         if (Boolean.valueOf(cyclomatic_complexity.value)) {
-            def observer = new CyclomaticComplexity()
-            necessaryStructureFilter.accept(observer.getFilter())
-            codeObservers.add(observer)
+            metricAnalyses.add(MetricAnalysis.Cyclomatic_Complexity)
             println "Observing cyclomatic complexity"
         }
+        codeObservers.addAll(MetricAnalysis.getCodeObserversByAnalysis(phenomena, metricAnalyses))
 
         //structure observer
         if (source_schema.value.contains("necessary")) {
+            def necessaryStructureFilter = new MultiFilter(MultiFilter.MatchStyle.ANY)
             if (source_schema.value.contains("files")) {
                 necessaryStructureFilter.accept(new RoleFilter("FILE"))
             }
             if (source_schema.value.contains("functions")) {
                 necessaryStructureFilter.accept(new FunctionFilter())
+            }
+            codeObservers.each {
+                necessaryStructureFilter.accept(it.filter)
             }
 
             def codeStructureObserver = new CodeStructureObserver(necessaryStructureFilter)
@@ -145,6 +149,7 @@ class PhenomenaClient implements Closeable {
             System.err.println("Failed to parse file: " + e.sourceFile + " - Reason: "
                     + e.parseResponse.errors().toString())
         } catch (all) {
+            System.err.println("Failed to parse file: " + file + " - Reason: " + all.message)
             all.printStackTrace()
             failCount.getAndIncrement()
         }

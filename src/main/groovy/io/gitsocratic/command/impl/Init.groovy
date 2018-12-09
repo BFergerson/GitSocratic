@@ -2,9 +2,8 @@ package io.gitsocratic.command.impl
 
 import com.codebrig.omnisrc.SourceLanguage
 import com.codebrig.phenomena.Phenomena
-import com.codebrig.phenomena.code.analysis.dependence.IdentifierAccessObserver
-import com.codebrig.phenomena.code.analysis.dependence.MethodCallObserver
-import com.codebrig.phenomena.code.analysis.metric.CyclomaticComplexity
+import com.codebrig.phenomena.code.analysis.DependenceAnalysis
+import com.codebrig.phenomena.code.analysis.MetricAnalysis
 import com.github.dockerjava.api.command.CreateContainerResponse
 import com.github.dockerjava.api.command.ExecCreateCmdResponse
 import com.github.dockerjava.api.model.*
@@ -162,19 +161,19 @@ class Init implements Callable<Integer> {
         //dependence observers
         if (Boolean.valueOf(ConfigOption.identifier_access.value)) {
             println "Installing identifier access schema"
-            phenomena.setupOntology(IdentifierAccessObserver.fullSchema)
+            phenomena.setupOntology(DependenceAnalysis.Identifier_Access.schemaDefinition)
             println "Identifier access schema installed"
         }
         if (Boolean.valueOf(ConfigOption.method_call.value)) {
-            println "Installing identifier access schema"
-            phenomena.setupOntology(MethodCallObserver.fullSchema)
-            println "Identifier access schema installed"
+            println "Installing method call schema"
+            phenomena.setupOntology(DependenceAnalysis.Method_Call.schemaDefinition)
+            println "Method call schema installed"
         }
 
         //metric observers
         if (Boolean.valueOf(ConfigOption.cyclomatic_complexity.value)) {
             println "Installing cyclomatic complexity schema"
-            phenomena.setupOntology(CyclomaticComplexity.fullSchema)
+            phenomena.setupOntology(MetricAnalysis.Cyclomatic_Complexity.schemaDefinition)
             println "Cyclomatic complexity schema installed"
         }
     }
