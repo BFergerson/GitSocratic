@@ -117,7 +117,11 @@ class Init implements Callable<Integer> {
         Callable<Boolean> setupOntology = new Callable<Boolean>() {
             Boolean call() throws Exception {
                 def phenomena = new Phenomena()
-                phenomena.graknHost = ConfigOption.grakn_host.value
+                if (Boolean.valueOf(ConfigOption.use_docker_grakn.value)) {
+                    phenomena.graknHost = ConfigOption.docker_host.value
+                } else {
+                    phenomena.graknHost = ConfigOption.grakn_host.value
+                }
                 phenomena.graknPort = ConfigOption.grakn_port.value as int
                 phenomena.graknKeyspace = ConfigOption.grakn_keyspace.value
                 phenomena.connectToGrakn()

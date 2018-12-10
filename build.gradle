@@ -105,5 +105,10 @@ shadowJar {
         exclude(dependency('org.antlr:antlr:.*:.*'))
         exclude(dependency('org.antlr:antlr-runtime:.*:.*'))
         exclude(dependency('org.antlr:antlr4-runtime:.*:.*'))
+        exclude(dependency('org.bouncycastle:bcpkix-jdk15on:.*:.*'))
+        exclude(dependency('org.bouncycastle:bcprov-jdk15on:.*:.*'))
+        exclude(dependency('com.fasterxml.jackson.core:jackson-databind:.*:.*'))
+        exclude(dependency('com.fasterxml.jackson.core:jackson-core:.*:.*'))
+        exclude(dependency('com.fasterxml.jackson.core:jackson-annotations:.*:.*'))
     }
 }
