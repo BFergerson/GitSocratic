@@ -36,10 +36,19 @@ class PhenomenaClient implements Closeable {
 
     private Phenomena setupPhenomena() {
         def phenomena = new Phenomena()
-        phenomena.graknHost = grakn_host.value
+        if (Boolean.valueOf(use_docker_grakn.value)) {
+            phenomena.graknHost = docker_host.value
+        } else {
+            phenomena.graknHost = grakn_host.value
+        }
         phenomena.graknPort = grakn_port.value as int
         phenomena.graknKeyspace = grakn_keyspace.value
-        phenomena.babelfishHost = babelfish_host.value
+
+        if (Boolean.valueOf(use_docker_babelfish.value)) {
+            phenomena.babelfishHost = docker_host.value
+        } else {
+            phenomena.babelfishHost = babelfish_host.value
+        }
         phenomena.babelfishPort = babelfish_port.value as int
         phenomena.scanPath = new ArrayList<>()
         phenomena.scanPath.add(repoLocation)
