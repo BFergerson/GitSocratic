@@ -155,13 +155,17 @@ Initialize services necessary to use GitSocratic
 
 Usage:
 ```
-gitsocratic init [-bghvV]
+gitsocratic init [-bghvV] [-bv=<babelfishVersion>] [-gv=<graknVersion>]
 ```
 
 Options:
 ```
 -b, --babelfish   Initialize Babelfish
+ -bv, --babelfish-version=<v2.12.0-drivers>
+
 -g, --grakn       Initialize Grakn
+ -gv, --grakn-version=<1.5.0>
+
 -v, --verbose     Verbose logging
 ```
 
@@ -169,6 +173,7 @@ Example(s):
 ```
 gitsocratic init
 gitsocratic init -v
+gitsocratic init -gv 1.5.0 -bv v2.12.0-drivers
 ```
 
 ## logs
