@@ -160,13 +160,11 @@ gitsocratic init [-bghvV] [-bv=<babelfishVersion>] [-gv=<graknVersion>]
 
 Options:
 ```
--b, --babelfish   Initialize Babelfish
- -bv, --babelfish-version=<v2.12.0-drivers>
-
--g, --grakn       Initialize Grakn
- -gv, --grakn-version=<1.5.0>
-
--v, --verbose     Verbose logging
+-b, --babelfish         Initialize Babelfish (default: true)
+-bv,--babelfish-version Babelfish version to initialize (default: v2.12.0-drivers)
+-g, --grakn             Initialize Grakn (default: true)
+-gv,--grakn-version     Grakn version to initialize (default: 1.5.0)
+-v, --verbose           Verbose logging (default: false)
 ```
 
 Example(s):
