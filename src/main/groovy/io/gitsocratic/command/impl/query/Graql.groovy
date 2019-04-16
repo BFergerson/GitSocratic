@@ -3,6 +3,7 @@ package io.gitsocratic.command.impl.query
 import grakn.core.concept.answer.Numeric
 import groovy.transform.ToString
 import io.gitsocratic.client.GraknClient
+import io.gitsocratic.command.result.QueryCommandResult
 import picocli.CommandLine
 
 import java.time.Duration
@@ -30,31 +31,42 @@ class Graql implements Callable<Integer> {
 
     @Override
     Integer call() throws Exception {
+        return executeCommand(true).status
+    }
+
+    QueryCommandResult.GraqlResponse execute() throws Exception {
+        return executeCommand(false)
+    }
+
+    private QueryCommandResult.GraqlResponse executeCommand(boolean outputLogging) throws Exception {
         if (query == null || query.isEmpty()) {
-            System.err.println("Missing Graql query")
-            return -1
+            if (outputLogging) System.err.println("Missing Graql query")
+            return new QueryCommandResult.GraqlResponse(-1)
         }
+
         def startTime = System.currentTimeMillis()
         def graknClient = new GraknClient()
         def tx = graknClient.makeReadSession()
-
         try {
-            println "# Query: $query"
-            println "# Result:"
+            if (outputLogging) {
+                println "# Query: $query"
+                println "# Result:"
+            }
+
             def result = graknClient.executeQuery(tx, query)
             if (result.size() == 1 && result.get(0) instanceof Numeric) {
-                println((result.get(0) as Numeric).number())
+                if (outputLogging) println((result.get(0) as Numeric).number())
             } else if (!result.isEmpty()) {
                 result.each {
                     it.forEach({ key, value ->
-                        println key.toString() + " = " + value.asAttribute().value().toString()
+                        if (outputLogging) println key.toString() + " = " + value.asAttribute().value().toString()
                     })
                 }
             } else {
-                println "N/A"
+                if (outputLogging) println "N/A"
             }
-            println "\n# Query time: " + humanReadableFormat(Duration.ofMillis(System.currentTimeMillis() - startTime))
-            return 0
+            if (outputLogging) println "\n# Query time: " + humanReadableFormat(Duration.ofMillis(System.currentTimeMillis() - startTime))
+            return new QueryCommandResult.GraqlResponse(0, result)
         } finally {
             tx.close()
             graknClient.close()

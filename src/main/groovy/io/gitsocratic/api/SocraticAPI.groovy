@@ -17,6 +17,6 @@ class SocraticAPI {
     }
 
     static KnowledgeAPI knowledge() {
-        return null
+        return new KnowledgeAPI()
     }
 }
