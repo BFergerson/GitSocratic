@@ -1,6 +1,8 @@
 # GitSocratic
 > Source code query command line interface
 
+[![Build Status](https://travis-ci.com/CodeBrig/GitSocratic.svg?branch=master)](https://travis-ci.com/CodeBrig/GitSocratic)
+
 ![gitsocratic architecture](https://user-images.githubusercontent.com/3278877/49333927-57f61280-f585-11e8-9547-b3e10fe54c2d.jpg)
 
 GitSocratic provides a pain-free interface for querying source code. GitSocratic uses the omnilingual parser [Babelfish](https://github.com/bblfsh/bblfshd) to extract universal abstract syntax trees (which are additionally annotated with their semantic meanings) and imports that data into a knowledge graph powered by [Grakn](https://github.com/graknlabs/grakn). This process is fully facilitated by GitSocratic's integration with [Phenomena](https://github.com/CodeBrig/Phenomena).
