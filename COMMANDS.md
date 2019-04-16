@@ -194,7 +194,7 @@ Options:
 Example(s):
 ```
 gitsocratic logs grakn
-gitsocratic logs babelfish
+gitsocratic logs babelfish -f
 ```
 
 ## query
