@@ -1,5 +1,6 @@
 package io.gitsocratic.command.impl
 
+import groovy.transform.ToString
 import io.gitsocratic.client.PhenomenaClient
 import picocli.CommandLine
 
@@ -13,6 +14,7 @@ import java.util.concurrent.Callable
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@ToString(includePackage = false, includeNames = true)
 @CommandLine.Command(name = "add-local-repo",
         description = "Add local source code repository to the knowledge graph",
         mixinStandardHelpOptions = true,
@@ -22,10 +24,10 @@ import java.util.concurrent.Callable
 class AddLocalRepo implements Callable<Integer> {
 
     @CommandLine.Parameters(index = "0", description = "The repository to add")
-    private File repoLocation
+    File repoLocation
 
     @CommandLine.Option(names = ["-p", "--parallel"], description = "Use parallel source code processing")
-    private boolean parallelProcessing = true
+    boolean parallelProcessing = true
 
     @Override
     Integer call() throws Exception {

@@ -7,6 +7,10 @@ buildscript {
     }
 }
 
+plugins {
+    id "com.avast.gradle.docker-compose" version "0.6.6"
+}
+
 group 'io.gitsocratic'
 version '0.2'
 
@@ -14,16 +18,19 @@ apply plugin: 'groovy'
 apply plugin: 'application'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-mainClassName = 'io.gitsocratic.GitSocraticCLI'
+mainClassName = 'io.gitsocratic.SocraticCLI'
 
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
+    maven {
+        url 'https://repo.grakn.ai/repository/maven/'
+    }
 }
 
 ext {
-    babelfishVersion = '1.10.1'
-    graknVersion = "1.4.2"
+    babelfishVersion = '1.11.0'
+    graknVersion = "1.5.0"
 }
 
 dependencies {
@@ -35,21 +42,28 @@ dependencies {
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.0.1.201806211838-r'
     implementation "com.github.rholder:guava-retrying:2.0.0"
     implementation group: 'com.github.docker-java', name: 'docker-java', version: '3.1.0-rc-5'
-    implementation 'com.github.codebrig:phenomena:e8ff64bd22'
-    implementation 'com.github.codebrig:omnisrc:v0.3-alpha'
+    implementation 'com.github.codebrig:phenomena:v0.2-alpha'
+    implementation 'com.github.codebrig:omnisrc:v0.3.1-alpha'
     implementation "org.bblfsh:bblfsh-client:$babelfishVersion"
-    implementation group: 'ai.grakn', name: 'grakn-core', version: "$graknVersion"
-    implementation group: 'ai.grakn', name: 'grakn-graql', version: "$graknVersion"
-    implementation group: 'ai.grakn', name: 'grakn-factory', version: "$graknVersion"
-    implementation group: 'ai.grakn', name: 'grakn-kb', version: "$graknVersion"
-    implementation group: 'ai.grakn', name: 'client-java', version: "$graknVersion"
-    implementation group: 'ai.grakn', name: 'migration-json', version: "$graknVersion"
+    implementation group: 'io.grakn.client', name: 'api', version: "$graknVersion"
+    compile group: 'io.vertx', name: 'vertx-core', version: '3.7.0'
 }
 
 configurations.all {
     exclude group: 'org.slf4j', module: 'slf4j-simple'
     exclude group: 'ch.qos.logback', module: 'logback-classic'
     exclude group: 'ch.qos.logback', module: 'logback-core'
+}
+
+test {
+    dependsOn "composeUp"
+    finalizedBy "composeDown"
+}
+
+dockerCompose {
+    useComposeFiles = ['./docker-compose.yml']
+    dockerComposeWorkingDirectory = './docker/'
+    captureContainersOutput = true
 }
 
 task createProperties(dependsOn: processResources) {

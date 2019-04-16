@@ -1,6 +1,6 @@
 package io.gitsocratic.command.config
 
-import io.gitsocratic.GitSocraticCLI
+import io.gitsocratic.SocraticCLI
 
 /**
  * Represents the configuration options which GitSocratic supports.
@@ -47,10 +47,10 @@ enum ConfigOption {
             configProperties = new Properties()
             InputStream input = null
             try {
-                if (!GitSocraticCLI.getConfigFile().exists()) {
-                    GitSocraticCLI.getConfigFile().createNewFile()
+                if (!SocraticCLI.getConfigFile().exists()) {
+                    SocraticCLI.getConfigFile().createNewFile()
                 }
-                input = new FileInputStream(GitSocraticCLI.getConfigFile())
+                input = new FileInputStream(SocraticCLI.getConfigFile())
                 configProperties.load(input)
             } catch (IOException ex) {
                 throw new RuntimeException(ex)
@@ -76,7 +76,7 @@ enum ConfigOption {
 
         OutputStream output = null
         try {
-            output = new FileOutputStream(GitSocraticCLI.configFile)
+            output = new FileOutputStream(SocraticCLI.configFile)
             configProperties.store(output, null)
         } catch (IOException io) {
             io.printStackTrace()

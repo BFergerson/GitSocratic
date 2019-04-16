@@ -1,5 +1,6 @@
 package io.gitsocratic.command.impl
 
+import groovy.transform.ToString
 import io.gitsocratic.client.PhenomenaClient
 import org.eclipse.jgit.api.Git
 import picocli.CommandLine
@@ -14,6 +15,7 @@ import java.util.concurrent.TimeUnit
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@ToString(includePackage = false, includeNames = true)
 @CommandLine.Command(name = "add-remote-repo",
         description = "Add remote source code repository to the knowledge graph",
         mixinStandardHelpOptions = true,
@@ -23,10 +25,10 @@ import java.util.concurrent.TimeUnit
 class AddRemoteRepo extends AddLocalRepo {
 
     @CommandLine.Parameters(index = "0", description = "The repository to add")
-    private String repoName
+    String repoName
 
     @CommandLine.Option(names = ["-p", "--parallel"], description = "Use parallel source code processing")
-    private boolean parallelProcessing = true
+    boolean parallelProcessing = true
 
     @Override
     Integer call() throws Exception {

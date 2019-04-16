@@ -10,7 +10,7 @@ package io.gitsocratic
 enum GitSocraticService {
 
     babelfish("bblfshd"),
-    grakn("grakn-docker-entrypoint")
+    grakn("./grakn-docker.sh")
 
     private String command
 

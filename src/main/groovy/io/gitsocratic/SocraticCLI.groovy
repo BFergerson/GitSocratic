@@ -27,14 +27,16 @@ import java.util.concurrent.Callable
         versionProvider = GitSocraticVersion.class,
         subcommands = [AddLocalRepo.class, AddRemoteRepo.class, Config.class, Console.class,
                 Init.class, Logs.class, Query.class, Question.class])
-class GitSocraticCLI implements Callable<Integer> {
+class SocraticCLI implements Callable<Integer> {
 
     @CommandLine.Option(names = ["-c", "--config"], description = 'Config file to use (default: ${DEFAULT-VALUE})')
     private static File configFile = new File(System.getProperty("java.io.tmpdir"), "gitsocratic.config")
     private static DockerClient dockerClient
 
+    private final String[] fullCommand
+
     static void main(String[] args) {
-        def cmd = new CommandLine(new GitSocraticCLI())
+        def cmd = new CommandLine(new SocraticCLI(args))
         List<Object> result = cmd.parseWithHandler(new CommandLine.RunAll(), args)
         dockerClient?.close()
         if (result != null) {
@@ -47,6 +49,14 @@ class GitSocraticCLI implements Callable<Integer> {
                 }
             }
         }
+    }
+
+    SocraticCLI(String[] fullCommand) {
+        this.fullCommand = fullCommand
+    }
+
+    String[] getFullCommand() {
+        return fullCommand
     }
 
     static File getConfigFile() {

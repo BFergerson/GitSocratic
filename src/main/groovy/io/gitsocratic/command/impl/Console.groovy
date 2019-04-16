@@ -1,5 +1,6 @@
 package io.gitsocratic.command.impl
 
+import groovy.transform.ToString
 import io.gitsocratic.command.console.ConsoleType
 import io.gitsocratic.command.console.GraqlConsole
 import picocli.CommandLine
@@ -14,6 +15,7 @@ import java.util.concurrent.Callable
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@ToString(includePackage = false, includeNames = true)
 @CommandLine.Command(name = "console",
         description = "Open interactive source code query console",
         mixinStandardHelpOptions = true,
@@ -23,7 +25,7 @@ import java.util.concurrent.Callable
 class Console implements Callable<Integer> {
 
     @CommandLine.Parameters(index = "0", description = "The console to attach to")
-    private ConsoleType console
+    ConsoleType console
 
     @Override
     Integer call() throws Exception {

@@ -1,5 +1,7 @@
 package io.gitsocratic.command.impl
 
+import groovy.transform.ToString
+import io.gitsocratic.SocraticCLI
 import io.gitsocratic.command.impl.query.Graql
 import picocli.CommandLine
 
@@ -13,6 +15,7 @@ import java.util.concurrent.Callable
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@ToString(includePackage = false, includeNames = true)
 @CommandLine.Command(name = "query",
         description = "Execute a single source code query",
         mixinStandardHelpOptions = true,
@@ -22,8 +25,14 @@ import java.util.concurrent.Callable
         subcommands = [Graql.class])
 class Query implements Callable<Integer> {
 
+    @CommandLine.ParentCommand
+    private SocraticCLI cli
+
     @Override
     Integer call() throws Exception {
+        if (cli.fullCommand.length == 1) {
+            CommandLine.usage(this, System.out)
+        }
         return 0
     }
 }

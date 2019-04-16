@@ -1,6 +1,7 @@
 package io.gitsocratic.command.impl
 
-import ai.grakn.graql.answer.Value
+import grakn.core.concept.answer.Numeric
+import groovy.transform.ToString
 import io.gitsocratic.client.GraknClient
 import io.gitsocratic.command.question.SourceQuestion
 import picocli.CommandLine
@@ -16,6 +17,7 @@ import java.util.concurrent.Callable
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@ToString(includePackage = false, includeNames = true)
 @CommandLine.Command(name = "question",
         description = "Execute a single source code question",
         mixinStandardHelpOptions = true,
@@ -25,7 +27,7 @@ import java.util.concurrent.Callable
 class Question implements Callable<Integer> {
 
     @CommandLine.Parameters(index = "0", converter = QuestionTypeConverter.class)
-    private SourceQuestion question
+    SourceQuestion question
 
     @Override
     Integer call() throws Exception {
@@ -38,8 +40,8 @@ class Question implements Callable<Integer> {
             println "# Question: " + question.formattedQuestion
             println "# Result:"
             def result = graknClient.executeQuery(tx, query)
-            if (result.size() == 1 && result.get(0) instanceof Value) {
-                println((result.get(0) as Value).number())
+            if (result.size() == 1 && result.get(0) instanceof Numeric) {
+                println((result.get(0) as Numeric).number())
             } else if (!result.isEmpty()) {
                 result.each {
                     it.forEach({ key, value ->

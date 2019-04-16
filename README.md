@@ -3,7 +3,7 @@
 
 ![gitsocratic architecture](https://user-images.githubusercontent.com/3278877/49333927-57f61280-f585-11e8-9547-b3e10fe54c2d.jpg)
 
-GitSocratic provides a pain-free interface for querying source code. GitSocratic uses the omnilingual parser [Babelfish](https://github.com/bblfsh/bblfshd) to extract universal abstract syntax trees (which are additionally annotated with their semantic meanings) and imports that data into a knowledge graph powered by [Grakn](https://github.com/graknlabs/grakn). This process is fully facilated by GitSocratic's integration with [Phenomena](https://github.com/CodeBrig/Phenomena). Phenemona is used to integrate source code properties, behaviors, and metrics into a knowledge graph. The resulting knowledge graph is a combination of all the data collected and calculated and is accessible through GitSocratic. GitSocratic allows source code to be queried using Graql (with more query languages coming soon), allowing for a wide range of modern source code analyses.
+GitSocratic provides a pain-free interface for querying source code. GitSocratic uses the omnilingual parser [Babelfish](https://github.com/bblfsh/bblfshd) to extract universal abstract syntax trees (which are additionally annotated with their semantic meanings) and imports that data into a knowledge graph powered by [Grakn](https://github.com/graknlabs/grakn). This process is fully facilitated by GitSocratic's integration with [Phenomena](https://github.com/CodeBrig/Phenomena). Phenemona is used to integrate source code properties, behaviors, and metrics into a knowledge graph. The resulting knowledge graph is a combination of all the data collected and calculated and is accessible through GitSocratic. GitSocratic allows source code to be queried using Graql (with more query languages coming soon), allowing for a wide range of modern source code analyses.
 
 ### Features
  - [Supports question/answer source code queries](https://github.com/CodeBrig/GitSocratic/blob/v0.2-alpha/docs/source_code_questions.md)
@@ -18,7 +18,7 @@ GitSocratic requires access to two services:
  - [Babelfish](https://github.com/bblfsh/bblfshd)
  
  GitSocratic is able to install these services automatically using [Docker](https://www.docker.com/).
- If you do no wish to use Docker you may suppy the host and ports for these services through the config file or command.
+ If you do no wish to use Docker you may supply the host and ports for these services through the config file or command.
  
  To automatically setup these services with Docker simply use the command:
  ```

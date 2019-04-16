@@ -3,7 +3,7 @@ package io.gitsocratic.command.console
 import com.github.dockerjava.api.command.ExecCreateCmdResponse
 import com.github.dockerjava.api.model.Container
 import com.github.dockerjava.core.command.ExecStartResultCallback
-import io.gitsocratic.GitSocraticCLI
+import io.gitsocratic.SocraticCLI
 import io.gitsocratic.GitSocraticService
 
 import java.util.concurrent.Callable
@@ -22,7 +22,7 @@ class GraqlConsole implements Callable<Integer> {
     @Override
     Integer call() throws Exception {
         Container graknContainer
-        GitSocraticCLI.dockerClient.listContainersCmd().withShowAll(true).exec().each {
+        SocraticCLI.dockerClient.listContainersCmd().withShowAll(true).exec().each {
             if (GitSocraticService.grakn.command == it.command) {
                 graknContainer = it
             }
@@ -34,12 +34,12 @@ class GraqlConsole implements Callable<Integer> {
 
         //attach to graql console
         ExecCreateCmdResponse execCreateCmdResponse =
-                GitSocraticCLI.dockerClient.execCreateCmd(graknContainer.id).withAttachStdout(true)
+                SocraticCLI.dockerClient.execCreateCmd(graknContainer.id).withAttachStdout(true)
                         .withAttachStdin(true)
                         .withTty(true)
                         .withCmd("/opt/grakn/grakn-core-" + buildBundle.getString("grakn_version") + "/./graql", "console")
                         .exec()
-        GitSocraticCLI.dockerClient.execStartCmd(execCreateCmdResponse.getId())
+        SocraticCLI.dockerClient.execStartCmd(execCreateCmdResponse.getId())
                 .withTty(true)
                 .withStdIn(System.in)
                 .exec(new ExecStartResultCallback(System.out, System.err))

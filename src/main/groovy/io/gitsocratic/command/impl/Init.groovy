@@ -10,9 +10,12 @@ import com.github.dockerjava.api.model.*
 import com.github.dockerjava.core.command.ExecStartResultCallback
 import com.github.dockerjava.core.command.PullImageResultCallback
 import com.github.rholder.retry.*
-import io.gitsocratic.GitSocraticCLI
+import groovy.transform.ToString
+import groovy.transform.builder.Builder
 import io.gitsocratic.GitSocraticService
+import io.gitsocratic.SocraticCLI
 import io.gitsocratic.command.config.ConfigOption
+import io.gitsocratic.command.result.InitCommandResult
 import picocli.CommandLine
 
 import java.util.concurrent.Callable
@@ -26,6 +29,8 @@ import java.util.concurrent.TimeUnit
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@Builder
+@ToString(includePackage = false, includeNames = true)
 @CommandLine.Command(name = "init",
         description = "Initialize services necessary to use GitSocratic",
         mixinStandardHelpOptions = true,
@@ -34,14 +39,20 @@ import java.util.concurrent.TimeUnit
         optionListHeading = "%nOptions:%n")
 class Init implements Callable<Integer> {
 
+    @CommandLine.Option(names = ["-gv", "--grakn-version"], description = "Grakn version")
+    String graknVersion = defaultGraknVersion
+
+    @CommandLine.Option(names = ["-bv", "--babelfish-version"], description = "Babelfish version")
+    String babelfishVersion = defaultBabelfishVersion
+
     @CommandLine.Option(names = ["-g", "--grakn"], description = "Initialize Grakn")
-    private boolean initGrakn = true
+    boolean initGrakn = defaultInitGrakn
 
     @CommandLine.Option(names = ["-b", "--babelfish"], description = "Initialize Babelfish")
-    private boolean initBabelfish = true
+    boolean initBabelfish = defaultInitBabelfish
 
     @CommandLine.Option(names = ["-v", "--verbose"], description = "Verbose logging")
-    private static boolean verbose = false
+    boolean verbose = defaultVerbose
 
     private static int validateExternalGrakn() {
         println "Validating external Grakn installation"
@@ -63,11 +74,11 @@ class Init implements Callable<Integer> {
     private int initDockerGrakn() {
         println "Initializing Grakn container"
         def callback = new PullImageProgress()
-        GitSocraticCLI.dockerClient.pullImageCmd("bfergerson/grakn-docker-toolbox:latest").exec(callback)
+        SocraticCLI.dockerClient.pullImageCmd("graknlabs/grakn:$graknVersion").exec(callback)
         callback.awaitCompletion()
 
         Container graknContainer
-        GitSocraticCLI.dockerClient.listContainersCmd().withShowAll(true).exec().each {
+        SocraticCLI.dockerClient.listContainersCmd().withShowAll(true).exec().each {
             if (GitSocraticService.grakn.command == it.command) {
                 graknContainer = it
             }
@@ -80,29 +91,29 @@ class Init implements Callable<Integer> {
             //start container (if necessary)
             if (graknContainer.state != "running") {
                 println "Starting Grakn container"
-                GitSocraticCLI.dockerClient.startContainerCmd(graknContainer.id).exec()
+                SocraticCLI.dockerClient.startContainerCmd(graknContainer.id).exec()
                 println "Grakn container started"
             } else {
                 println "Grakn already running"
             }
         } else {
             //create container
-            List<Image> images = GitSocraticCLI.dockerClient.listImagesCmd().withShowAll(true).exec()
+            List<Image> images = SocraticCLI.dockerClient.listImagesCmd().withShowAll(true).exec()
             images.each {
-                if (it.repoTags?.contains("bfergerson/grakn-docker-toolbox:latest") && initGrakn) {
+                if (it.repoTags?.contains("graknlabs/grakn:$graknVersion") && initGrakn) {
                     def graknPort = ConfigOption.grakn_port.getValue() as int
                     ExposedPort graknTcpPort = ExposedPort.tcp(ConfigOption.grakn_port.defaultValue as int)
                     Ports portBindings = new Ports()
                     portBindings.bind(graknTcpPort, Ports.Binding.bindPort(graknPort))
 
-                    CreateContainerResponse container = GitSocraticCLI.dockerClient.createContainerCmd(it.id)
+                    CreateContainerResponse container = SocraticCLI.dockerClient.createContainerCmd(it.id)
                             .withAttachStderr(true)
                             .withAttachStdout(true)
                             .withExposedPorts(graknTcpPort)
                             .withPortBindings(portBindings)
                             .withPublishAllPorts(true)
                             .exec()
-                    GitSocraticCLI.dockerClient.startContainerCmd(container.getId()).exec()
+                    SocraticCLI.dockerClient.startContainerCmd(container.getId()).exec()
 
                     println "Waiting for Grakn to start"
                     Thread.sleep(10 * 1000) //todo: smarter
@@ -209,11 +220,11 @@ class Init implements Callable<Integer> {
     private int initDockerBabelfish() {
         println "Initializing Babelfish container"
         def callback = new PullImageProgress()
-        GitSocraticCLI.dockerClient.pullImageCmd("bblfsh/bblfshd:latest").exec(callback)
+        SocraticCLI.dockerClient.pullImageCmd("bblfsh/bblfshd:$babelfishVersion").exec(callback)
         callback.awaitCompletion()
 
         Container babelfishContainer
-        GitSocraticCLI.dockerClient.listContainersCmd().withShowAll(true).exec().each {
+        SocraticCLI.dockerClient.listContainersCmd().withShowAll(true).exec().each {
             if (GitSocraticService.babelfish.command == it.command) {
                 babelfishContainer = it
             }
@@ -226,21 +237,21 @@ class Init implements Callable<Integer> {
             //start container (if necessary)
             if (babelfishContainer.state != "running") {
                 println "Starting Babelfish container"
-                GitSocraticCLI.dockerClient.startContainerCmd(babelfishContainer.id).exec()
+                SocraticCLI.dockerClient.startContainerCmd(babelfishContainer.id).exec()
                 println "Babelfish container started"
             } else {
                 println "Babelfish already running"
             }
         } else {
             //create container
-            List<Image> images = GitSocraticCLI.dockerClient.listImagesCmd().withShowAll(true).exec()
+            List<Image> images = SocraticCLI.dockerClient.listImagesCmd().withShowAll(true).exec()
             images.each {
-                if (it.repoTags?.contains("bblfsh/bblfshd:latest") && initBabelfish) {
+                if (it.repoTags?.contains("bblfsh/bblfshd:$babelfishVersion") && initBabelfish) {
                     def babelfishPort = ConfigOption.babelfish_port.getValue() as int
                     ExposedPort babelfishTcpPort = ExposedPort.tcp(ConfigOption.babelfish_port.defaultValue as int)
                     Ports portBindings = new Ports()
                     portBindings.bind(babelfishTcpPort, Ports.Binding.bindPort(babelfishPort))
-                    CreateContainerResponse container = GitSocraticCLI.dockerClient.createContainerCmd(it.id)
+                    CreateContainerResponse container = SocraticCLI.dockerClient.createContainerCmd(it.id)
                             .withPrivileged(true)
                             .withAttachStderr(true)
                             .withAttachStdout(true)
@@ -248,15 +259,15 @@ class Init implements Callable<Integer> {
                             .withPortBindings(portBindings)
                             .withPublishAllPorts(true)
                             .exec()
-                    GitSocraticCLI.dockerClient.startContainerCmd(container.getId()).exec()
+                    SocraticCLI.dockerClient.startContainerCmd(container.getId()).exec()
 
                     //auto-install recommended language drivers
                     ExecCreateCmdResponse execCreateCmdResponse =
-                            GitSocraticCLI.dockerClient.execCreateCmd(container.id).withCmd("bblfshctl", "driver", "install", "--recommended")
+                            SocraticCLI.dockerClient.execCreateCmd(container.id).withCmd("bblfshctl", "driver", "install", "--recommended")
                                     .withTty(true)
                                     .withPrivileged(true)
                                     .exec()
-                    GitSocraticCLI.dockerClient.execStartCmd(execCreateCmdResponse.getId())
+                    SocraticCLI.dockerClient.execStartCmd(execCreateCmdResponse.getId())
                             .withTty(true)
                             .exec(new ExecStartResultCallback(System.out, System.err))
                             .awaitCompletion()
@@ -270,30 +281,38 @@ class Init implements Callable<Integer> {
 
     @Override
     Integer call() throws Exception {
+        return executeCommand(true).status
+    }
+
+    InitCommandResult execute() throws Exception {
+        return executeCommand(false)
+    }
+
+    private InitCommandResult executeCommand(boolean outputLogging) throws Exception {
         def status = 0
         if (initBabelfish) {
             if (Boolean.valueOf(ConfigOption.use_docker_babelfish.getValue())) {
                 status = initDockerBabelfish()
-                if (status != 0) return status
+                if (status != 0) return new InitCommandResult(status)
             } else {
                 status = validateExternalBabelfish()
-                if (status != 0) return status
+                if (status != 0) return new InitCommandResult(status)
             }
             println()
         }
         if (initGrakn) {
             if (Boolean.valueOf(ConfigOption.use_docker_grakn.getValue())) {
                 status = initDockerGrakn()
-                if (status != 0) return status
+                if (status != 0) return new InitCommandResult(status)
             } else {
                 status = validateExternalGrakn()
-                if (status != 0) return status
+                if (status != 0) return new InitCommandResult(status)
             }
         }
-        return status
+        return new InitCommandResult(status)
     }
 
-    static class PullImageProgress extends PullImageResultCallback {
+    class PullImageProgress extends PullImageResultCallback {
         private Set<String> seenStatuses = new HashSet<>()
 
         @Override
@@ -312,5 +331,25 @@ class Init implements Callable<Integer> {
             }
             if (item.progress != null && verbose) println " Id: " + item.id + " - Progress: " + item.progress
         }
+    }
+
+    static String getDefaultGraknVersion() {
+        return "1.5.1"
+    }
+
+    static String getDefaultBabelfishVersion() {
+        return "v2.12.0-drivers"
+    }
+
+    static boolean getDefaultInitGrakn() {
+        return true
+    }
+
+    static boolean getDefaultInitBabelfish() {
+        return true
+    }
+
+    static boolean getDefaultVerbose() {
+        return false
     }
 }

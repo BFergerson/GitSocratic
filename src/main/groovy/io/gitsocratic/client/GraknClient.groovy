@@ -1,12 +1,7 @@
 package io.gitsocratic.client
 
-import ai.grakn.GraknSession
-import ai.grakn.GraknTx
-import ai.grakn.GraknTxType
-import ai.grakn.Keyspace
-import ai.grakn.client.Grakn
-import ai.grakn.graql.answer.ConceptMap
-import ai.grakn.util.SimpleURI
+import grakn.core.concept.answer.ConceptMap
+import graql.lang.Graql
 import io.gitsocratic.command.config.ConfigOption
 
 /**
@@ -21,7 +16,7 @@ class GraknClient {
     private final String host
     private final int port
     private final String keyspace
-    private final GraknSession session
+    private final grakn.client.GraknClient.Session session
 
     GraknClient() {
         if (Boolean.valueOf(ConfigOption.use_docker_grakn.value)) {
@@ -31,14 +26,18 @@ class GraknClient {
         }
         this.port = ConfigOption.grakn_port.value as int
         this.keyspace = ConfigOption.grakn_keyspace.value
-        session = new Grakn(new SimpleURI("$host:$port")).session(Keyspace.of(keyspace))
+
+        def client = new grakn.client.GraknClient("$host:$port")
+        session = client.session(keyspace)
     }
 
     GraknClient(String host, int port, String keyspace) {
         this.host = host
         this.port = port
         this.keyspace = keyspace
-        session = new Grakn(new SimpleURI("$host:$port")).session(Keyspace.of(keyspace))
+
+        def client = new grakn.client.GraknClient("$host:$port")
+        session = client.session(keyspace)
     }
 
     List<ConceptMap> executeReadQuery(String query) {
@@ -59,17 +58,16 @@ class GraknClient {
         }
     }
 
-    static List<ConceptMap> executeQuery(GraknTx tx, String query) {
-        def graql = tx.graql()
-        return graql.parse(query).execute() as List<ConceptMap>
+    static List<ConceptMap> executeQuery(grakn.client.GraknClient.Transaction tx, String query) {
+        return tx.execute(Graql.parse(query)) as List<ConceptMap>
     }
 
-    GraknTx makeWriteSession() {
-        return session.transaction(GraknTxType.WRITE)
+    grakn.client.GraknClient.Transaction makeWriteSession() {
+        return session.transaction().write()
     }
 
-    GraknTx makeReadSession() {
-        return session.transaction(GraknTxType.READ)
+    grakn.client.GraknClient.Transaction makeReadSession() {
+        return session.transaction().read()
     }
 
     void close() {

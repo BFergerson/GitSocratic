@@ -1,6 +1,7 @@
 package io.gitsocratic.command.impl.query
 
-import ai.grakn.graql.answer.Value
+import grakn.core.concept.answer.Numeric
+import groovy.transform.ToString
 import io.gitsocratic.client.GraknClient
 import picocli.CommandLine
 
@@ -15,6 +16,7 @@ import java.util.concurrent.Callable
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@ToString(includePackage = false, includeNames = true)
 @CommandLine.Command(name = "graql",
         description = "Execute a single Graql query",
         mixinStandardHelpOptions = true,
@@ -24,7 +26,7 @@ import java.util.concurrent.Callable
 class Graql implements Callable<Integer> {
 
     @CommandLine.Parameters(index = "0", description = "Query to run")
-    private String query
+    String query
 
     @Override
     Integer call() throws Exception {
@@ -40,8 +42,8 @@ class Graql implements Callable<Integer> {
             println "# Query: $query"
             println "# Result:"
             def result = graknClient.executeQuery(tx, query)
-            if (result.size() == 1 && result.get(0) instanceof Value) {
-                println((result.get(0) as Value).number())
+            if (result.size() == 1 && result.get(0) instanceof Numeric) {
+                println((result.get(0) as Numeric).number())
             } else if (!result.isEmpty()) {
                 result.each {
                     it.forEach({ key, value ->
