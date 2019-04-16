@@ -1,4 +1,4 @@
-This document demonstrates how it's possible to perform cross-language querying. Presented below are several source code snippets as well as the queries and results performed on this collection of various source code languages using GitSocratic.
+This document demonstrates how it's possible to perform cross-language querying. Presented below are several source code snippets as well as the queries used and results returned on this collection of source code using GitSocratic.
 
 ## Example source code repository
 
