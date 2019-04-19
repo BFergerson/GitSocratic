@@ -46,10 +46,10 @@ $kNumber has numberValue $kNumberValue;
 ($kNumber) isa NUMBER;
 (is_parent: $kDeclaration, is_child: $kIdentifier);
 (is_parent: $kDeclaration, is_child: $kNumber);
-aggregate sum $kNumberValue;
+get $kNumber, $kNumberValue; sum $kNumberValue;
 ```
 
 #### Result
 ```
-30.0
+30
 ```
