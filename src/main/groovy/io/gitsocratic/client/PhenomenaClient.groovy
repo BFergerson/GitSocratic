@@ -30,12 +30,12 @@ class PhenomenaClient implements Closeable {
     private final String repoLocation
     private final Phenomena phenomena
 
-    PhenomenaClient(String repoLocation) {
+    PhenomenaClient(String repoLocation) throws ConnectException  {
         this.repoLocation = repoLocation
         this.phenomena = setupPhenomena()
     }
 
-    private Phenomena setupPhenomena() {
+    private Phenomena setupPhenomena() throws ConnectException {
         def phenomena = new Phenomena()
         if (Boolean.valueOf(use_docker_grakn.value)) {
             phenomena.graknHost = docker_host.value
