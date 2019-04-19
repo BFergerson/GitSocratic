@@ -9,6 +9,7 @@ import com.codebrig.phenomena.Phenomena
 import com.codebrig.phenomena.code.CodeObserver
 import com.codebrig.phenomena.code.analysis.DependenceAnalysis
 import com.codebrig.phenomena.code.analysis.MetricAnalysis
+import com.codebrig.phenomena.code.analysis.semantic.CodeSemanticObserver
 import com.codebrig.phenomena.code.structure.CodeStructureObserver
 import groovyx.gpars.GParsPool
 
@@ -88,11 +89,12 @@ class PhenomenaClient implements Closeable {
             codeObservers.each {
                 necessaryStructureFilter.accept(it.filter)
             }
+            codeObservers.add(new CodeStructureObserver(necessaryStructureFilter))
 
-            def codeStructureObserver = new CodeStructureObserver(necessaryStructureFilter)
-            codeStructureObserver.includeIndividualSemanticRoles = Boolean.valueOf(individual_semantic_roles.value)
-            codeStructureObserver.includeActualSemanticRoles = Boolean.valueOf(actual_semantic_roles.value)
-            codeObservers.add(codeStructureObserver)
+            if (Boolean.valueOf(individual_semantic_roles.value) || Boolean.valueOf(actual_semantic_roles.value)) {
+                codeObservers.add(new CodeSemanticObserver(Boolean.valueOf(individual_semantic_roles.value),
+                        Boolean.valueOf(actual_semantic_roles.value)))
+            }
         } else {
             def hasFilter = false
             def filter = new MultiFilter(MultiFilter.MatchStyle.ANY)
@@ -106,15 +108,17 @@ class PhenomenaClient implements Closeable {
             }
 
             if (hasFilter) {
-                def codeStructureObserver = new CodeStructureObserver(filter)
-                codeStructureObserver.includeIndividualSemanticRoles = Boolean.valueOf(individual_semantic_roles.value)
-                codeStructureObserver.includeActualSemanticRoles = Boolean.valueOf(actual_semantic_roles.value)
-                codeObservers.add(codeStructureObserver)
+                codeObservers.add(new CodeStructureObserver(filter))
+                if (Boolean.valueOf(individual_semantic_roles.value) || Boolean.valueOf(actual_semantic_roles.value)) {
+                    codeObservers.add(new CodeSemanticObserver(Boolean.valueOf(individual_semantic_roles.value),
+                            Boolean.valueOf(actual_semantic_roles.value)))
+                }
             } else {
-                def codeStructureObserver = new CodeStructureObserver()
-                codeStructureObserver.includeIndividualSemanticRoles = Boolean.valueOf(individual_semantic_roles.value)
-                codeStructureObserver.includeActualSemanticRoles = Boolean.valueOf(actual_semantic_roles.value)
-                codeObservers.add(codeStructureObserver)
+                codeObservers.add(new CodeStructureObserver())
+                if (Boolean.valueOf(individual_semantic_roles.value) || Boolean.valueOf(actual_semantic_roles.value)) {
+                    codeObservers.add(new CodeSemanticObserver(Boolean.valueOf(individual_semantic_roles.value),
+                            Boolean.valueOf(actual_semantic_roles.value)))
+                }
             }
         }
         phenomena.init(codeObservers)

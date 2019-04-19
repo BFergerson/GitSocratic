@@ -4,6 +4,7 @@ import com.codebrig.omnisrc.SourceLanguage
 import com.codebrig.phenomena.Phenomena
 import com.codebrig.phenomena.code.analysis.DependenceAnalysis
 import com.codebrig.phenomena.code.analysis.MetricAnalysis
+import com.codebrig.phenomena.code.analysis.semantic.CodeSemanticObserver
 import com.github.dockerjava.api.command.CreateContainerResponse
 import com.github.dockerjava.api.command.ExecCreateCmdResponse
 import com.github.dockerjava.api.model.*
@@ -145,11 +146,17 @@ class Init implements Callable<Integer> {
                 if (Boolean.valueOf(ConfigOption.individual_semantic_roles.value)) {
                     println "Installing individual semantic roles"
                     phenomena.setupOntology(SourceLanguage.OmniSRC.getIndividualSemanticRolesSchemaDefinition())
+                    new CodeSemanticObserver().getRules().each {
+                        phenomena.setupOntology(it)
+                    }
                     println "Individual semantic roles installed"
                 }
                 if (Boolean.valueOf(ConfigOption.actual_semantic_roles.value)) {
                     println "Installing actual semantic roles"
                     phenomena.setupOntology(SourceLanguage.OmniSRC.getActualSemanticRolesSchemaDefinition())
+                    new CodeSemanticObserver().getRules().each {
+                        phenomena.setupOntology(it)
+                    }
                     println "Actual semantic roles installed"
                 }
 
