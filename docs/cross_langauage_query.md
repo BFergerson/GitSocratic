@@ -51,5 +51,5 @@ get $kNumber, $kNumberValue; sum $kNumberValue;
 
 #### Result
 ```
-30.0
+30
 ```
