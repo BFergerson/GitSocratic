@@ -1,12 +1,3 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.3'
-    }
-}
-
 plugins {
     id "com.avast.gradle.docker-compose" version "0.6.6"
 }
@@ -16,7 +7,6 @@ version '0.2'
 
 apply plugin: 'groovy'
 apply plugin: 'application'
-apply plugin: 'com.github.johnrengelman.shadow'
 
 mainClassName = 'io.gitsocratic.SocraticCLI'
 
@@ -86,43 +76,5 @@ classes {
 startScripts {
     doLast {
         windowsScript.text = windowsScript.text.replaceAll('set CLASSPATH=.*', 'set CLASSPATH=.;%APP_HOME%/lib/*')
-    }
-}
-
-shadowJar {
-    zip64 true
-    minimize {
-        exclude(dependency('ai.grakn:client-java:.*:.*'))
-        exclude(dependency('ai.grakn:grakn-core:.*:.*'))
-        exclude(dependency('ai.grakn:grakn-factory:.*:.*'))
-        exclude(dependency('ai.grakn:grakn-graql:.*:.*'))
-        exclude(dependency('ai.grakn:grakn-kb:.*:.*'))
-        exclude(dependency('org.codehaus.groovy:groovy:.*:.*'))
-        exclude(dependency('org.codehaus.groovy:groovy-datetime:.*:.*'))
-        exclude(dependency('io.grpc:grpc-stub:.*:.*'))
-        exclude(dependency('io.grpc:grpc-core:.*:.*'))
-        exclude(dependency('io.grpc:grpc-context:.*:.*'))
-        exclude(dependency('io.grpc:grpc-netty:.*:.*'))
-        exclude(dependency('io.grpc:grpc-protobuf:.*:.*'))
-        exclude(dependency('io.grpc:grpc-protobuf-lite:.*:.*'))
-        exclude(dependency('io.netty:netty-codec:.*:.*'))
-        exclude(dependency('io.netty:netty-codec-http2:.*:.*'))
-        exclude(dependency('io.netty:netty-codec-http:.*:.*'))
-        exclude(dependency('io.netty:netty-all:.*:.*'))
-        exclude(dependency('io.netty:netty-common:.*:.*'))
-        exclude(dependency('io.netty:netty-buffer:.*:.*'))
-        exclude(dependency('io.netty:netty-transport:.*:.*'))
-        exclude(dependency('io.netty:netty-resolver:.*:.*'))
-        exclude(dependency('io.netty:netty:.*:.*'))
-        exclude(dependency('io.opencensus:opencensus-api:.*:.*'))
-        exclude(dependency('io.opencensus:opencensus-contrib-grpc-metrics:.*:.*'))
-        exclude(dependency('org.antlr:antlr:.*:.*'))
-        exclude(dependency('org.antlr:antlr-runtime:.*:.*'))
-        exclude(dependency('org.antlr:antlr4-runtime:.*:.*'))
-        exclude(dependency('org.bouncycastle:bcpkix-jdk15on:.*:.*'))
-        exclude(dependency('org.bouncycastle:bcprov-jdk15on:.*:.*'))
-        exclude(dependency('com.fasterxml.jackson.core:jackson-databind:.*:.*'))
-        exclude(dependency('com.fasterxml.jackson.core:jackson-core:.*:.*'))
-        exclude(dependency('com.fasterxml.jackson.core:jackson-annotations:.*:.*'))
     }
 }
