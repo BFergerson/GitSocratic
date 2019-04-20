@@ -2,6 +2,7 @@ package io.gitsocratic.command.impl
 
 import groovy.transform.ToString
 import io.gitsocratic.client.PhenomenaClient
+import io.gitsocratic.command.result.AddRemoteRepoCommandResult
 import org.eclipse.jgit.api.Git
 import picocli.CommandLine
 
@@ -28,23 +29,49 @@ class AddRemoteRepo extends AddLocalRepo {
     String repoName
 
     @CommandLine.Option(names = ["-p", "--parallel"], description = "Use parallel source code processing")
-    boolean parallelProcessing = true
+    boolean parallelProcessing = defaultParallelProcessing
+
+    @SuppressWarnings("unused")
+    protected AddRemoteRepo() {
+        //used by Picocli
+    }
+
+    AddRemoteRepo(String repoName, boolean parallelProcessing) {
+        this.repoName = Objects.requireNonNull(repoName)
+        this.parallelProcessing = parallelProcessing
+    }
 
     @Override
     Integer call() throws Exception {
+        return executeCommand(true).status
+    }
+
+    AddRemoteRepoCommandResult execute() throws Exception {
+        return executeCommand(false)
+    }
+
+    private AddRemoteRepoCommandResult executeCommand(boolean outputLogging) throws Exception {
         //clone repo
         new File("/tmp/gitsocratic/out/").deleteDir()
-        cloneRepo(repoName, new File("/tmp/gitsocratic/out/"))
+        cloneRepo(repoName, new File("/tmp/gitsocratic/out/"), outputLogging)
 
         //import source code into grakn with phenomena
         new PhenomenaClient("/tmp/gitsocratic/out/").withCloseable {
             it.processSourceCodeRepository(parallelProcessing)
         }
-        return 0
+        return new AddRemoteRepoCommandResult(0)
     }
 
-    static void cloneRepo(String githubRepository, File outputDirectory) {
-        println "Cloning: $githubRepository"
+    String getRepoName() {
+        return repoName
+    }
+
+    boolean getParallelProcessing() {
+        return parallelProcessing
+    }
+
+    private static void cloneRepo(String githubRepository, File outputDirectory, boolean outputLogging) {
+        if (outputLogging) println "Cloning: $githubRepository"
         if (githubRepository.startsWith("http")) {
             Git.cloneRepository()
                     .setURI(githubRepository)
@@ -60,6 +87,10 @@ class AddRemoteRepo extends AddLocalRepo {
                     .setTimeout(TimeUnit.MINUTES.toSeconds(5) as int)
                     .call()
         }
-        println "Cloned: $githubRepository"
+        if (outputLogging) println "Cloned: $githubRepository"
+    }
+
+    static boolean getDefaultParallelProcessing() {
+        return true
     }
 }

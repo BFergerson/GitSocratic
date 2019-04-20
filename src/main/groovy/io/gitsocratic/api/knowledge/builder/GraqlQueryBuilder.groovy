@@ -19,6 +19,6 @@ class GraqlQueryBuilder {
     }
 
     Graql build() {
-        return new Graql(query: query)
+        return new Graql(query)
     }
 }

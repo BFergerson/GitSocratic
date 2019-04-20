@@ -27,7 +27,16 @@ import java.util.concurrent.Callable
 class Graql implements Callable<Integer> {
 
     @CommandLine.Parameters(index = "0", description = "Query to run")
-    String query
+    private String query
+
+    @SuppressWarnings("unused")
+    protected Graql() {
+        //used by Picocli
+    }
+
+    Graql(String query) {
+        this.query = Objects.requireNonNull(query)
+    }
 
     @Override
     Integer call() throws Exception {
@@ -71,6 +80,10 @@ class Graql implements Callable<Integer> {
             tx.close()
             graknClient.close()
         }
+    }
+
+    String getQuery() {
+        return query
     }
 
     static String humanReadableFormat(Duration duration) {

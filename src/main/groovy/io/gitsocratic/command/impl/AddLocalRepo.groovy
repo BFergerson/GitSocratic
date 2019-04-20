@@ -2,6 +2,7 @@ package io.gitsocratic.command.impl
 
 import groovy.transform.ToString
 import io.gitsocratic.client.PhenomenaClient
+import io.gitsocratic.command.result.AddLocalRepoCommandResult
 import picocli.CommandLine
 
 import java.util.concurrent.Callable
@@ -24,22 +25,52 @@ import java.util.concurrent.Callable
 class AddLocalRepo implements Callable<Integer> {
 
     @CommandLine.Parameters(index = "0", description = "The repository to add")
-    File repoLocation
+    private File repoLocation
 
     @CommandLine.Option(names = ["-p", "--parallel"], description = "Use parallel source code processing")
-    boolean parallelProcessing = true
+    private boolean parallelProcessing = defaultParallelProcessing
+
+    @SuppressWarnings("unused")
+    protected AddLocalRepo() {
+        //used by Picocli
+    }
+
+    AddLocalRepo(File repoLocation, boolean parallelProcessing) {
+        this.repoLocation = Objects.requireNonNull(repoLocation)
+        this.parallelProcessing = parallelProcessing
+    }
 
     @Override
     Integer call() throws Exception {
+        return executeCommand(true).status
+    }
+
+    AddLocalRepoCommandResult execute() throws Exception {
+        return executeCommand(false)
+    }
+
+    private AddLocalRepoCommandResult executeCommand(boolean outputLogging) throws Exception {
         if (!repoLocation.exists()) {
-            System.err.println "Invalid repository location: $repoLocation"
-            return -1
+            if (outputLogging) System.err.println "Invalid repository location: $repoLocation"
+            return new AddLocalRepoCommandResult(-1)
         }
 
         //import source code into grakn with phenomena
         new PhenomenaClient(repoLocation.absolutePath).withCloseable {
             it.processSourceCodeRepository(parallelProcessing)
         }
-        return 0
+        return new AddLocalRepoCommandResult(0)
+    }
+
+    File getRepoLocation() {
+        return repoLocation
+    }
+
+    boolean getParallelProcessing() {
+        return parallelProcessing
+    }
+
+    static boolean getDefaultParallelProcessing() {
+        return true
     }
 }
