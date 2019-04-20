@@ -15,12 +15,13 @@ import groovy.transform.ToString
 import groovy.transform.builder.Builder
 import io.gitsocratic.GitSocraticService
 import io.gitsocratic.SocraticCLI
-import io.gitsocratic.command.config.ConfigOption
 import io.gitsocratic.command.result.InitCommandResult
 import picocli.CommandLine
 
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
+
+import static io.gitsocratic.command.config.ConfigOption.*
 
 /**
  * Represents the `init` command.
@@ -57,8 +58,8 @@ class Init implements Callable<Integer> {
 
     private static int validateExternalGrakn() {
         println "Validating external Grakn installation"
-        def host = ConfigOption.babelfish_host.value
-        def port = ConfigOption.babelfish_port.value as int
+        def host = babelfish_host.value
+        def port = babelfish_port.value as int
         println " Host: $host"
         println " Port: $port"
 
@@ -102,8 +103,8 @@ class Init implements Callable<Integer> {
             List<Image> images = SocraticCLI.dockerClient.listImagesCmd().withShowAll(true).exec()
             images.each {
                 if (it.repoTags?.contains("graknlabs/grakn:$graknVersion") && initGrakn) {
-                    def graknPort = ConfigOption.grakn_port.getValue() as int
-                    ExposedPort graknTcpPort = ExposedPort.tcp(ConfigOption.grakn_port.defaultValue as int)
+                    def graknPort = grakn_port.getValue() as int
+                    ExposedPort graknTcpPort = ExposedPort.tcp(grakn_port.defaultValue as int)
                     Ports portBindings = new Ports()
                     portBindings.bind(graknTcpPort, Ports.Binding.bindPort(graknPort))
 
@@ -129,13 +130,13 @@ class Init implements Callable<Integer> {
         Callable<Boolean> setupOntology = new Callable<Boolean>() {
             Boolean call() throws Exception {
                 def phenomena = new Phenomena()
-                if (Boolean.valueOf(ConfigOption.use_docker_grakn.value)) {
-                    phenomena.graknHost = ConfigOption.docker_host.value
+                if (Boolean.valueOf(use_docker_grakn.value)) {
+                    phenomena.graknHost = docker_host.value
                 } else {
-                    phenomena.graknHost = ConfigOption.grakn_host.value
+                    phenomena.graknHost = grakn_host.value
                 }
-                phenomena.graknPort = ConfigOption.grakn_port.value as int
-                phenomena.graknKeyspace = ConfigOption.grakn_keyspace.value
+                phenomena.graknPort = grakn_port.value as int
+                phenomena.graknKeyspace = grakn_keyspace.value
                 phenomena.connectToGrakn()
                 println "Successfully connected to Grakn"
 
@@ -143,7 +144,7 @@ class Init implements Callable<Integer> {
                 phenomena.setupOntology(SourceLanguage.OmniSRC.getBaseStructureSchemaDefinition())
                 println "Base structure installed"
 
-                if (Boolean.valueOf(ConfigOption.individual_semantic_roles.value)) {
+                if (Boolean.valueOf(individual_semantic_roles.value)) {
                     println "Installing individual semantic roles"
                     phenomena.setupOntology(SourceLanguage.OmniSRC.getIndividualSemanticRolesSchemaDefinition())
                     new CodeSemanticObserver().getRules().each {
@@ -151,7 +152,7 @@ class Init implements Callable<Integer> {
                     }
                     println "Individual semantic roles installed"
                 }
-                if (Boolean.valueOf(ConfigOption.actual_semantic_roles.value)) {
+                if (Boolean.valueOf(actual_semantic_roles.value)) {
                     println "Installing actual semantic roles"
                     phenomena.setupOntology(SourceLanguage.OmniSRC.getActualSemanticRolesSchemaDefinition())
                     new CodeSemanticObserver().getRules().each {
@@ -166,7 +167,7 @@ class Init implements Callable<Integer> {
             }
         }
         RetryerBuilder.<Boolean> newBuilder()
-                .retryIfRuntimeException()
+                .retryIfExceptionOfType(ConnectException.class)
                 .withWaitStrategy(WaitStrategies.fixedWait(15, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(5))
                 .withRetryListener(new RetryListener() {
@@ -181,19 +182,19 @@ class Init implements Callable<Integer> {
 
     private static void installObserverSchemas(Phenomena phenomena) {
         //dependence observers
-        if (Boolean.valueOf(ConfigOption.identifier_access.value)) {
+        if (Boolean.valueOf(identifier_access.value)) {
             println "Installing identifier access schema"
             phenomena.setupOntology(DependenceAnalysis.Identifier_Access.schemaDefinition)
             println "Identifier access schema installed"
         }
-        if (Boolean.valueOf(ConfigOption.method_call.value)) {
+        if (Boolean.valueOf(method_call.value)) {
             println "Installing method call schema"
             phenomena.setupOntology(DependenceAnalysis.Method_Call.schemaDefinition)
             println "Method call schema installed"
         }
 
         //metric observers
-        if (Boolean.valueOf(ConfigOption.cyclomatic_complexity.value)) {
+        if (Boolean.valueOf(cyclomatic_complexity.value)) {
             println "Installing cyclomatic complexity schema"
             phenomena.setupOntology(MetricAnalysis.Cyclomatic_Complexity.schemaDefinition)
             println "Cyclomatic complexity schema installed"
@@ -202,8 +203,8 @@ class Init implements Callable<Integer> {
 
     private static int validateExternalBabelfish() {
         println "Validating external Babelfish installation"
-        def host = ConfigOption.babelfish_host.value
-        def port = ConfigOption.babelfish_port.value as int
+        def host = babelfish_host.value
+        def port = babelfish_port.value as int
         println " Host: $host"
         println " Port: $port"
 
@@ -254,8 +255,8 @@ class Init implements Callable<Integer> {
             List<Image> images = SocraticCLI.dockerClient.listImagesCmd().withShowAll(true).exec()
             images.each {
                 if (it.repoTags?.contains("bblfsh/bblfshd:$babelfishVersion") && initBabelfish) {
-                    def babelfishPort = ConfigOption.babelfish_port.getValue() as int
-                    ExposedPort babelfishTcpPort = ExposedPort.tcp(ConfigOption.babelfish_port.defaultValue as int)
+                    def babelfishPort = babelfish_port.getValue() as int
+                    ExposedPort babelfishTcpPort = ExposedPort.tcp(babelfish_port.defaultValue as int)
                     Ports portBindings = new Ports()
                     portBindings.bind(babelfishTcpPort, Ports.Binding.bindPort(babelfishPort))
                     CreateContainerResponse container = SocraticCLI.dockerClient.createContainerCmd(it.id)
@@ -270,7 +271,8 @@ class Init implements Callable<Integer> {
 
                     //auto-install recommended language drivers
                     ExecCreateCmdResponse execCreateCmdResponse =
-                            SocraticCLI.dockerClient.execCreateCmd(container.id).withCmd("bblfshctl", "driver", "install", "--recommended")
+                            SocraticCLI.dockerClient.execCreateCmd(container.id)
+                                    .withCmd("bblfshctl", "driver", "install", "--recommended")
                                     .withTty(true)
                                     .withPrivileged(true)
                                     .exec()
@@ -298,7 +300,7 @@ class Init implements Callable<Integer> {
     private InitCommandResult executeCommand(boolean outputLogging) throws Exception {
         def status = 0
         if (initBabelfish) {
-            if (Boolean.valueOf(ConfigOption.use_docker_babelfish.getValue())) {
+            if (Boolean.valueOf(use_docker_babelfish.getValue())) {
                 status = initDockerBabelfish()
                 if (status != 0) return new InitCommandResult(status)
             } else {
@@ -308,7 +310,7 @@ class Init implements Callable<Integer> {
             println()
         }
         if (initGrakn) {
-            if (Boolean.valueOf(ConfigOption.use_docker_grakn.getValue())) {
+            if (Boolean.valueOf(use_docker_grakn.getValue())) {
                 status = initDockerGrakn()
                 if (status != 0) return new InitCommandResult(status)
             } else {
