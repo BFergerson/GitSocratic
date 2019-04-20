@@ -197,12 +197,12 @@ Options:
 Example(s):
 ```
 gitsocratic logs grakn
-gitsocratic logs babelfish
+gitsocratic logs babelfish -f
 ```
 
 ## query
 
-Execute single source code query
+Execute a single source code query
 
 Usage:
 ```
@@ -235,7 +235,7 @@ gitsocratic query graql 'match $x; get;'
 
 ## question
 
-Execute single source code question
+Execute a single source code question
 
 Usage:
 ```
