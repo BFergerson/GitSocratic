@@ -21,6 +21,12 @@ enum ConfigOption {
     use_docker_babelfish("true"),
     babelfish_host("localhost"),
     babelfish_port("9432"),
+    use_docker_apache_skywalking("true"),
+    apache_skywalking_host("localhost"),
+    apache_skywalking_port("12800"),
+    use_docker_source_plus_plus("true"),
+    source_plus_plus_host("localhost"),
+    source_plus_plus_port("8080"),
 
     //phenomena
     source_schema("full"),
