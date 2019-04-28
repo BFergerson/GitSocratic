@@ -7,4 +7,4 @@ or
 ($functionName) isa NAME;
 ($functionName) isa IDENTIFIER;
 $functionName has token contains "<name>";
-aggregate count $function;
+get $function; count;

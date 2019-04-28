@@ -4,6 +4,7 @@ import grakn.core.concept.answer.Numeric
 import groovy.transform.ToString
 import io.gitsocratic.client.GraknClient
 import io.gitsocratic.command.question.SourceQuestion
+import io.gitsocratic.command.result.QuestionCommandResult
 import picocli.CommandLine
 
 import java.time.Duration
@@ -27,32 +28,53 @@ import java.util.concurrent.Callable
 class Question implements Callable<Integer> {
 
     @CommandLine.Parameters(index = "0", converter = QuestionTypeConverter.class)
-    SourceQuestion question
+    private SourceQuestion question
+
+    @SuppressWarnings("unused")
+    protected Question() {
+        //used by Picocli
+    }
+
+    Question(SourceQuestion question) {
+        this.question = Objects.requireNonNull(question)
+    }
 
     @Override
     Integer call() throws Exception {
+        return executeCommand(true).status
+    }
+
+    QuestionCommandResult execute() throws Exception {
+        return executeCommand(false)
+    }
+
+    private QuestionCommandResult executeCommand(boolean outputLogging) throws Exception {
         def startTime = System.currentTimeMillis()
         def query = question.query
         def graknClient = new GraknClient()
         def tx = graknClient.makeReadSession()
 
         try {
-            println "# Question: " + question.formattedQuestion
-            println "# Result:"
+            if (outputLogging) println "# Question: " + question.formattedQuestion
+            if (outputLogging) println "# Result:"
             def result = graknClient.executeQuery(tx, query)
-            if (result.size() == 1 && result.get(0) instanceof Numeric) {
-                println((result.get(0) as Numeric).number())
-            } else if (!result.isEmpty()) {
-                result.each {
-                    it.forEach({ key, value ->
-                        println key.toString() + " = " + value.asAttribute().value().toString()
-                    })
+            def queryTimeMs = System.currentTimeMillis() - startTime
+
+            if (outputLogging) {
+                if (result.size() == 1 && result.get(0) instanceof Numeric) {
+                    println((result.get(0) as Numeric).number())
+                } else if (!result.isEmpty()) {
+                    result.each {
+                        it.forEach({ key, value ->
+                            println key.toString() + " = " + value.asAttribute().value().toString()
+                        })
+                    }
+                } else {
+                    println "N/A"
                 }
-            } else {
-                println "N/A"
+                println "\n# Query time: " + humanReadableFormat(Duration.ofMillis(queryTimeMs))
             }
-            println "\n# Query time: " + humanReadableFormat(Duration.ofMillis(System.currentTimeMillis() - startTime))
-            return 0
+            return new QuestionCommandResult(0, result, queryTimeMs)
         } finally {
             tx.close()
             graknClient.close()

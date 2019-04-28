@@ -1,12 +1,10 @@
 package io.gitsocratic.command.impl.init
 
 import com.github.dockerjava.api.command.CreateContainerResponse
-import com.github.dockerjava.api.command.ExecCreateCmdResponse
 import com.github.dockerjava.api.model.Container
 import com.github.dockerjava.api.model.ExposedPort
 import com.github.dockerjava.api.model.Image
 import com.github.dockerjava.api.model.Ports
-import com.github.dockerjava.core.command.ExecStartResultCallback
 import groovy.transform.ToString
 import io.gitsocratic.GitSocraticService
 import io.gitsocratic.SocraticCLI
@@ -103,7 +101,7 @@ class Babelfish implements Callable<Integer> {
     private int initDockerBabelfish() {
         println "Initializing Babelfish container"
         def callback = new PullImageProgress()
-        SocraticCLI.dockerClient.pullImageCmd("bblfsh/bblfshd:v$babelfishVersion").exec(callback)
+        SocraticCLI.dockerClient.pullImageCmd("bblfsh/bblfshd:v$babelfishVersion-drivers").exec(callback)
         callback.awaitCompletion()
 
         Container babelfishContainer
@@ -129,7 +127,7 @@ class Babelfish implements Callable<Integer> {
             //create container
             List<Image> images = SocraticCLI.dockerClient.listImagesCmd().withShowAll(true).exec()
             images.each {
-                if (it.repoTags?.contains("bblfsh/bblfshd:v$babelfishVersion")) {
+                if (it.repoTags?.contains("bblfsh/bblfshd:v$babelfishVersion-drivers")) {
                     def babelfishPort = babelfish_port.getValue() as int
                     ExposedPort babelfishTcpPort = ExposedPort.tcp(babelfish_port.defaultValue as int)
                     Ports portBindings = new Ports()
@@ -143,19 +141,6 @@ class Babelfish implements Callable<Integer> {
                             .withPublishAllPorts(true)
                             .exec()
                     SocraticCLI.dockerClient.startContainerCmd(container.getId()).exec()
-
-                    //auto-install recommended language drivers
-                    ExecCreateCmdResponse execCreateCmdResponse =
-                            SocraticCLI.dockerClient.execCreateCmd(container.id)
-                                    .withCmd("bblfshctl", "driver", "install", "--recommended")
-                                    .withTty(true)
-                                    .withPrivileged(true)
-                                    .exec()
-                    SocraticCLI.dockerClient.execStartCmd(execCreateCmdResponse.getId())
-                            .withTty(true)
-                            .exec(new ExecStartResultCallback(System.out, System.err))
-                            .awaitCompletion()
-                    //todo: real wait on driver installation
                 }
             }
         }
@@ -164,6 +149,6 @@ class Babelfish implements Callable<Integer> {
     }
 
     static String getDefaultBabelfishVersion() {
-        return "2.12.1-drivers"
+        return "2.12.1"
     }
 }

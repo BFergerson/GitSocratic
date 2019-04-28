@@ -42,7 +42,7 @@ class Init implements Callable<Integer> {
     }
 
     private InitCommandResult executeCommand(boolean outputLogging) throws Exception {
-        if (cli.fullCommand.length == 1) {
+        if (cli == null || cli.fullCommand.length == 1) {
             //install base services: babelfish & grakn
             def status = new Babelfish().call()
             if (status == 0) {

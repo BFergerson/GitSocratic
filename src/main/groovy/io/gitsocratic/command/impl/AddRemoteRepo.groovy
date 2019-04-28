@@ -26,10 +26,10 @@ import java.util.concurrent.TimeUnit
 class AddRemoteRepo extends AddLocalRepo {
 
     @CommandLine.Parameters(index = "0", description = "The repository to add")
-    String repoName
+    private String repoName
 
     @CommandLine.Option(names = ["-p", "--parallel"], description = "Use parallel source code processing")
-    boolean parallelProcessing = defaultParallelProcessing
+    private boolean parallelProcessing = defaultParallelProcessing
 
     @SuppressWarnings("unused")
     protected AddRemoteRepo() {

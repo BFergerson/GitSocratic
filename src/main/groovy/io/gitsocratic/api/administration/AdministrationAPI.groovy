@@ -62,4 +62,12 @@ class AdministrationAPI {
     AddRemoteRepoCommandBuilder addRemoteRepo() {
         return new AddRemoteRepoCommandBuilder()
     }
+
+    void shutdownActiveServices() {
+        //todo: here
+    }
+
+    void restartActiveServices() {
+        //todo: here
+    }
 }

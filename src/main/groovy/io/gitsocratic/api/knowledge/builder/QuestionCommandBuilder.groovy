@@ -1,6 +1,7 @@
 package io.gitsocratic.api.knowledge.builder
 
 import io.gitsocratic.command.impl.Question
+import io.gitsocratic.command.question.SourceQuestion
 
 /**
  * Used to construct the 'question' command via API.
@@ -11,14 +12,19 @@ import io.gitsocratic.command.impl.Question
  */
 class QuestionCommandBuilder {
 
-    private String question
+    private SourceQuestion question
 
     QuestionCommandBuilder question(String question) {
+        this.question = SourceQuestion.toSourceQuestion(question)
+        return this
+    }
+
+    QuestionCommandBuilder question(SourceQuestion question) {
         this.question = question
         return this
     }
 
     Question build() {
-        return new Question(question: question)
+        return new Question(question)
     }
 }

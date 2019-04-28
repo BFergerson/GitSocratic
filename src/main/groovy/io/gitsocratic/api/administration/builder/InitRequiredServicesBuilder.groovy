@@ -3,6 +3,7 @@ package io.gitsocratic.api.administration.builder
 import io.gitsocratic.command.impl.Init
 import io.gitsocratic.command.impl.init.Babelfish
 import io.gitsocratic.command.impl.init.Grakn
+import io.gitsocratic.command.result.InitCommandResult
 
 /**
  * Used to construct the 'init' command via API.
@@ -36,7 +37,7 @@ class InitRequiredServicesBuilder {
         return new RequiredServices(babelfishVersion, graknVersion, verbose)
     }
 
-    static class RequiredServices extends Init {
+    static class RequiredServices {
         final String babelfishVersion
         final String graknVersion
         final boolean verbose
@@ -45,6 +46,15 @@ class InitRequiredServicesBuilder {
             this.babelfishVersion = babelfishVersion
             this.graknVersion = graknVersion
             this.verbose = verbose
+        }
+
+        InitCommandResult execute() throws Exception {
+            //install base services: babelfish & grakn
+            def status = new Babelfish(babelfishVersion, verbose).call()
+            if (status == 0) {
+                status = new Grakn(graknVersion, verbose).call()
+            }
+            return new InitCommandResult(status)
         }
     }
 }

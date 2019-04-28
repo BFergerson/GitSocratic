@@ -1,5 +1,4 @@
 match $x
-    has name $name
+    has name $name,
     has cyclomaticComplexity $c;
-order by $c desc; offset 0; limit 1;
-get $name;
+get $name, $c; sort $c desc; offset 0; limit <limit>;

@@ -73,8 +73,9 @@ enum SourceQuestion {
             def matches = userQuestion =~ matchRegex
             int matchIndex = 1
             valueConverters.each {
-                def value = matches[0][matchIndex++] as String
+                def value = matches[0][matchIndex] as String
                 questionQuery = questionQuery.replace("<" + it.key + ">", it.value.convert(value))
+                matchIndex += 2
             }
         }
         return questionQuery
