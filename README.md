@@ -24,7 +24,7 @@ If you do no wish to use Docker you may supply the host and ports for these serv
 
 To automatically setup these services with Docker, simply use the command:
 ```
-gitsocratic init babelfish && gitsocratic init grakn
+gitsocratic init
 ```
 
 Note: This command may take several minutes on the first use.
