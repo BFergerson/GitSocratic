@@ -343,7 +343,7 @@ class Init implements Callable<Integer> {
     }
 
     static String getDefaultGraknVersion() {
-        return "1.5.1"
+        return "1.5.2"
     }
 
     static String getDefaultBabelfishVersion() {

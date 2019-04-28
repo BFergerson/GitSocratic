@@ -163,7 +163,7 @@ Options:
 -b, --babelfish         Initialize Babelfish (default: true)
 -bv,--babelfish-version Babelfish version to initialize (default: v2.12.1-drivers)
 -g, --grakn             Initialize Grakn (default: true)
--gv,--grakn-version     Grakn version to initialize (default: 1.5.1)
+-gv,--grakn-version     Grakn version to initialize (default: 1.5.2)
 -v, --verbose           Verbose logging (default: false)
 ```
 
@@ -171,7 +171,7 @@ Example(s):
 ```
 gitsocratic init
 gitsocratic init -v
-gitsocratic init -gv 1.5.1 -bv v2.12.1-drivers
+gitsocratic init -gv 1.5.2 -bv v2.12.1-drivers
 ```
 
 ## logs
