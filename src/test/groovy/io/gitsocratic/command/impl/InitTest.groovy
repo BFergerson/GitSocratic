@@ -11,7 +11,7 @@ class InitTest extends SocraticCommandTest {
     @Test
     void "default init command"() {
         def command = SocraticAPI.administration().init().build()
-        assertEquals("1.5.2", command.graknVersion)
+        assertEquals("1.5.1", command.graknVersion)
         assertEquals("v2.12.1-drivers", command.babelfishVersion)
         assertTrue(command.initGrakn)
         assertTrue(command.initBabelfish)
