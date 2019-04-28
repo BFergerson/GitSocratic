@@ -160,18 +160,84 @@ gitsocratic init [-bghvV] [-bv=<babelfishVersion>] [-gv=<graknVersion>]
 
 Options:
 ```
--b, --babelfish         Initialize Babelfish (default: true)
--bv,--babelfish-version Babelfish version to initialize (default: v2.12.1-drivers)
--g, --grakn             Initialize Grakn (default: true)
--gv,--grakn-version     Grakn version to initialize (default: 1.5.2)
--v, --verbose           Verbose logging (default: false)
+service
+    - enum (apache_skywalking, babelfish, grakn, source_plus_plus)
+```
+
+### init (Apache Skywalking)
+
+Usage:
+```
+gitsocratic init apache_skywalking [-hvV] <version>
+```
+
+Options:
+```
+version
+    - string
 ```
 
 Example(s):
 ```
-gitsocratic init
-gitsocratic init -v
-gitsocratic init -gv 1.5.2 -bv v2.12.1-drivers
+gitsocratic init apache_skywalking
+gitsocratic init apache_skwyalking 6.0.0-GA -v
+```
+
+### init (Babelfish)
+
+Usage:
+```
+gitsocratic init babelfish [-hvV] <version>
+```
+
+Options:
+```
+version
+    - string
+```
+
+Example(s):
+```
+gitsocratic init babelfish
+gitsocratic init babelfish v2.12.1-drivers -v
+```
+
+### init (Grakn)
+
+Usage:
+```
+gitsocratic init grakn [-hvV] <version>
+```
+
+Options:
+```
+version
+    - string
+```
+
+Example(s):
+```
+gitsocratic init grakn
+gitsocratic init grakn 1.5.2 -v
+```
+
+### init (Source++)
+
+Usage:
+```
+gitsocratic init source_plus_plus [-hvV] <version>
+```
+
+Options:
+```
+version
+    - string
+```
+
+Example(s):
+```
+gitsocratic init source_plus_plus
+gitsocratic init source_plus_plus 0.2.0-alpha -v
 ```
 
 ## logs
@@ -186,7 +252,7 @@ gitsocratic logs [-htV] <service>
 Param(s):
 ```
 service
-    - enum (babelfish, grakn)
+    - enum (apache_skywalking, babelfish, grakn, source_plus_plus)
 ```
 
 Options:
