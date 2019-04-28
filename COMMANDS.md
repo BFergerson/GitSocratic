@@ -11,7 +11,7 @@
    - [Apache Skywalking](#init-apache-skywalking)
    - [Babelfish](#init-babelfish)
    - [Grakn](#init-grakn)
-   - [Source++](#init-source-plus-plus)
+   - [Source++](#init-source)
  - [logs](#logs)
  - [query](#query)
    - [graql](#query-graql)
