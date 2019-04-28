@@ -9,8 +9,10 @@ package io.gitsocratic
  */
 enum GitSocraticService {
 
+    apache_skywalking("sh docker-entrypoint.sh"),
     babelfish("bblfshd"),
-    grakn("./grakn-docker.sh")
+    grakn("./grakn-docker.sh"),
+    source_plus_plus("source-core.sh")
 
     private String command
 
