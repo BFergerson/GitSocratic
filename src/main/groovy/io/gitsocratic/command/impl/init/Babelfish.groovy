@@ -103,7 +103,7 @@ class Babelfish implements Callable<Integer> {
     private int initDockerBabelfish() {
         println "Initializing Babelfish container"
         def callback = new PullImageProgress()
-        SocraticCLI.dockerClient.pullImageCmd("bblfsh/bblfshd:$babelfishVersion").exec(callback)
+        SocraticCLI.dockerClient.pullImageCmd("bblfsh/bblfshd:v$babelfishVersion").exec(callback)
         callback.awaitCompletion()
 
         Container babelfishContainer
@@ -129,7 +129,7 @@ class Babelfish implements Callable<Integer> {
             //create container
             List<Image> images = SocraticCLI.dockerClient.listImagesCmd().withShowAll(true).exec()
             images.each {
-                if (it.repoTags?.contains("bblfsh/bblfshd:$babelfishVersion")) {
+                if (it.repoTags?.contains("bblfsh/bblfshd:v$babelfishVersion")) {
                     def babelfishPort = babelfish_port.getValue() as int
                     ExposedPort babelfishTcpPort = ExposedPort.tcp(babelfish_port.defaultValue as int)
                     Ports portBindings = new Ports()
@@ -164,6 +164,6 @@ class Babelfish implements Callable<Integer> {
     }
 
     static String getDefaultBabelfishVersion() {
-        return "v2.12.1-drivers"
+        return "2.12.1-drivers"
     }
 }
