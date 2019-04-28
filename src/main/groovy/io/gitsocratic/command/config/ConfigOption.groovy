@@ -1,16 +1,17 @@
 package io.gitsocratic.command.config
 
-import io.gitsocratic.GitSocraticCLI
+import io.gitsocratic.SocraticCLI
 
 /**
- * todo: description
+ * Represents the configuration options which GitSocratic supports.
  *
- * @version 0.1
+ * @version 0.2
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
 enum ConfigOption {
 
+    //environment
     use_docker_grakn("true"),
     docker_host("localhost"),
     docker_port("2376"),
@@ -19,7 +20,19 @@ enum ConfigOption {
     grakn_keyspace("grakn"),
     use_docker_babelfish("true"),
     babelfish_host("localhost"),
-    babelfish_port("9432")
+    babelfish_port("9432"),
+
+    //phenomena
+    source_schema("full"),
+    individual_semantic_roles("false"),
+    actual_semantic_roles("false"),
+
+    //observers - dependence
+    identifier_access("false"),
+    method_call("false"),
+
+    //observers - metric
+    cyclomatic_complexity("false")
 
     public final String defaultValue
 
@@ -34,10 +47,10 @@ enum ConfigOption {
             configProperties = new Properties()
             InputStream input = null
             try {
-                if (!GitSocraticCLI.getConfigFile().exists()) {
-                    GitSocraticCLI.getConfigFile().createNewFile()
+                if (!SocraticCLI.getConfigFile().exists()) {
+                    SocraticCLI.getConfigFile().createNewFile()
                 }
-                input = new FileInputStream(GitSocraticCLI.getConfigFile())
+                input = new FileInputStream(SocraticCLI.getConfigFile())
                 configProperties.load(input)
             } catch (IOException ex) {
                 throw new RuntimeException(ex)
@@ -63,7 +76,7 @@ enum ConfigOption {
 
         OutputStream output = null
         try {
-            output = new FileOutputStream(GitSocraticCLI.configFile)
+            output = new FileOutputStream(SocraticCLI.configFile)
             configProperties.store(output, null)
         } catch (IOException io) {
             io.printStackTrace()

@@ -6,9 +6,10 @@ import io.gitsocratic.command.question.converters.NopValueConverter
 import io.gitsocratic.command.question.converters.SourceLanguageQualifiedNameValue
 
 /**
- * todo: description
+ * Represents source code questions GitSocratic understands.
+ * Likely to be replaced by DialogFlow in 0.3.
  *
- * @version 0.1
+ * @version 0.2
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
@@ -23,7 +24,15 @@ enum SourceQuestion {
             [new QuestionValue("name", new NopValueConverter())]),
     how_many_methods_are_named_like_x("how many methods are named like [name]", "(?:how many methods are named like )([^\\s]+)",
             [new QuestionValue("name", new NopValueConverter())]),
-    how_many_methods_total("how many methods total")
+    how_many_methods_total("how many methods total"),
+    what_are_the_x_most_complex_x_methods("what are the [limit] most complex [language] methods", "(?:what are the )([^\\s]+)(?: most complex )([^\\s]+)( methods)",
+            [new QuestionValue("limit", new NopValueConverter()),
+             new QuestionValue("language", new SourceLanguageQualifiedNameValue())]),
+    what_are_the_x_most_complex_methods("what are the [limit] most complex methods", "(?:what are the )([^\\s]+)(?: most complex methods)",
+            [new QuestionValue("limit", new NopValueConverter())]),
+    what_is_the_most_complex_x_method("what is the most complex [language] method", "(?:what is the most complex )([^\\s]+)( method)",
+            [new QuestionValue("language", new SourceLanguageQualifiedNameValue())]),
+    what_is_the_most_complex_method("what is the most complex method")
 
     private final String formattedQuestion
     private String matchRegex
@@ -65,10 +74,6 @@ enum SourceQuestion {
             int matchIndex = 1
             valueConverters.each {
                 def value = matches[0][matchIndex++] as String
-                if (value == " methods are named ") {
-                    //todo: fix this; because I don't understand how regex matchers work apparently
-                    value = matches[0][matchIndex] as String
-                }
                 questionQuery = questionQuery.replace("<" + it.key + ">", it.value.convert(value))
             }
         }

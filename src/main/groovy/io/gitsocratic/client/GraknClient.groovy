@@ -1,17 +1,13 @@
 package io.gitsocratic.client
 
-import ai.grakn.GraknSession
-import ai.grakn.GraknTxType
-import ai.grakn.Keyspace
-import ai.grakn.client.Grakn
-import ai.grakn.graql.answer.ConceptMap
-import ai.grakn.util.SimpleURI
+import grakn.core.concept.answer.ConceptMap
+import graql.lang.Graql
 import io.gitsocratic.command.config.ConfigOption
 
 /**
- * todo: description
+ * Used to execute queries/questions on the Grakn knowledge graph.
  *
- * @version 0.1
+ * @version 0.2
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
@@ -20,7 +16,7 @@ class GraknClient {
     private final String host
     private final int port
     private final String keyspace
-    private final GraknSession session
+    private final grakn.client.GraknClient.Session session
 
     GraknClient() {
         if (Boolean.valueOf(ConfigOption.use_docker_grakn.value)) {
@@ -30,24 +26,48 @@ class GraknClient {
         }
         this.port = ConfigOption.grakn_port.value as int
         this.keyspace = ConfigOption.grakn_keyspace.value
-        session = new Grakn(new SimpleURI("$host:$port")).session(Keyspace.of(keyspace))
+
+        def client = new grakn.client.GraknClient("$host:$port")
+        session = client.session(keyspace)
     }
 
     GraknClient(String host, int port, String keyspace) {
         this.host = host
         this.port = port
         this.keyspace = keyspace
-        session = new Grakn(new SimpleURI("$host:$port")).session(Keyspace.of(keyspace))
+
+        def client = new grakn.client.GraknClient("$host:$port")
+        session = client.session(keyspace)
     }
 
-    List<ConceptMap> executeQuery(String query) {
-        def tx = session.transaction(GraknTxType.WRITE)
+    List<ConceptMap> executeReadQuery(String query) {
+        def tx = makeReadSession()
         try {
-            def graql = tx.graql()
-            return graql.parse(query).execute() as List<ConceptMap>
+            executeQuery(tx, query)
         } finally {
             tx.close()
         }
+    }
+
+    List<ConceptMap> executeWriteQuery(String query) {
+        def tx = makeWriteSession()
+        try {
+            executeQuery(tx, query)
+        } finally {
+            tx.close()
+        }
+    }
+
+    static List<ConceptMap> executeQuery(grakn.client.GraknClient.Transaction tx, String query) {
+        return tx.execute(Graql.parse(query)) as List<ConceptMap>
+    }
+
+    grakn.client.GraknClient.Transaction makeWriteSession() {
+        return session.transaction().write()
+    }
+
+    grakn.client.GraknClient.Transaction makeReadSession() {
+        return session.transaction().read()
     }
 
     void close() {

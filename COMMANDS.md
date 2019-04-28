@@ -1,17 +1,17 @@
 # Commands
 
- - [add-local-repo](https://github.com/CodeBrig/GitSocratic/blob/master/COMMANDS.md#add-local-repo)
- - [add-remote-repo](https://github.com/CodeBrig/GitSocratic/blob/master/COMMANDS.md#add-remote-repo)
- - [config](https://github.com/CodeBrig/GitSocratic/blob/master/COMMANDS.md#config)
-   - [Display configuration](https://github.com/CodeBrig/GitSocratic/blob/master/COMMANDS.md#display-configuration)
-   - [Get config option](https://github.com/CodeBrig/GitSocratic/blob/master/COMMANDS.md#get-config-option)
-   - [Set config option](https://github.com/CodeBrig/GitSocratic/blob/master/COMMANDS.md#set-config-option)
- - [console](https://github.com/CodeBrig/GitSocratic/blob/master/COMMANDS.md#console)
- - [init](https://github.com/CodeBrig/GitSocratic/blob/master/COMMANDS.md#init)
- - [logs](https://github.com/CodeBrig/GitSocratic/blob/master/COMMANDS.md#logs)
- - [query](https://github.com/CodeBrig/GitSocratic/blob/master/COMMANDS.md#query)
-   - [graql](https://github.com/CodeBrig/GitSocratic/blob/master/COMMANDS.md#query-graql)
- - [question](https://github.com/CodeBrig/GitSocratic/blob/master/COMMANDS.md#question)
+ - [add-local-repo](#add-local-repo)
+ - [add-remote-repo](#add-remote-repo)
+ - [config](#config)
+   - [Display configuration](#display-configuration)
+   - [Get config option](#get-config-option)
+   - [Set config option](#set-config-option)
+ - [console](#console)
+ - [init](#init)
+ - [logs](#logs)
+ - [query](#query)
+   - [graql](#query-graql)
+ - [question](#question)
 
 ## add-local-repo
 
@@ -155,20 +155,23 @@ Initialize services necessary to use GitSocratic
 
 Usage:
 ```
-gitsocratic init [-bghvV]
+gitsocratic init [-bghvV] [-bv=<babelfishVersion>] [-gv=<graknVersion>]
 ```
 
 Options:
 ```
--b, --babelfish   Initialize Babelfish (Default: true)
--g, --grakn       Initialize Grakn (Default: true)
--v, --verbose     Verbose logging
+-b, --babelfish         Initialize Babelfish (default: true)
+-bv,--babelfish-version Babelfish version to initialize (default: v2.12.0-drivers)
+-g, --grakn             Initialize Grakn (default: true)
+-gv,--grakn-version     Grakn version to initialize (default: 1.5.0)
+-v, --verbose           Verbose logging (default: false)
 ```
 
 Example(s):
 ```
 gitsocratic init
 gitsocratic init -v
+gitsocratic init -gv 1.5.0 -bv v2.12.0-drivers
 ```
 
 ## logs

@@ -2,22 +2,25 @@ package io.gitsocratic.command.impl
 
 import com.github.dockerjava.api.model.Frame
 import com.github.dockerjava.core.command.LogContainerResultCallback
+import groovy.transform.ToString
 import io.gitsocratic.GitSocraticService
 import picocli.CommandLine
 
 import java.util.concurrent.Callable
 
-import static io.gitsocratic.GitSocraticCLI.dockerClient
+import static io.gitsocratic.SocraticCLI.dockerClient
 
 /**
- * todo: description
+ * Represents the `logs` command.
+ * Used to view logs of initialized services.
  *
- * @version 0.1
+ * @version 0.2
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@ToString(includePackage = false, includeNames = true)
 @CommandLine.Command(name = "logs",
-        description = "View logs for initialized services",
+        description = "View logs of initialized services",
         mixinStandardHelpOptions = true,
         descriptionHeading = "%nDescription:%n%n",
         parameterListHeading = "%nParameters:%n",
@@ -25,10 +28,10 @@ import static io.gitsocratic.GitSocraticCLI.dockerClient
 class Logs implements Callable<Integer> {
 
     @CommandLine.Parameters(index = "0", description = "The service to view logs for")
-    private GitSocraticService service
+    GitSocraticService service
 
     @CommandLine.Option(names = ["-t", "-f", "--tail"], description = "Tail logs")
-    private boolean tailLogs = false
+    boolean tailLogs = false
 
     @Override
     Integer call() throws Exception {

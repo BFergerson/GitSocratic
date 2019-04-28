@@ -12,9 +12,9 @@ import picocli.CommandLine
 import java.util.concurrent.Callable
 
 /**
- * todo: description
+ * Main entry point of the GitSocratic CLI implementation.
  *
- * @version 0.1
+ * @version 0.2
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
@@ -27,14 +27,16 @@ import java.util.concurrent.Callable
         versionProvider = GitSocraticVersion.class,
         subcommands = [AddLocalRepo.class, AddRemoteRepo.class, Config.class, Console.class,
                 Init.class, Logs.class, Query.class, Question.class])
-class GitSocraticCLI implements Callable<Integer> {
+class SocraticCLI implements Callable<Integer> {
 
     @CommandLine.Option(names = ["-c", "--config"], description = 'Config file to use (default: ${DEFAULT-VALUE})')
     private static File configFile = new File(System.getProperty("java.io.tmpdir"), "gitsocratic.config")
     private static DockerClient dockerClient
 
+    private final String[] fullCommand
+
     static void main(String[] args) {
-        def cmd = new CommandLine(new GitSocraticCLI())
+        def cmd = new CommandLine(new SocraticCLI(args))
         List<Object> result = cmd.parseWithHandler(new CommandLine.RunAll(), args)
         dockerClient?.close()
         if (result != null) {
@@ -49,12 +51,20 @@ class GitSocraticCLI implements Callable<Integer> {
         }
     }
 
+    SocraticCLI(String[] fullCommand) {
+        this.fullCommand = fullCommand
+    }
+
+    String[] getFullCommand() {
+        return fullCommand
+    }
+
     static File getConfigFile() {
         return configFile
     }
 
     static DockerClient getDockerClient() {
-        if (dockerClient == null){
+        if (dockerClient == null) {
             NettyDockerCmdExecFactory factory = new NettyDockerCmdExecFactory()
             def config = DefaultDockerClientConfig.createDefaultConfigBuilder()
             if (SystemUtils.IS_OS_WINDOWS) {
