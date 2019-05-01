@@ -12,7 +12,7 @@ import io.gitsocratic.command.impl.init.SourcePlusPlus
  */
 class InitSourcePlusPlusCommandBuilder extends InitCommandBuilder<InitSourcePlusPlusCommandBuilder, SourcePlusPlus> {
 
-    private String sppVersion
+    private String sppVersion = SourcePlusPlus.defaultSourcePlusPlusVersion
 
     InitSourcePlusPlusCommandBuilder sppVersion(String sppVersion) {
         this.sppVersion = sppVersion

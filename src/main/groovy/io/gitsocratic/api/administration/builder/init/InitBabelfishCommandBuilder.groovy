@@ -12,7 +12,7 @@ import io.gitsocratic.command.impl.init.Babelfish
  */
 class InitBabelfishCommandBuilder extends InitCommandBuilder<InitBabelfishCommandBuilder, Babelfish> {
 
-    private String babelfishVersion
+    private String babelfishVersion = Babelfish.defaultBabelfishVersion
 
     InitBabelfishCommandBuilder babelfishVersion(String babelfishVersion) {
         this.babelfishVersion = babelfishVersion

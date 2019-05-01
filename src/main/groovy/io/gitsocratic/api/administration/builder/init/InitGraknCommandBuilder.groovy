@@ -12,7 +12,7 @@ import io.gitsocratic.command.impl.init.Grakn
  */
 class InitGraknCommandBuilder extends InitCommandBuilder<InitGraknCommandBuilder, Grakn> {
 
-    private String graknVersion
+    private String graknVersion = Grakn.defaultGraknVersion
 
     InitGraknCommandBuilder graknVersion(String graknVersion) {
         this.graknVersion = graknVersion

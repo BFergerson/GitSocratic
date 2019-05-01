@@ -12,7 +12,7 @@ import io.gitsocratic.command.impl.init.ApacheSkywalking
  */
 class InitApacheSkywalkingCommandBuilder extends InitCommandBuilder<InitApacheSkywalkingCommandBuilder, ApacheSkywalking> {
 
-    private String skywalkingVersion
+    private String skywalkingVersion = ApacheSkywalking.defaultApacheSkywalkingVersion
 
     InitApacheSkywalkingCommandBuilder skywalkingVersion(String skywalkingVersion) {
         this.skywalkingVersion = skywalkingVersion
