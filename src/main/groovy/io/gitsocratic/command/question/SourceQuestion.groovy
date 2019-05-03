@@ -15,7 +15,7 @@ import io.gitsocratic.command.question.converters.SourceLanguageQualifiedNameVal
  */
 enum SourceQuestion {
 
-    how_many_x_methods_are_named_x("how many [language] methods are named [name]", "(?:how many )([^\\s]+)( methods are named )([^\\s]+)",
+    how_many_x_methods_are_named_x("how many [language] methods are named [name]", "(?:how many )([^\\s]+)(?: methods are named )([^\\s]+)",
             [new QuestionValue("language", new SourceLanguageQualifiedNameValue()),
              new QuestionValue("name", new NopValueConverter())]),
     how_many_x_methods_total("how many [language] methods total", "(?:how many )([^\\s]+)(?: methods total)",
@@ -25,12 +25,12 @@ enum SourceQuestion {
     how_many_methods_are_named_like_x("how many methods are named like [name]", "(?:how many methods are named like )([^\\s]+)",
             [new QuestionValue("name", new NopValueConverter())]),
     how_many_methods_total("how many methods total"),
-    what_are_the_x_most_complex_x_methods("what are the [limit] most complex [language] methods", "(?:what are the )([^\\s]+)(?: most complex )([^\\s]+)( methods)",
+    what_are_the_x_most_complex_x_methods("what are the [limit] most complex [language] methods", "(?:what are the )([^\\s]+)(?: most complex )([^\\s]+)(?: methods)",
             [new QuestionValue("limit", new NopValueConverter()),
              new QuestionValue("language", new SourceLanguageQualifiedNameValue())]),
     what_are_the_x_most_complex_methods("what are the [limit] most complex methods", "(?:what are the )([^\\s]+)(?: most complex methods)",
             [new QuestionValue("limit", new NopValueConverter())]),
-    what_is_the_most_complex_x_method("what is the most complex [language] method", "(?:what is the most complex )([^\\s]+)( method)",
+    what_is_the_most_complex_x_method("what is the most complex [language] method", "(?:what is the most complex )([^\\s]+)(?: method)",
             [new QuestionValue("language", new SourceLanguageQualifiedNameValue())]),
     what_is_the_most_complex_method("what is the most complex method")
 
@@ -73,9 +73,8 @@ enum SourceQuestion {
             def matches = userQuestion =~ matchRegex
             int matchIndex = 1
             valueConverters.each {
-                def value = matches[0][matchIndex] as String
+                def value = matches[0][matchIndex++] as String
                 questionQuery = questionQuery.replace("<" + it.key + ">", it.value.convert(value))
-                matchIndex += 2
             }
         }
         return questionQuery

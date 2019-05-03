@@ -63,5 +63,22 @@ class BasicQuestionsTest {
                 .question("what is the most complex method").build().execute()
         assertEquals(0, question1.status)
         assertEquals("ComplexMethods.mostComplexMethod()", question1.answer)
+
+        def question2 = SocraticAPI.knowledge().question()
+                .question("what is the most complex java method").build().execute()
+        assertEquals(0, question2.status)
+        assertEquals("ComplexMethods.mostComplexMethod()", question2.answer)
+
+        def question3 = SocraticAPI.knowledge().question()
+                .question("what are the 2 most complex methods").build().execute()
+        assertEquals(0, question3.status)
+        assertEquals(["ComplexMethods.mostComplexMethod()",
+                      "ComplexMethods.complexMethod()"], question3.answer)
+
+        def question4 = SocraticAPI.knowledge().question()
+                .question("what are the 2 most complex java methods").build().execute()
+        assertEquals(0, question4.status)
+        assertEquals(["ComplexMethods.mostComplexMethod()",
+                      "ComplexMethods.complexMethod()"], question4.answer)
     }
 }

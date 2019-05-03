@@ -70,7 +70,11 @@ class Question implements Callable<Integer> {
                         if (outputLogging) println key.toString() + " = " + value.asAttribute().value().toString()
                     })
                 }
-                questionAnswer = result.get(0).get("name").asAttribute().value()
+                if (result.size() == 1) {
+                    questionAnswer = result.get(0).get("name").asAttribute().value()
+                } else {
+                    questionAnswer = result.collect { it.get("name").asAttribute().value() }
+                }
             } else if (outputLogging) {
                 println "N/A"
             }

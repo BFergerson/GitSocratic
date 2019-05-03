@@ -1,5 +1,4 @@
-match $x isa <language>SourceArtifact
-    has name $name
+match $x isa <language>SourceArtifact,
+    has name $name,
     has cyclomaticComplexity $c;
-order by $c desc; offset 0; limit <limit>;
-get $name;
+get $name, $c; sort $c desc; offset 0; limit <limit>;
