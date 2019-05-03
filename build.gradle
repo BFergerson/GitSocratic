@@ -32,7 +32,7 @@ dependencies {
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.0.1.201806211838-r'
     implementation "com.github.rholder:guava-retrying:2.0.0"
     implementation group: 'com.github.docker-java', name: 'docker-java', version: '3.1.0-rc-5'
-    implementation 'com.github.codebrig:phenomena:57ef317f19'
+    implementation 'com.github.codebrig:phenomena:v0.2.3-alpha'
     implementation 'com.github.codebrig:arthur:f20c04e98e'
     implementation "org.bblfsh:bblfsh-client:$babelfishVersion"
     implementation group: 'io.grakn.client', name: 'api', version: "$graknVersion"
