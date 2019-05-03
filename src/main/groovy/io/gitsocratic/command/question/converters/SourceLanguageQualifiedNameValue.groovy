@@ -1,6 +1,6 @@
 package io.gitsocratic.command.question.converters
 
-import com.codebrig.omnisrc.SourceLanguage
+import com.codebrig.arthur.SourceLanguage
 import io.gitsocratic.command.question.QuestionValueConverter
 
 /**

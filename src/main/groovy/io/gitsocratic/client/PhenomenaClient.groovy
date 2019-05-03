@@ -1,9 +1,9 @@
 package io.gitsocratic.client
 
-import com.codebrig.omnisrc.SourceLanguage
-import com.codebrig.omnisrc.observe.filter.FunctionFilter
-import com.codebrig.omnisrc.observe.filter.MultiFilter
-import com.codebrig.omnisrc.observe.filter.RoleFilter
+import com.codebrig.arthur.SourceLanguage
+import com.codebrig.arthur.observe.structure.filter.FunctionFilter
+import com.codebrig.arthur.observe.structure.filter.MultiFilter
+import com.codebrig.arthur.observe.structure.filter.RoleFilter
 import com.codebrig.phenomena.ParseException
 import com.codebrig.phenomena.Phenomena
 import com.codebrig.phenomena.code.CodeObserver
@@ -30,7 +30,7 @@ class PhenomenaClient implements Closeable {
     private final String repoLocation
     private final Phenomena phenomena
 
-    PhenomenaClient(String repoLocation) throws ConnectException  {
+    PhenomenaClient(String repoLocation) throws ConnectException {
         this.repoLocation = repoLocation
         this.phenomena = setupPhenomena()
     }
@@ -81,7 +81,7 @@ class PhenomenaClient implements Closeable {
         if (source_schema.value.contains("necessary")) {
             def necessaryStructureFilter = new MultiFilter(MultiFilter.MatchStyle.ANY)
             if (source_schema.value.contains("files")) {
-                necessaryStructureFilter.accept(new RoleFilter("FILE"))
+                necessaryStructureFilter.accept(new RoleFilter("FILE", "MODULE"))
             }
             if (source_schema.value.contains("functions")) {
                 necessaryStructureFilter.accept(new FunctionFilter())
@@ -91,15 +91,14 @@ class PhenomenaClient implements Closeable {
             }
             codeObservers.add(new CodeStructureObserver(necessaryStructureFilter))
 
-            if (Boolean.valueOf(individual_semantic_roles.value) || Boolean.valueOf(actual_semantic_roles.value)) {
-                codeObservers.add(new CodeSemanticObserver(Boolean.valueOf(individual_semantic_roles.value),
-                        Boolean.valueOf(actual_semantic_roles.value)))
+            if (Boolean.valueOf(semantic_roles.value)) {
+                codeObservers.add(new CodeSemanticObserver())
             }
         } else {
             def hasFilter = false
             def filter = new MultiFilter(MultiFilter.MatchStyle.ANY)
             if (source_schema.value.contains("files")) {
-                filter.accept(new RoleFilter("FILE"))
+                filter.accept(new RoleFilter("FILE", "MODULE"))
                 hasFilter = true
             }
             if (source_schema.value.contains("functions")) {
@@ -109,16 +108,11 @@ class PhenomenaClient implements Closeable {
 
             if (hasFilter) {
                 codeObservers.add(new CodeStructureObserver(filter))
-                if (Boolean.valueOf(individual_semantic_roles.value) || Boolean.valueOf(actual_semantic_roles.value)) {
-                    codeObservers.add(new CodeSemanticObserver(Boolean.valueOf(individual_semantic_roles.value),
-                            Boolean.valueOf(actual_semantic_roles.value)))
-                }
             } else {
                 codeObservers.add(new CodeStructureObserver())
-                if (Boolean.valueOf(individual_semantic_roles.value) || Boolean.valueOf(actual_semantic_roles.value)) {
-                    codeObservers.add(new CodeSemanticObserver(Boolean.valueOf(individual_semantic_roles.value),
-                            Boolean.valueOf(actual_semantic_roles.value)))
-                }
+            }
+            if (Boolean.valueOf(semantic_roles.value)) {
+                codeObservers.add(new CodeSemanticObserver())
             }
         }
         phenomena.init(codeObservers)

@@ -16,7 +16,8 @@ class GraknClient {
     private final String host
     private final int port
     private final String keyspace
-    private final grakn.client.GraknClient.Session session
+    private grakn.client.GraknClient client
+    private grakn.client.GraknClient.Session session
 
     GraknClient() {
         if (Boolean.valueOf(ConfigOption.use_docker_grakn.value)) {
@@ -27,7 +28,7 @@ class GraknClient {
         this.port = ConfigOption.grakn_port.value as int
         this.keyspace = ConfigOption.grakn_keyspace.value
 
-        def client = new grakn.client.GraknClient("$host:$port")
+        client = new grakn.client.GraknClient("$host:$port")
         session = client.session(keyspace)
     }
 
@@ -36,7 +37,7 @@ class GraknClient {
         this.port = port
         this.keyspace = keyspace
 
-        def client = new grakn.client.GraknClient("$host:$port")
+        client = new grakn.client.GraknClient("$host:$port")
         session = client.session(keyspace)
     }
 
@@ -70,7 +71,14 @@ class GraknClient {
         return session.transaction().read()
     }
 
+    void resetKeyspace() {
+        client.keyspaces().delete(keyspace)
+        session.close()
+        session = client.session(keyspace)
+    }
+
     void close() {
         session.close()
+        client.close()
     }
 }

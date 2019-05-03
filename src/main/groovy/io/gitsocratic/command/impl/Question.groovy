@@ -60,21 +60,22 @@ class Question implements Callable<Integer> {
             def result = graknClient.executeQuery(tx, query)
             def queryTimeMs = System.currentTimeMillis() - startTime
 
-            if (outputLogging) {
-                if (result.size() == 1 && result.get(0) instanceof Numeric) {
-                    println((result.get(0) as Numeric).number())
-                } else if (!result.isEmpty()) {
-                    result.each {
-                        it.forEach({ key, value ->
-                            println key.toString() + " = " + value.asAttribute().value().toString()
-                        })
-                    }
-                } else {
-                    println "N/A"
+            def questionAnswer = null
+            if (result.size() == 1 && result.get(0) instanceof Numeric) {
+                questionAnswer = (result.get(0) as Numeric).number().longValue()
+                if (outputLogging) println questionAnswer
+            } else if (!result.isEmpty()) {
+                result.each {
+                    it.forEach({ key, value ->
+                        if (outputLogging) println key.toString() + " = " + value.asAttribute().value().toString()
+                    })
                 }
-                println "\n# Query time: " + humanReadableFormat(Duration.ofMillis(queryTimeMs))
+                questionAnswer = result.get(0).get("name").asAttribute().value()
+            } else if (outputLogging) {
+                println "N/A"
             }
-            return new QuestionCommandResult(0, result, queryTimeMs)
+            if (outputLogging) println "\n# Query time: " + humanReadableFormat(Duration.ofMillis(queryTimeMs))
+            return new QuestionCommandResult(0, questionAnswer, queryTimeMs)
         } finally {
             tx.close()
             graknClient.close()

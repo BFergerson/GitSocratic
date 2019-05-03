@@ -1,6 +1,6 @@
 package io.gitsocratic.command.impl.init
 
-import com.codebrig.omnisrc.SourceLanguage
+import com.codebrig.arthur.SourceLanguage
 import com.codebrig.phenomena.Phenomena
 import com.codebrig.phenomena.code.analysis.DependenceAnalysis
 import com.codebrig.phenomena.code.analysis.MetricAnalysis
@@ -166,26 +166,17 @@ class Grakn implements Callable<Integer> {
                 println "Successfully connected to Grakn"
 
                 println "Installing base structure"
-                phenomena.setupOntology(SourceLanguage.OmniSRC.getBaseStructureSchemaDefinition())
+                phenomena.setupOntology(SourceLanguage.Omnilingual.getBaseStructureSchemaDefinition())
                 println "Base structure installed"
 
-                if (Boolean.valueOf(individual_semantic_roles.value)) {
-                    println "Installing individual semantic roles"
-                    phenomena.setupOntology(SourceLanguage.OmniSRC.getIndividualSemanticRolesSchemaDefinition())
+                if (Boolean.valueOf(semantic_roles.value)) {
+                    println "Installing semantic roles"
+                    phenomena.setupOntology(SourceLanguage.Omnilingual.getSemanticRolesSchemaDefinition())
                     new CodeSemanticObserver().getRules().each {
                         phenomena.setupOntology(it)
                     }
-                    println "Individual semantic roles installed"
+                    println "Semantic roles installed"
                 }
-                if (Boolean.valueOf(actual_semantic_roles.value)) {
-                    println "Installing actual semantic roles"
-                    phenomena.setupOntology(SourceLanguage.OmniSRC.getActualSemanticRolesSchemaDefinition())
-                    new CodeSemanticObserver().getRules().each {
-                        phenomena.setupOntology(it)
-                    }
-                    println "Actual semantic roles installed"
-                }
-
                 installObserverSchemas(phenomena)
                 phenomena.close()
                 return true

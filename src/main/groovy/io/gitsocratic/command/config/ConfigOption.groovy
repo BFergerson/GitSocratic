@@ -28,10 +28,9 @@ enum ConfigOption {
     source_plus_plus_host("localhost"),
     source_plus_plus_port("8080"),
 
-    //phenomena
+    //base phenomena
     source_schema("full"),
-    individual_semantic_roles("false"),
-    actual_semantic_roles("false"),
+    semantic_roles("true"),
 
     //observers - dependence
     identifier_access("false"),

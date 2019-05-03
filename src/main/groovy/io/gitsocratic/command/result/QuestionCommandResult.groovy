@@ -1,6 +1,5 @@
 package io.gitsocratic.command.result
 
-import grakn.core.concept.answer.ConceptMap
 import groovy.transform.TupleConstructor
 
 /**
@@ -13,6 +12,6 @@ import groovy.transform.TupleConstructor
 @TupleConstructor
 class QuestionCommandResult {
     final int status
-    final List<ConceptMap> answer
+    final Object answer
     final long queryTimeMs
 }
