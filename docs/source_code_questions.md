@@ -1,13 +1,13 @@
 # Supported questions
-- [how many methods total?](https://github.com/CodeBrig/GitSocratic/blob/v0.2-alpha/docs/source_code_questions.md#how-many-methods-total)
-- [what are the \[limit\] most complex \[language\] methods?](https://github.com/CodeBrig/GitSocratic/blob/v0.2-alpha/docs/source_code_questions.md#what-are-the-limit-most-complex-language-methods)
-- [how many methods are named like \[name\]?](https://github.com/CodeBrig/GitSocratic/blob/v0.2-alpha/docs/source_code_questions.md#how-many-methods-are-named-like-name)
-- [what is the most complex \[language\] method?](https://github.com/CodeBrig/GitSocratic/blob/v0.2-alpha/docs/source_code_questions.md#what-is-the-most-complex-language-method)
-- [what is the most complex method?](https://github.com/CodeBrig/GitSocratic/blob/v0.2-alpha/docs/source_code_questions.md#what-is-the-most-complex-method)
-- [how many methods are named \[name\]?](https://github.com/CodeBrig/GitSocratic/blob/v0.2-alpha/docs/source_code_questions.md#how-many-methods-are-named-name)
-- [how many \[language\] methods total?](https://github.com/CodeBrig/GitSocratic/blob/v0.2-alpha/docs/source_code_questions.md#how-many-language-methods-total)
-- [how many \[language\] methods are named \[name\]?](https://github.com/CodeBrig/GitSocratic/blob/v0.2-alpha/docs/source_code_questions.md#how-many-language-methods-are-named-name)
-- [what are the \[limit\] most complex methods?](https://github.com/CodeBrig/GitSocratic/blob/v0.2-alpha/docs/source_code_questions.md#what-are-the-limit-most-complex-methods)
+- [how many methods total?](#how-many-methods-total)
+- [what are the \[limit\] most complex \[language\] methods?](#what-are-the-limit-most-complex-language-methods)
+- [how many methods are named like \[name\]?](#how-many-methods-are-named-like-name)
+- [what is the most complex \[language\] method?](#what-is-the-most-complex-language-method)
+- [what is the most complex method?](#what-is-the-most-complex-method)
+- [how many methods are named \[name\]?](#how-many-methods-are-named-name)
+- [how many \[language\] methods total?](#how-many-language-methods-total)
+- [how many \[language\] methods are named \[name\]?](#how-many-language-methods-are-named-name)
+- [what are the \[limit\] most complex methods?](#what-are-the-limit-most-complex-methods)
 
 ## how many methods total?
 #### Example:

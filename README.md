@@ -8,10 +8,10 @@
 GitSocratic provides a pain-free interface for querying source code. GitSocratic uses the omnilingual parser [Babelfish](https://github.com/bblfsh/bblfshd) to extract universal abstract syntax trees (which are additionally annotated with their semantic meanings) and imports that data into a knowledge graph powered by [Grakn](https://github.com/graknlabs/grakn). This process is fully facilitated by GitSocratic's integration with [Phenomena](https://github.com/CodeBrig/Phenomena).
 
 ### Features
- - [Supports question/answer source code queries](https://github.com/CodeBrig/GitSocratic/blob/v0.2-alpha/docs/source_code_questions.md)
- - [Cross-language source code querying](https://github.com/CodeBrig/GitSocratic/blob/v0.2-alpha/docs/cross_langauage_query.md)
- - [Semantic role querying](https://github.com/CodeBrig/GitSocratic/blob/v0.2-alpha/docs/semantic_querying.md)
- - [UAST structure querying](https://github.com/CodeBrig/GitSocratic/blob/v0.2-alpha/docs/uast_querying.md)
+ - [Supports question/answer source code queries](https://github.com/CodeBrig/GitSocratic/blob/master/docs/source_code_questions.md)
+ - [Cross-language source code querying](https://github.com/CodeBrig/GitSocratic/blob/master/docs/cross_langauage_query.md)
+ - [Semantic role querying](https://github.com/CodeBrig/GitSocratic/blob/master/docs/semantic_querying.md)
+ - [UAST structure querying](https://github.com/CodeBrig/GitSocratic/blob/master/docs/uast_querying.md)
 
 ## Setup
 
