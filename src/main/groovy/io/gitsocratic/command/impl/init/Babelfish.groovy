@@ -149,6 +149,6 @@ class Babelfish implements Callable<Integer> {
     }
 
     static String getDefaultBabelfishVersion() {
-        return "2.12.1"
+        return "2.13.0"
     }
 }

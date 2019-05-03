@@ -203,7 +203,7 @@ version
 Example(s):
 ```
 gitsocratic init babelfish
-gitsocratic init babelfish 2.12.1-drivers -v
+gitsocratic init babelfish 2.13.0-drivers -v
 ```
 
 ### init (Grakn)
