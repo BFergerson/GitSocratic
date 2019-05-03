@@ -15,6 +15,9 @@ class QuestionCommandBuilder {
     private SourceQuestion question
 
     QuestionCommandBuilder question(String question) {
+        if (question.endsWith("?")) {
+            question = question.substring(0, question.length() - 1)
+        }
         this.question = SourceQuestion.toSourceQuestion(question)
         return this
     }
