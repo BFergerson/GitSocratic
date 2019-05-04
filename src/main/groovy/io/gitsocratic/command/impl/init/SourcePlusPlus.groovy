@@ -95,22 +95,22 @@ class SourcePlusPlus implements Callable<Integer> {
     }
 
     private static int validateExternalSourcePlusPlus(PrintWriter out) {
-        println "Validating external Source++ installation"
+        out.println "Validating external Source++ installation"
         def host = source_plus_plus_host.value
         def port = source_plus_plus_port.value as int
-        println " Host: $host"
-        println " Port: $port"
+        out.println " Host: $host"
+        out.println " Port: $port"
 
-        println "Connecting to Source++"
+        out.println "Connecting to Source++"
         Socket s1 = new Socket()
         try {
             s1.setSoTimeout(200)
             s1.connect(new InetSocketAddress(host, port), 200)
-            println "Successfully connected to Source++"
+            out.println "Successfully connected to Source++"
             //todo: real connection test
             return 0
         } catch (all) {
-            println "Failed to connect to Source++"
+            out.println "Failed to connect to Source++"
             all.printStackTrace(out)
             return -1
         } finally {
