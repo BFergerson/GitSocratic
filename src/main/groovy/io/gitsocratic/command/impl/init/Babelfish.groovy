@@ -80,7 +80,7 @@ class Babelfish implements Callable<Integer> {
         def out = new GroovyPrintWriter(output, true)
         def status
         if (Boolean.valueOf(use_docker_babelfish.getValue())) {
-            status = initDockerBabelfish()
+            status = initDockerBabelfish(out)
             if (status != 0) return new InitCommandResult(status)
         } else {
             status = validateExternalBabelfish(out)
