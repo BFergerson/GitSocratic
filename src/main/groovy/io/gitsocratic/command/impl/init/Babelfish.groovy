@@ -106,7 +106,7 @@ class Babelfish implements Callable<Integer> {
             return 0
         } catch (all) {
             out.println "Failed to connect to Babelfish"
-            all.printStackTrace()
+            all.printStackTrace(out)
             return -1
         } finally {
             s1.close()
