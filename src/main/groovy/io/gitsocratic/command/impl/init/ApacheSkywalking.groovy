@@ -77,9 +77,9 @@ class ApacheSkywalking implements Callable<Integer> {
     }
 
     InitCommandResult execute(PipedOutputStream output) throws Exception {
+        def status = -1
         def out = new GroovyPrintWriter(output, true)
         try {
-            def status
             if (Boolean.valueOf(use_docker_apache_skywalking.getValue())) {
                 status = initDockerApacheSkywalking(out)
                 if (status != 0) return new InitCommandResult(status)
@@ -87,12 +87,11 @@ class ApacheSkywalking implements Callable<Integer> {
                 status = validateExternalApacheSkywalking(out)
                 if (status != 0) return new InitCommandResult(status)
             }
-            return new InitCommandResult(status)
         } catch (all) {
             out.println "Failed to initialize service"
             all.printStackTrace(out)
-            throw all
         }
+        return new InitCommandResult(status)
     }
 
     private static int validateExternalApacheSkywalking(PrintWriter out) {

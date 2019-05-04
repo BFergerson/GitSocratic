@@ -84,14 +84,19 @@ class Grakn implements Callable<Integer> {
     }
 
     InitCommandResult execute(PipedOutputStream output) throws Exception {
+        def status = -1
         def out = new GroovyPrintWriter(output, true)
-        def status
-        if (Boolean.valueOf(use_docker_grakn.getValue())) {
-            status = initDockerGrakn(out)
-            if (status != 0) return new InitCommandResult(status)
-        } else {
-            status = validateExternalGrakn(out)
-            if (status != 0) return new InitCommandResult(status)
+        try {
+            if (Boolean.valueOf(use_docker_grakn.getValue())) {
+                status = initDockerGrakn(out)
+                if (status != 0) return new InitCommandResult(status)
+            } else {
+                status = validateExternalGrakn(out)
+                if (status != 0) return new InitCommandResult(status)
+            }
+        } catch (all) {
+            out.println "Failed to initialize service"
+            all.printStackTrace(out)
         }
         return new InitCommandResult(status)
     }

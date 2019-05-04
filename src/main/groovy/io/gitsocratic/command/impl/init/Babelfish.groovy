@@ -77,14 +77,19 @@ class Babelfish implements Callable<Integer> {
     }
 
     InitCommandResult execute(PipedOutputStream output) throws Exception {
+        def status = -1
         def out = new GroovyPrintWriter(output, true)
-        def status
-        if (Boolean.valueOf(use_docker_babelfish.getValue())) {
-            status = initDockerBabelfish(out)
-            if (status != 0) return new InitCommandResult(status)
-        } else {
-            status = validateExternalBabelfish(out)
-            if (status != 0) return new InitCommandResult(status)
+        try {
+            if (Boolean.valueOf(use_docker_babelfish.getValue())) {
+                status = initDockerBabelfish(out)
+                if (status != 0) return new InitCommandResult(status)
+            } else {
+                status = validateExternalBabelfish(out)
+                if (status != 0) return new InitCommandResult(status)
+            }
+        } catch (all) {
+            out.println "Failed to initialize service"
+            all.printStackTrace(out)
         }
         return new InitCommandResult(status)
     }

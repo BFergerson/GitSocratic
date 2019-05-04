@@ -77,14 +77,19 @@ class SourcePlusPlus implements Callable<Integer> {
     }
 
     InitCommandResult execute(PipedOutputStream output) throws Exception {
+        def status = -1
         def out = new GroovyPrintWriter(output, true)
-        def status
-        if (Boolean.valueOf(use_docker_source_plus_plus.getValue())) {
-            status = initDockerSourcePlusPlus(out)
-            if (status != 0) return new InitCommandResult(status)
-        } else {
-            status = validateExternalSourcePlusPlus(out)
-            if (status != 0) return new InitCommandResult(status)
+        try {
+            if (Boolean.valueOf(use_docker_source_plus_plus.getValue())) {
+                status = initDockerSourcePlusPlus(out)
+                if (status != 0) return new InitCommandResult(status)
+            } else {
+                status = validateExternalSourcePlusPlus(out)
+                if (status != 0) return new InitCommandResult(status)
+            }
+        } catch (all) {
+            out.println "Failed to initialize service"
+            all.printStackTrace(out)
         }
         return new InitCommandResult(status)
     }
