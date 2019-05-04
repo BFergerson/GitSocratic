@@ -14,6 +14,11 @@ class PullImageProgress extends PullImageResultCallback {
 
     private Set<String> seenStatuses = new HashSet<>()
     private boolean verbose = false
+    private final PrintWriter out
+
+    PullImageProgress(PrintWriter out) {
+        this.out = out
+    }
 
     @Override
     void onNext(PullResponseItem item) {
@@ -26,9 +31,9 @@ class PullImageProgress extends PullImageResultCallback {
             status = "Id: " + item.id + " - Status: " + item.status
         }
         if (!seenStatuses.contains(status)) {
-            println " " + status
+            out.println " " + status
             seenStatuses.add(status)
         }
-        if (item.progress != null && verbose) println " Id: " + item.id + " - Progress: " + item.progress
+        if (item.progress != null && verbose) out.println " Id: " + item.id + " - Progress: " + item.progress
     }
 }

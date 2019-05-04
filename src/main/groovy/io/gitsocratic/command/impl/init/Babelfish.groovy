@@ -5,7 +5,9 @@ import com.github.dockerjava.api.model.Container
 import com.github.dockerjava.api.model.ExposedPort
 import com.github.dockerjava.api.model.Image
 import com.github.dockerjava.api.model.Ports
+import groovy.io.GroovyPrintWriter
 import groovy.transform.ToString
+import groovy.util.logging.Slf4j
 import io.gitsocratic.GitSocraticService
 import io.gitsocratic.SocraticCLI
 import io.gitsocratic.command.impl.Init
@@ -24,6 +26,7 @@ import static io.gitsocratic.command.config.ConfigOption.*
  * @since 0.2
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@Slf4j
 @ToString(includePackage = false, includeNames = true)
 @CommandLine.Command(name = "babelfish",
         description = "Initialize Babelfish service",
@@ -55,42 +58,54 @@ class Babelfish implements Callable<Integer> {
 
     @Override
     Integer call() throws Exception {
-        return executeCommand(true).status
+        def input = new PipedInputStream()
+        def output = new PipedOutputStream()
+        input.connect(output)
+        Thread.startDaemon {
+            input.newReader().eachLine {
+                log.info it
+            }
+        }
+        return execute(output).status
     }
 
     InitCommandResult execute() throws Exception {
-        return executeCommand(false)
+        def input = new PipedInputStream()
+        def output = new PipedOutputStream()
+        input.connect(output)
+        return execute(output)
     }
 
-    InitCommandResult executeCommand(boolean outputLogging) throws Exception {
+    InitCommandResult execute(PipedOutputStream output) throws Exception {
+        def out = new GroovyPrintWriter(output, true)
         def status
         if (Boolean.valueOf(use_docker_babelfish.getValue())) {
             status = initDockerBabelfish()
             if (status != 0) return new InitCommandResult(status)
         } else {
-            status = validateExternalBabelfish()
+            status = validateExternalBabelfish(out)
             if (status != 0) return new InitCommandResult(status)
         }
         return new InitCommandResult(status)
     }
 
-    private static int validateExternalBabelfish() {
-        println "Validating external Babelfish installation"
+    private static int validateExternalBabelfish(PrintWriter out) {
+        out.println "Validating external Babelfish installation"
         def host = babelfish_host.value
         def port = babelfish_port.value as int
-        println " Host: $host"
-        println " Port: $port"
+        out.println " Host: $host"
+        out.println " Port: $port"
 
-        println "Connecting to Babelfish"
+        out.println "Connecting to Babelfish"
         Socket s1 = new Socket()
         try {
             s1.setSoTimeout(200)
             s1.connect(new InetSocketAddress(host, port), 200)
-            println "Successfully connected to Babelfish"
+            out.println "Successfully connected to Babelfish"
             //todo: real connection test
             return 0
         } catch (all) {
-            println "Failed to connect to Babelfish"
+            out.println "Failed to connect to Babelfish"
             all.printStackTrace()
             return -1
         } finally {
@@ -98,9 +113,9 @@ class Babelfish implements Callable<Integer> {
         }
     }
 
-    private int initDockerBabelfish() {
-        println "Initializing Babelfish container"
-        def callback = new PullImageProgress()
+    private int initDockerBabelfish(PrintWriter out) {
+        out.println "Initializing Babelfish container"
+        def callback = new PullImageProgress(out)
         SocraticCLI.dockerClient.pullImageCmd("bblfsh/bblfshd:v$babelfishVersion-drivers").exec(callback)
         callback.awaitCompletion()
 
@@ -112,16 +127,16 @@ class Babelfish implements Callable<Integer> {
         }
 
         if (babelfishContainer != null) {
-            println "Found Babelfish container"
-            println " Id: " + babelfishContainer.id
+            out.println "Found Babelfish container"
+            out.println " Id: " + babelfishContainer.id
 
             //start container (if necessary)
             if (babelfishContainer.state != "running") {
-                println "Starting Babelfish container"
+                out.println "Starting Babelfish container"
                 SocraticCLI.dockerClient.startContainerCmd(babelfishContainer.id).exec()
-                println "Babelfish container started"
+                out.println "Babelfish container started"
             } else {
-                println "Babelfish already running"
+                out.println "Babelfish already running"
             }
         } else {
             //create container

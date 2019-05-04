@@ -49,12 +49,19 @@ class InitRequiredServicesBuilder {
         }
 
         InitCommandResult execute() throws Exception {
+            def input = new PipedInputStream()
+            def output = new PipedOutputStream()
+            input.connect(output)
+            return execute(output)
+        }
+
+        InitCommandResult execute(PipedOutputStream output) throws Exception {
             //install base services: babelfish & grakn
-            def status = new Babelfish(babelfishVersion, verbose).call()
-            if (status == 0) {
-                status = new Grakn(graknVersion, verbose).call()
+            def status = new Babelfish(babelfishVersion, verbose).execute(output)
+            if (status.status == 0) {
+                status = new Grakn(graknVersion, verbose).execute(output)
             }
-            return new InitCommandResult(status)
+            return new InitCommandResult(status.status)
         }
     }
 }

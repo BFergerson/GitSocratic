@@ -11,7 +11,9 @@ import com.github.dockerjava.api.model.ExposedPort
 import com.github.dockerjava.api.model.Image
 import com.github.dockerjava.api.model.Ports
 import com.github.rholder.retry.*
+import groovy.io.GroovyPrintWriter
 import groovy.transform.ToString
+import groovy.util.logging.Slf4j
 import io.gitsocratic.GitSocraticService
 import io.gitsocratic.SocraticCLI
 import io.gitsocratic.command.impl.Init
@@ -31,6 +33,7 @@ import static io.gitsocratic.command.config.ConfigOption.*
  * @since 0.2
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@Slf4j
 @ToString(includePackage = false, includeNames = true)
 @CommandLine.Command(name = "grakn",
         description = "Initialize Grakn service",
@@ -62,45 +65,57 @@ class Grakn implements Callable<Integer> {
 
     @Override
     Integer call() throws Exception {
-        return executeCommand(true).status
+        def input = new PipedInputStream()
+        def output = new PipedOutputStream()
+        input.connect(output)
+        Thread.startDaemon {
+            input.newReader().eachLine {
+                log.info it
+            }
+        }
+        return execute(output).status
     }
 
     InitCommandResult execute() throws Exception {
-        return executeCommand(false)
+        def input = new PipedInputStream()
+        def output = new PipedOutputStream()
+        input.connect(output)
+        return execute(output)
     }
 
-    InitCommandResult executeCommand(boolean outputLogging) throws Exception {
+    InitCommandResult execute(PipedOutputStream output) throws Exception {
+        def out = new GroovyPrintWriter(output, true)
         def status
         if (Boolean.valueOf(use_docker_grakn.getValue())) {
-            status = initDockerGrakn()
+            status = initDockerGrakn(out)
             if (status != 0) return new InitCommandResult(status)
         } else {
-            status = validateExternalGrakn()
+            status = validateExternalGrakn(out)
             if (status != 0) return new InitCommandResult(status)
         }
         return new InitCommandResult(status)
     }
 
-    private static int validateExternalGrakn() {
-        println "Validating external Grakn installation"
+    private static int validateExternalGrakn(PrintWriter out) {
+        out.println "Validating external Grakn installation"
         def host = babelfish_host.value
         def port = babelfish_port.value as int
-        println " Host: $host"
-        println " Port: $port"
+        out.println " Host: $host"
+        out.println " Port: $port"
 
         try {
             setupGraknOntology()
             return 0
         } catch (all) {
-            println "Failed to connect to Grakn"
-            all.printStackTrace()
+            out.println "Failed to connect to Grakn"
+            all.printStackTrace(out)
             return -1
         }
     }
 
-    private int initDockerGrakn() {
-        println "Initializing Grakn container"
-        def callback = new PullImageProgress()
+    private int initDockerGrakn(PrintWriter out) {
+        out.println "Initializing Grakn container"
+        def callback = new PullImageProgress(out)
         SocraticCLI.dockerClient.pullImageCmd("graknlabs/grakn:$graknVersion").exec(callback)
         callback.awaitCompletion()
 
@@ -112,16 +127,16 @@ class Grakn implements Callable<Integer> {
         }
 
         if (graknContainer != null) {
-            println "Found Grakn container"
-            println " Id: " + graknContainer.id
+            out.println "Found Grakn container"
+            out.println " Id: " + graknContainer.id
 
             //start container (if necessary)
             if (graknContainer.state != "running") {
-                println "Starting Grakn container"
+                out.println "Starting Grakn container"
                 SocraticCLI.dockerClient.startContainerCmd(graknContainer.id).exec()
-                println "Grakn container started"
+                out.println "Grakn container started"
             } else {
-                println "Grakn already running"
+                out.println "Grakn already running"
             }
         } else {
             //create container
@@ -142,7 +157,7 @@ class Grakn implements Callable<Integer> {
                             .exec()
                     SocraticCLI.dockerClient.startContainerCmd(container.getId()).exec()
 
-                    println "Waiting for Grakn to start"
+                    out.println "Waiting for Grakn to start"
                     Thread.sleep(10 * 1000) //todo: smarter
                 }
             }
@@ -151,7 +166,7 @@ class Grakn implements Callable<Integer> {
         return 0
     }
 
-    private static void setupGraknOntology() {
+    private static void setupGraknOntology(PrintWriter out) {
         Callable<Boolean> setupOntology = new Callable<Boolean>() {
             Boolean call() throws Exception {
                 def phenomena = new Phenomena()
@@ -163,21 +178,21 @@ class Grakn implements Callable<Integer> {
                 phenomena.graknPort = grakn_port.value as int
                 phenomena.graknKeyspace = grakn_keyspace.value
                 phenomena.connectToGrakn()
-                println "Successfully connected to Grakn"
+                out.println "Successfully connected to Grakn"
 
-                println "Installing base structure"
+                out.println "Installing base structure"
                 phenomena.setupOntology(SourceLanguage.Omnilingual.getBaseStructureSchemaDefinition())
-                println "Base structure installed"
+                out.println "Base structure installed"
 
                 if (Boolean.valueOf(semantic_roles.value)) {
-                    println "Installing semantic roles"
+                    out.println "Installing semantic roles"
                     phenomena.setupOntology(SourceLanguage.Omnilingual.getSemanticRolesSchemaDefinition())
                     new CodeSemanticObserver().getRules().each {
                         phenomena.setupOntology(it)
                     }
-                    println "Semantic roles installed"
+                    out.println "Semantic roles installed"
                 }
-                installObserverSchemas(phenomena)
+                installObserverSchemas(out, phenomena)
                 phenomena.close()
                 return true
             }
@@ -190,30 +205,30 @@ class Grakn implements Callable<Integer> {
             @Override
             void onRetry(Attempt attempt) {
                 if (attempt.hasException()) {
-                    println "Ontology setup failed. Retrying ontology setup in 15 seconds..."
+                    out.println "Ontology setup failed. Retrying ontology setup in 15 seconds..."
                 }
             }
         }).build().call(setupOntology)
     }
 
-    private static void installObserverSchemas(Phenomena phenomena) {
+    private static void installObserverSchemas(PrintWriter out, Phenomena phenomena) {
         //dependence observers
         if (Boolean.valueOf(identifier_access.value)) {
-            println "Installing identifier access schema"
+            out.println "Installing identifier access schema"
             phenomena.setupOntology(DependenceAnalysis.Identifier_Access.schemaDefinition)
-            println "Identifier access schema installed"
+            out.println "Identifier access schema installed"
         }
         if (Boolean.valueOf(method_call.value)) {
-            println "Installing method call schema"
+            out.println "Installing method call schema"
             phenomena.setupOntology(DependenceAnalysis.Method_Call.schemaDefinition)
-            println "Method call schema installed"
+            out.println "Method call schema installed"
         }
 
         //metric observers
         if (Boolean.valueOf(cyclomatic_complexity.value)) {
-            println "Installing cyclomatic complexity schema"
+            out.println "Installing cyclomatic complexity schema"
             phenomena.setupOntology(MetricAnalysis.Cyclomatic_Complexity.schemaDefinition)
-            println "Cyclomatic complexity schema installed"
+            out.println "Cyclomatic complexity schema installed"
         }
     }
 

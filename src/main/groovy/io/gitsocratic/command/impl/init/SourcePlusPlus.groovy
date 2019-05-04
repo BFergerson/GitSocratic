@@ -5,7 +5,9 @@ import com.github.dockerjava.api.model.Container
 import com.github.dockerjava.api.model.ExposedPort
 import com.github.dockerjava.api.model.Image
 import com.github.dockerjava.api.model.Ports
+import groovy.io.GroovyPrintWriter
 import groovy.transform.ToString
+import groovy.util.logging.Slf4j
 import io.gitsocratic.GitSocraticService
 import io.gitsocratic.SocraticCLI
 import io.gitsocratic.command.impl.Init
@@ -24,6 +26,7 @@ import static io.gitsocratic.command.config.ConfigOption.*
  * @since 0.2
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@Slf4j
 @ToString(includePackage = false, includeNames = true)
 @CommandLine.Command(name = "source_plus_plus",
         description = "Initialize Source++ service",
@@ -55,26 +58,38 @@ class SourcePlusPlus implements Callable<Integer> {
 
     @Override
     Integer call() throws Exception {
-        return executeCommand(true).status
+        def input = new PipedInputStream()
+        def output = new PipedOutputStream()
+        input.connect(output)
+        Thread.startDaemon {
+            input.newReader().eachLine {
+                log.info it
+            }
+        }
+        return execute(output).status
     }
 
     InitCommandResult execute() throws Exception {
-        return executeCommand(false)
+        def input = new PipedInputStream()
+        def output = new PipedOutputStream()
+        input.connect(output)
+        return execute(output)
     }
 
-    InitCommandResult executeCommand(boolean outputLogging) throws Exception {
+    InitCommandResult execute(PipedOutputStream output) throws Exception {
+        def out = new GroovyPrintWriter(output, true)
         def status
         if (Boolean.valueOf(use_docker_source_plus_plus.getValue())) {
-            status = initDockerSourcePlusPlus()
+            status = initDockerSourcePlusPlus(out)
             if (status != 0) return new InitCommandResult(status)
         } else {
-            status = validateExternalSourcePlusPlus()
+            status = validateExternalSourcePlusPlus(out)
             if (status != 0) return new InitCommandResult(status)
         }
         return new InitCommandResult(status)
     }
 
-    private static int validateExternalSourcePlusPlus() {
+    private static int validateExternalSourcePlusPlus(PrintWriter out) {
         println "Validating external Source++ installation"
         def host = source_plus_plus_host.value
         def port = source_plus_plus_port.value as int
@@ -91,16 +106,16 @@ class SourcePlusPlus implements Callable<Integer> {
             return 0
         } catch (all) {
             println "Failed to connect to Source++"
-            all.printStackTrace()
+            all.printStackTrace(out)
             return -1
         } finally {
             s1.close()
         }
     }
 
-    private int initDockerSourcePlusPlus() {
-        println "Initializing Source++ container"
-        def callback = new PullImageProgress()
+    private int initDockerSourcePlusPlus(PrintWriter out) {
+        out.println "Initializing Source++ container"
+        def callback = new PullImageProgress(out)
         SocraticCLI.dockerClient.pullImageCmd("codebrig/source:v$sppVersion-skywalking-h2").exec(callback)
         callback.awaitCompletion()
 
@@ -112,16 +127,16 @@ class SourcePlusPlus implements Callable<Integer> {
         }
 
         if (sppContainer != null) {
-            println "Found Source++ container"
-            println " Id: " + sppContainer.id
+            out.println "Found Source++ container"
+            out.println " Id: " + sppContainer.id
 
             //start container (if necessary)
             if (sppContainer.state != "running") {
-                println "Starting Source++ container"
+                out.println "Starting Source++ container"
                 SocraticCLI.dockerClient.startContainerCmd(sppContainer.id).exec()
-                println "Source++ container started"
+                out.println "Source++ container started"
             } else {
-                println "Source++ already running"
+                out.println "Source++ already running"
             }
         } else {
             //create container
