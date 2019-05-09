@@ -21,6 +21,6 @@ class InitBabelfishCommandBuilder extends InitCommandBuilder<InitBabelfishComman
 
     @Override
     Babelfish build() {
-        return new Babelfish(babelfishVersion, verbose)
+        return new Babelfish(babelfishVersion, verbose, useServicePorts)
     }
 }

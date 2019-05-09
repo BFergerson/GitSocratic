@@ -19,6 +19,7 @@ import io.gitsocratic.SocraticCLI
 import io.gitsocratic.command.impl.Init
 import io.gitsocratic.command.impl.init.docker.PullImageProgress
 import io.gitsocratic.command.result.InitCommandResult
+import io.gitsocratic.command.result.InitDockerCommandResult
 import picocli.CommandLine
 
 import java.util.concurrent.Callable
@@ -49,6 +50,8 @@ class Grakn implements Callable<Integer> {
     @CommandLine.Option(names = ["-v", "--verbose"], description = "Verbose logging")
     boolean verbose = Init.defaultVerbose
 
+    boolean useServicePorts = Init.defaultUseServicePorts
+
     @SuppressWarnings("unused")
     protected Grakn() {
         //used by Picocli
@@ -61,6 +64,12 @@ class Grakn implements Callable<Integer> {
     Grakn(String graknVersion, boolean verbose) {
         this.graknVersion = Objects.requireNonNull(graknVersion)
         this.verbose = verbose
+    }
+
+    Grakn(String graknVersion, boolean verbose, boolean useServicePorts) {
+        this.graknVersion = Objects.requireNonNull(graknVersion)
+        this.verbose = verbose
+        this.useServicePorts = useServicePorts
     }
 
     @Override
@@ -84,21 +93,28 @@ class Grakn implements Callable<Integer> {
     }
 
     InitCommandResult execute(PipedOutputStream output) throws Exception {
-        def status = -1
         def out = new GroovyPrintWriter(output, true)
-        try {
-            if (Boolean.valueOf(use_docker_grakn.getValue())) {
-                status = initDockerGrakn(out)
-                if (status != 0) return new InitCommandResult(status)
-            } else {
-                status = validateExternalGrakn(out)
-                if (status != 0) return new InitCommandResult(status)
+        if (Boolean.valueOf(use_docker_grakn.getValue())) {
+            try {
+                def portBindings = initDockerGrakn(out)
+                if (portBindings != null) {
+                    return new InitDockerCommandResult(portBindings)
+                }
+            } catch (all) {
+                out.println "Failed to initialize service"
+                all.printStackTrace(out)
             }
-        } catch (all) {
-            out.println "Failed to initialize service"
-            all.printStackTrace(out)
+            return new InitDockerCommandResult(-1)
+        } else {
+            try {
+                def status = validateExternalGrakn(out)
+                return new InitCommandResult(status)
+            } catch (all) {
+                out.println "Failed to validate external service"
+                all.printStackTrace(out)
+                return new InitCommandResult(-1)
+            }
         }
-        return new InitCommandResult(status)
     }
 
     private static int validateExternalGrakn(PrintWriter out) {
@@ -118,7 +134,7 @@ class Grakn implements Callable<Integer> {
         }
     }
 
-    private int initDockerGrakn(PrintWriter out) {
+    private Map<String, String[]> initDockerGrakn(PrintWriter out) {
         out.println "Initializing Grakn container"
         def callback = new PullImageProgress(out)
         SocraticCLI.dockerClient.pullImageCmd("graknlabs/grakn:$graknVersion").exec(callback)
@@ -131,7 +147,9 @@ class Grakn implements Callable<Integer> {
             }
         }
 
+        def containerId
         if (graknContainer != null) {
+            containerId = graknContainer.id
             out.println "Found Grakn container"
             out.println " Id: " + graknContainer.id
 
@@ -148,11 +166,14 @@ class Grakn implements Callable<Integer> {
             List<Image> images = SocraticCLI.dockerClient.listImagesCmd().withShowAll(true).exec()
             images.each {
                 if (it.repoTags?.contains("graknlabs/grakn:$graknVersion")) {
-                    def graknPort = grakn_port.getValue() as int
                     ExposedPort graknTcpPort = ExposedPort.tcp(grakn_port.defaultValue as int)
                     Ports portBindings = new Ports()
-                    portBindings.bind(graknTcpPort, Ports.Binding.bindPort(graknPort))
-
+                    if (useServicePorts) {
+                        portBindings.bind(graknTcpPort, Ports.Binding.bindPort(Integer.parseInt(
+                                grakn_port.defaultValue)))
+                    } else {
+                        portBindings.bind(graknTcpPort, Ports.Binding.empty())
+                    }
                     CreateContainerResponse container = SocraticCLI.dockerClient.createContainerCmd(it.id)
                             .withAttachStderr(true)
                             .withAttachStdout(true)
@@ -164,11 +185,17 @@ class Grakn implements Callable<Integer> {
 
                     out.println "Waiting for Grakn to start"
                     Thread.sleep(10 * 1000) //todo: smarter
+                    containerId = container.id
                 }
             }
         }
         setupGraknOntology()
-        return 0
+
+        def portBindings = new HashMap<String, String[]>()
+        SocraticCLI.dockerClient.inspectContainerCmd(containerId).exec().networkSettings.ports.bindings.each {
+            portBindings.put(it.key.toString(), it.value.collect { it.toString() } as String[])
+        }
+        return portBindings
     }
 
     private static void setupGraknOntology(PrintWriter out) {

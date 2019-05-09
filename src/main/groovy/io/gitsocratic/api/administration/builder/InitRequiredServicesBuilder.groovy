@@ -17,6 +17,7 @@ class InitRequiredServicesBuilder {
     private String babelfishVersion = Babelfish.defaultBabelfishVersion
     private String graknVersion = Grakn.defaultGraknVersion
     private boolean verbose = Init.defaultVerbose
+    private boolean useServicePorts = Init.defaultUseServicePorts
 
     InitRequiredServicesBuilder babelfishVersion(String babelfishVersion) {
         this.babelfishVersion = babelfishVersion
@@ -33,19 +34,26 @@ class InitRequiredServicesBuilder {
         return this
     }
 
+    InitRequiredServicesBuilder useServicePorts(boolean useServicePorts) {
+        this.useServicePorts = useServicePorts
+        return this
+    }
+
     RequiredServices build() {
-        return new RequiredServices(babelfishVersion, graknVersion, verbose)
+        return new RequiredServices(babelfishVersion, graknVersion, verbose, useServicePorts)
     }
 
     static class RequiredServices {
         final String babelfishVersion
         final String graknVersion
         final boolean verbose
+        final boolean useServicePorts
 
-        RequiredServices(String babelfishVersion, String graknVersion, boolean verbose) {
+        RequiredServices(String babelfishVersion, String graknVersion, boolean verbose, boolean useServicePorts) {
             this.babelfishVersion = babelfishVersion
             this.graknVersion = graknVersion
             this.verbose = verbose
+            this.useServicePorts = useServicePorts
         }
 
         InitCommandResult execute() throws Exception {
@@ -57,9 +65,9 @@ class InitRequiredServicesBuilder {
 
         InitCommandResult execute(PipedOutputStream output) throws Exception {
             //install base services: babelfish & grakn
-            def status = new Babelfish(babelfishVersion, verbose).execute(output)
+            def status = new Babelfish(babelfishVersion, verbose, useServicePorts).execute(output)
             if (status.status == 0) {
-                status = new Grakn(graknVersion, verbose).execute(output)
+                status = new Grakn(graknVersion, verbose, useServicePorts).execute(output)
             }
             return new InitCommandResult(status.status)
         }
