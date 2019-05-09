@@ -13,6 +13,7 @@ import io.gitsocratic.SocraticCLI
 import io.gitsocratic.command.impl.Init
 import io.gitsocratic.command.impl.init.docker.PullImageProgress
 import io.gitsocratic.command.result.InitCommandResult
+import io.gitsocratic.command.result.InitDockerCommandResult
 import picocli.CommandLine
 
 import java.util.concurrent.Callable
@@ -42,6 +43,8 @@ class SourcePlusPlus implements Callable<Integer> {
     @CommandLine.Option(names = ["-v", "--verbose"], description = "Verbose logging")
     boolean verbose = Init.defaultVerbose
 
+    boolean useServicePorts = Init.defaultUseServicePorts
+
     @SuppressWarnings("unused")
     protected SourcePlusPlus() {
         //used by Picocli
@@ -54,6 +57,12 @@ class SourcePlusPlus implements Callable<Integer> {
     SourcePlusPlus(String sppVersion, boolean verbose) {
         this.sppVersion = Objects.requireNonNull(sppVersion)
         this.verbose = verbose
+    }
+
+    SourcePlusPlus(String sppVersion, boolean verbose, boolean useServicePorts) {
+        this.sppVersion = Objects.requireNonNull(sppVersion)
+        this.verbose = verbose
+        this.useServicePorts = useServicePorts
     }
 
     @Override
@@ -77,21 +86,28 @@ class SourcePlusPlus implements Callable<Integer> {
     }
 
     InitCommandResult execute(PipedOutputStream output) throws Exception {
-        def status = -1
         def out = new GroovyPrintWriter(output, true)
-        try {
-            if (Boolean.valueOf(use_docker_source_plus_plus.getValue())) {
-                status = initDockerSourcePlusPlus(out)
-                if (status != 0) return new InitCommandResult(status)
-            } else {
-                status = validateExternalSourcePlusPlus(out)
-                if (status != 0) return new InitCommandResult(status)
+        if (Boolean.valueOf(use_docker_source_plus_plus.getValue())) {
+            try {
+                def portBindings = initDockerSourcePlusPlus(out)
+                if (portBindings != null) {
+                    return new InitDockerCommandResult(portBindings)
+                }
+            } catch (all) {
+                out.println "Failed to initialize service"
+                all.printStackTrace(out)
             }
-        } catch (all) {
-            out.println "Failed to initialize service"
-            all.printStackTrace(out)
+            return new InitDockerCommandResult(-1)
+        } else {
+            try {
+                def status = validateExternalSourcePlusPlus(out)
+                return new InitCommandResult(status)
+            } catch (all) {
+                out.println "Failed to validate external service"
+                all.printStackTrace(out)
+                return new InitCommandResult(-1)
+            }
         }
-        return new InitCommandResult(status)
     }
 
     private static int validateExternalSourcePlusPlus(PrintWriter out) {
@@ -118,7 +134,7 @@ class SourcePlusPlus implements Callable<Integer> {
         }
     }
 
-    private int initDockerSourcePlusPlus(PrintWriter out) {
+    private Map<String, String[]> initDockerSourcePlusPlus(PrintWriter out) {
         out.println "Initializing Source++ container"
         def callback = new PullImageProgress(out)
         SocraticCLI.dockerClient.pullImageCmd("codebrig/source:v$sppVersion-skywalking-h2").exec(callback)
@@ -131,7 +147,9 @@ class SourcePlusPlus implements Callable<Integer> {
             }
         }
 
+        def containerId
         if (sppContainer != null) {
+            containerId = sppContainer.id
             out.println "Found Source++ container"
             out.println " Id: " + sppContainer.id
 
@@ -160,11 +178,16 @@ class SourcePlusPlus implements Callable<Integer> {
                             .withPublishAllPorts(true)
                             .exec()
                     SocraticCLI.dockerClient.startContainerCmd(container.getId()).exec()
+                    containerId = container.id
                 }
             }
         }
-        //todo: real connection test
-        return 0
+
+        def portBindings = new HashMap<String, String[]>()
+        SocraticCLI.dockerClient.inspectContainerCmd(containerId).exec().networkSettings.ports.bindings.each {
+            portBindings.put(it.key.toString(), it.value.collect { it.toString() } as String[])
+        }
+        return portBindings
     }
 
     static String getDefaultSourcePlusPlusVersion() {

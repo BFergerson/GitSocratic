@@ -21,6 +21,6 @@ class InitSourcePlusPlusCommandBuilder extends InitCommandBuilder<InitSourcePlus
 
     @Override
     SourcePlusPlus build() {
-        return new SourcePlusPlus(sppVersion, verbose)
+        return new SourcePlusPlus(sppVersion, verbose, useServicePorts)
     }
 }
