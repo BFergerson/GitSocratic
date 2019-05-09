@@ -166,10 +166,14 @@ class SourcePlusPlus implements Callable<Integer> {
             List<Image> images = SocraticCLI.dockerClient.listImagesCmd().withShowAll(true).exec()
             images.each {
                 if (it.repoTags?.contains("codebrig/source:v$sppVersion-skywalking-h2")) {
-                    def sppPort = source_plus_plus_port.getValue() as int
                     ExposedPort sppTcpPort = ExposedPort.tcp(source_plus_plus_port.defaultValue as int)
                     Ports portBindings = new Ports()
-                    portBindings.bind(sppTcpPort, Ports.Binding.bindPort(sppPort))
+                    if (useServicePorts) {
+                        portBindings.bind(sppTcpPort, Ports.Binding.bindPort(Integer.parseInt(
+                                source_plus_plus_port.defaultValue)))
+                    } else {
+                        portBindings.bind(sppTcpPort, Ports.Binding.empty())
+                    }
                     CreateContainerResponse container = SocraticCLI.dockerClient.createContainerCmd(it.id)
                             .withAttachStderr(true)
                             .withAttachStdout(true)
