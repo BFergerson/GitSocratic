@@ -13,6 +13,7 @@ import io.gitsocratic.SocraticCLI
 import io.gitsocratic.command.impl.Init
 import io.gitsocratic.command.impl.init.docker.PullImageProgress
 import io.gitsocratic.command.result.InitCommandResult
+import io.gitsocratic.command.result.InitDockerCommandResult
 import picocli.CommandLine
 
 import java.util.concurrent.Callable
@@ -42,6 +43,8 @@ class ApacheSkywalking implements Callable<Integer> {
     @CommandLine.Option(names = ["-v", "--verbose"], description = "Verbose logging")
     boolean verbose = Init.defaultVerbose
 
+    boolean useServicePorts = Init.defaultUseServicePorts
+
     @SuppressWarnings("unused")
     protected ApacheSkywalking() {
         //used by Picocli
@@ -54,6 +57,12 @@ class ApacheSkywalking implements Callable<Integer> {
     ApacheSkywalking(String skywalkingVersion, boolean verbose) {
         this.skywalkingVersion = Objects.requireNonNull(skywalkingVersion)
         this.verbose = verbose
+    }
+
+    ApacheSkywalking(String skywalkingVersion, boolean verbose, boolean useServicePorts) {
+        this.skywalkingVersion = Objects.requireNonNull(skywalkingVersion)
+        this.verbose = verbose
+        this.useServicePorts = useServicePorts
     }
 
     @Override
@@ -77,27 +86,34 @@ class ApacheSkywalking implements Callable<Integer> {
     }
 
     InitCommandResult execute(PipedOutputStream output) throws Exception {
-        def status = -1
         def out = new GroovyPrintWriter(output, true)
-        try {
-            if (Boolean.valueOf(use_docker_apache_skywalking.getValue())) {
-                status = initDockerApacheSkywalking(out)
-                if (status != 0) return new InitCommandResult(status)
-            } else {
-                status = validateExternalApacheSkywalking(out)
-                if (status != 0) return new InitCommandResult(status)
+        if (Boolean.valueOf(use_docker_apache_skywalking.getValue())) {
+            try {
+                def portBindings = initDockerApacheSkywalking(out)
+                if (portBindings != null) {
+                    return new InitDockerCommandResult(portBindings)
+                }
+            } catch (all) {
+                out.println "Failed to initialize service"
+                all.printStackTrace(out)
             }
-        } catch (all) {
-            out.println "Failed to initialize service"
-            all.printStackTrace(out)
+            return new InitDockerCommandResult(-1)
+        } else {
+            try {
+                def status = validateExternalApacheSkywalking(out)
+                return new InitCommandResult(status)
+            } catch (all) {
+                out.println "Failed to validate external service"
+                all.printStackTrace(out)
+                return new InitCommandResult(-1)
+            }
         }
-        return new InitCommandResult(status)
     }
 
     private static int validateExternalApacheSkywalking(PrintWriter out) {
         out.println "Validating external Apache Skywalking installation"
         def host = apache_skywalking_host.value
-        def port = apache_skywalking_port.value as int
+        def port = apache_skywalking_rest_port.value as int
         out.println " Host: $host"
         out.println " Port: $port"
 
@@ -118,7 +134,7 @@ class ApacheSkywalking implements Callable<Integer> {
         }
     }
 
-    private int initDockerApacheSkywalking(PrintWriter out) {
+    private Map<String, String[]> initDockerApacheSkywalking(PrintWriter out) {
         out.println "Initializing Apache Skywalking container"
         def callback = new PullImageProgress(out)
         SocraticCLI.dockerClient.pullImageCmd("apache/skywalking-oap-server:$skywalkingVersion").exec(callback)
@@ -131,7 +147,9 @@ class ApacheSkywalking implements Callable<Integer> {
             }
         }
 
+        def containerId
         if (skywalkingContainer != null) {
+            containerId = skywalkingContainer.id
             out.println "Found Apache Skywalking container"
             out.println " Id: " + skywalkingContainer.id
 
@@ -148,23 +166,36 @@ class ApacheSkywalking implements Callable<Integer> {
             List<Image> images = SocraticCLI.dockerClient.listImagesCmd().withShowAll(true).exec()
             images.each {
                 if (it.repoTags?.contains("apache/skywalking-oap-server:$skywalkingVersion")) {
-                    def skywalkingPort = apache_skywalking_port.getValue() as int
-                    ExposedPort skywalkingTcpPort = ExposedPort.tcp(apache_skywalking_port.defaultValue as int)
+                    ExposedPort grpcPort = ExposedPort.tcp(apache_skywalking_grpc_port.defaultValue as int)
+                    ExposedPort restPort = ExposedPort.tcp(apache_skywalking_rest_port.defaultValue as int)
                     Ports portBindings = new Ports()
-                    portBindings.bind(skywalkingTcpPort, Ports.Binding.bindPort(skywalkingPort))
+                    if (useServicePorts) {
+                        portBindings.bind(grpcPort, Ports.Binding.bindPort(Integer.parseInt(
+                                apache_skywalking_grpc_port.defaultValue)))
+                        portBindings.bind(restPort, Ports.Binding.bindPort(Integer.parseInt(
+                                apache_skywalking_rest_port.defaultValue)))
+                    } else {
+                        portBindings.bind(grpcPort, Ports.Binding.empty())
+                        portBindings.bind(restPort, Ports.Binding.empty())
+                    }
                     CreateContainerResponse container = SocraticCLI.dockerClient.createContainerCmd(it.id)
                             .withAttachStderr(true)
                             .withAttachStdout(true)
-                            .withExposedPorts(skywalkingTcpPort)
+                            .withExposedPorts(grpcPort, restPort)
                             .withPortBindings(portBindings)
                             .withPublishAllPorts(true)
                             .exec()
-                    SocraticCLI.dockerClient.startContainerCmd(container.getId()).exec()
+                    SocraticCLI.dockerClient.startContainerCmd(container.id).exec()
+                    containerId = container.id
                 }
             }
         }
-        //todo: real connection test
-        return 0
+
+        def portBindings = new HashMap<String, String[]>()
+        SocraticCLI.dockerClient.inspectContainerCmd(containerId).exec().networkSettings.ports.bindings.each {
+            portBindings.put(it.key.toString(), it.value.collect { it.toString() } as String[])
+        }
+        return portBindings
     }
 
     static String getDefaultApacheSkywalkingVersion() {
