@@ -12,9 +12,15 @@ import io.gitsocratic.command.impl.Init
 abstract class InitCommandBuilder<C, S> {
 
     protected boolean verbose = Init.defaultVerbose
+    protected boolean useServicePorts = Init.defaultUseServicePorts
 
     C verbose(boolean verbose) {
         this.verbose = verbose
+        return (C) this
+    }
+
+    C useServicePorts(boolean useServicePorts) {
+        this.useServicePorts = useServicePorts
         return (C) this
     }
 

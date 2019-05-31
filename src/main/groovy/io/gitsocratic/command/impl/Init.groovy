@@ -56,4 +56,8 @@ class Init implements Callable<Integer> {
     static boolean getDefaultVerbose() {
         return false
     }
+
+    static boolean getDefaultUseServicePorts() {
+        return true
+    }
 }

@@ -21,6 +21,6 @@ class InitGraknCommandBuilder extends InitCommandBuilder<InitGraknCommandBuilder
 
     @Override
     Grakn build() {
-        return new Grakn(graknVersion, verbose)
+        return new Grakn(graknVersion, verbose, useServicePorts)
     }
 }

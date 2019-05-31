@@ -13,6 +13,7 @@ import io.gitsocratic.SocraticCLI
 import io.gitsocratic.command.impl.Init
 import io.gitsocratic.command.impl.init.docker.PullImageProgress
 import io.gitsocratic.command.result.InitCommandResult
+import io.gitsocratic.command.result.InitDockerCommandResult
 import picocli.CommandLine
 
 import java.util.concurrent.Callable
@@ -42,6 +43,8 @@ class Babelfish implements Callable<Integer> {
     @CommandLine.Option(names = ["-v", "--verbose"], description = "Verbose logging")
     boolean verbose = Init.defaultVerbose
 
+    boolean useServicePorts = Init.defaultUseServicePorts
+
     @SuppressWarnings("unused")
     protected Babelfish() {
         //used by Picocli
@@ -54,6 +57,12 @@ class Babelfish implements Callable<Integer> {
     Babelfish(String babelfishVersion, boolean verbose) {
         this.babelfishVersion = Objects.requireNonNull(babelfishVersion)
         this.verbose = verbose
+    }
+
+    Babelfish(String babelfishVersion, boolean verbose, boolean useServicePorts) {
+        this.babelfishVersion = Objects.requireNonNull(babelfishVersion)
+        this.verbose = verbose
+        this.useServicePorts = useServicePorts
     }
 
     @Override
@@ -77,21 +86,28 @@ class Babelfish implements Callable<Integer> {
     }
 
     InitCommandResult execute(PipedOutputStream output) throws Exception {
-        def status = -1
         def out = new GroovyPrintWriter(output, true)
-        try {
-            if (Boolean.valueOf(use_docker_babelfish.getValue())) {
-                status = initDockerBabelfish(out)
-                if (status != 0) return new InitCommandResult(status)
-            } else {
-                status = validateExternalBabelfish(out)
-                if (status != 0) return new InitCommandResult(status)
+        if (Boolean.valueOf(use_docker_babelfish.getValue())) {
+            try {
+                def portBindings = initDockerBabelfish(out)
+                if (portBindings != null) {
+                    return new InitDockerCommandResult(portBindings)
+                }
+            } catch (all) {
+                out.println "Failed to initialize service"
+                all.printStackTrace(out)
             }
-        } catch (all) {
-            out.println "Failed to initialize service"
-            all.printStackTrace(out)
+            return new InitDockerCommandResult(-1)
+        } else {
+            try {
+                def status = validateExternalBabelfish(out)
+                return new InitCommandResult(status)
+            } catch (all) {
+                out.println "Failed to validate external service"
+                all.printStackTrace(out)
+                return new InitCommandResult(-1)
+            }
         }
-        return new InitCommandResult(status)
     }
 
     private static int validateExternalBabelfish(PrintWriter out) {
@@ -118,10 +134,12 @@ class Babelfish implements Callable<Integer> {
         }
     }
 
-    private int initDockerBabelfish(PrintWriter out) {
+    private Map<String, String[]> initDockerBabelfish(PrintWriter out) {
         out.println "Initializing Babelfish container"
+
+        def dockerRepository = "bblfsh/bblfshd:v$babelfishVersion-drivers"
         def callback = new PullImageProgress(out)
-        SocraticCLI.dockerClient.pullImageCmd("bblfsh/bblfshd:v$babelfishVersion-drivers").exec(callback)
+        SocraticCLI.dockerClient.pullImageCmd(dockerRepository).exec(callback)
         callback.awaitCompletion()
 
         Container babelfishContainer
@@ -131,7 +149,9 @@ class Babelfish implements Callable<Integer> {
             }
         }
 
+        def containerId = null
         if (babelfishContainer != null) {
+            containerId = babelfishContainer.id
             out.println "Found Babelfish container"
             out.println " Id: " + babelfishContainer.id
 
@@ -147,11 +167,15 @@ class Babelfish implements Callable<Integer> {
             //create container
             List<Image> images = SocraticCLI.dockerClient.listImagesCmd().withShowAll(true).exec()
             images.each {
-                if (it.repoTags?.contains("bblfsh/bblfshd:v$babelfishVersion-drivers")) {
-                    def babelfishPort = babelfish_port.getValue() as int
+                if (it.repoTags?.contains(dockerRepository)) {
                     ExposedPort babelfishTcpPort = ExposedPort.tcp(babelfish_port.defaultValue as int)
                     Ports portBindings = new Ports()
-                    portBindings.bind(babelfishTcpPort, Ports.Binding.bindPort(babelfishPort))
+                    if (useServicePorts) {
+                        portBindings.bind(babelfishTcpPort, Ports.Binding.bindPort(Integer.parseInt(
+                                babelfish_port.defaultValue)))
+                    } else {
+                        portBindings.bind(babelfishTcpPort, Ports.Binding.empty())
+                    }
                     CreateContainerResponse container = SocraticCLI.dockerClient.createContainerCmd(it.id)
                             .withPrivileged(true)
                             .withAttachStderr(true)
@@ -161,11 +185,16 @@ class Babelfish implements Callable<Integer> {
                             .withPublishAllPorts(true)
                             .exec()
                     SocraticCLI.dockerClient.startContainerCmd(container.getId()).exec()
+                    containerId = container.id
                 }
             }
         }
-        //todo: real connection test
-        return 0
+
+        def portBindings = new HashMap<String, String[]>()
+        SocraticCLI.dockerClient.inspectContainerCmd(containerId).exec().networkSettings.ports.bindings.each {
+            portBindings.put(it.key.toString(), it.value.collect { it.toString() } as String[])
+        }
+        return portBindings
     }
 
     static String getDefaultBabelfishVersion() {

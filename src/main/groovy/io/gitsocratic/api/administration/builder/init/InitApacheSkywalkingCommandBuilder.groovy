@@ -21,6 +21,6 @@ class InitApacheSkywalkingCommandBuilder extends InitCommandBuilder<InitApacheSk
 
     @Override
     ApacheSkywalking build() {
-        return new ApacheSkywalking(skywalkingVersion, verbose)
+        return new ApacheSkywalking(skywalkingVersion, verbose, useServicePorts)
     }
 }
