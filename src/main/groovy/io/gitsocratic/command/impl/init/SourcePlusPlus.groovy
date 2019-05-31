@@ -136,8 +136,10 @@ class SourcePlusPlus implements Callable<Integer> {
 
     private Map<String, String[]> initDockerSourcePlusPlus(PrintWriter out) {
         out.println "Initializing Source++ container"
+
+        def dockerRepository = "sourceplusplus/core-and-apache-skywalking:v$sppVersion"
         def callback = new PullImageProgress(out)
-        SocraticCLI.dockerClient.pullImageCmd("codebrig/source:v$sppVersion-skywalking-h2").exec(callback)
+        SocraticCLI.dockerClient.pullImageCmd(dockerRepository).exec(callback)
         callback.awaitCompletion()
 
         Container sppContainer
@@ -147,7 +149,7 @@ class SourcePlusPlus implements Callable<Integer> {
             }
         }
 
-        def containerId
+        def containerId = null
         if (sppContainer != null) {
             containerId = sppContainer.id
             out.println "Found Source++ container"
@@ -165,7 +167,7 @@ class SourcePlusPlus implements Callable<Integer> {
             //create container
             List<Image> images = SocraticCLI.dockerClient.listImagesCmd().withShowAll(true).exec()
             images.each {
-                if (it.repoTags?.contains("codebrig/source:v$sppVersion-skywalking-h2")) {
+                if (it.repoTags?.contains(dockerRepository)) {
                     ExposedPort sppTcpPort = ExposedPort.tcp(source_plus_plus_port.defaultValue as int)
                     Ports portBindings = new Ports()
                     if (useServicePorts) {

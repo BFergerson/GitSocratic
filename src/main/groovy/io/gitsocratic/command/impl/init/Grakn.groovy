@@ -136,8 +136,10 @@ class Grakn implements Callable<Integer> {
 
     private Map<String, String[]> initDockerGrakn(PrintWriter out) {
         out.println "Initializing Grakn container"
+
+        def dockerRepository = "graknlabs/grakn:$graknVersion"
         def callback = new PullImageProgress(out)
-        SocraticCLI.dockerClient.pullImageCmd("graknlabs/grakn:$graknVersion").exec(callback)
+        SocraticCLI.dockerClient.pullImageCmd(dockerRepository).exec(callback)
         callback.awaitCompletion()
 
         Container graknContainer
@@ -147,7 +149,7 @@ class Grakn implements Callable<Integer> {
             }
         }
 
-        def containerId
+        def containerId = null
         if (graknContainer != null) {
             containerId = graknContainer.id
             out.println "Found Grakn container"
@@ -165,7 +167,7 @@ class Grakn implements Callable<Integer> {
             //create container
             List<Image> images = SocraticCLI.dockerClient.listImagesCmd().withShowAll(true).exec()
             images.each {
-                if (it.repoTags?.contains("graknlabs/grakn:$graknVersion")) {
+                if (it.repoTags?.contains(dockerRepository)) {
                     ExposedPort graknTcpPort = ExposedPort.tcp(grakn_port.defaultValue as int)
                     Ports portBindings = new Ports()
                     if (useServicePorts) {

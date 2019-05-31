@@ -136,8 +136,10 @@ class ApacheSkywalking implements Callable<Integer> {
 
     private Map<String, String[]> initDockerApacheSkywalking(PrintWriter out) {
         out.println "Initializing Apache Skywalking container"
+
+        def dockerRepository = "apache/skywalking-oap-server:$skywalkingVersion"
         def callback = new PullImageProgress(out)
-        SocraticCLI.dockerClient.pullImageCmd("apache/skywalking-oap-server:$skywalkingVersion").exec(callback)
+        SocraticCLI.dockerClient.pullImageCmd(dockerRepository).exec(callback)
         callback.awaitCompletion()
 
         Container skywalkingContainer
@@ -147,7 +149,7 @@ class ApacheSkywalking implements Callable<Integer> {
             }
         }
 
-        def containerId
+        def containerId = null
         if (skywalkingContainer != null) {
             containerId = skywalkingContainer.id
             out.println "Found Apache Skywalking container"
@@ -165,7 +167,7 @@ class ApacheSkywalking implements Callable<Integer> {
             //create container
             List<Image> images = SocraticCLI.dockerClient.listImagesCmd().withShowAll(true).exec()
             images.each {
-                if (it.repoTags?.contains("apache/skywalking-oap-server:$skywalkingVersion")) {
+                if (it.repoTags?.contains(dockerRepository)) {
                     ExposedPort grpcPort = ExposedPort.tcp(apache_skywalking_grpc_port.defaultValue as int)
                     ExposedPort restPort = ExposedPort.tcp(apache_skywalking_rest_port.defaultValue as int)
                     Ports portBindings = new Ports()
