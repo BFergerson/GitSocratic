@@ -182,7 +182,7 @@ class SourcePlusPlus implements Callable<Integer> {
                             .withExposedPorts(sppTcpPort)
                             .withPortBindings(portBindings)
                             .withPublishAllPorts(true)
-                            .withNetworkMode("host")
+                            .withNetworkMode("bridge")
                             .exec()
                     SocraticCLI.dockerClient.startContainerCmd(container.getId()).exec()
                     containerId = container.id
