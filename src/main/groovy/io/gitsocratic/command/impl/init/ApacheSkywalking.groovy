@@ -186,6 +186,7 @@ class ApacheSkywalking implements Callable<Integer> {
                             .withExposedPorts(grpcPort, restPort)
                             .withPortBindings(portBindings)
                             .withPublishAllPorts(true)
+                            .withNetworkMode("host")
                             .exec()
                     SocraticCLI.dockerClient.startContainerCmd(container.id).exec()
                     containerId = container.id
