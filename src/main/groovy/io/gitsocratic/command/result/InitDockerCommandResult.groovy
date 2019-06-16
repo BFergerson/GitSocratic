@@ -9,15 +9,18 @@ package io.gitsocratic.command.result
  */
 class InitDockerCommandResult extends InitCommandResult {
 
+    final String containerName
     final Map<String, String[]> portBindings
 
-    InitDockerCommandResult(Map<String, String[]> portBindings) {
+    InitDockerCommandResult(String containerName, Map<String, String[]> portBindings) {
         super(0)
+        this.containerName = containerName
         this.portBindings = Objects.requireNonNull(portBindings)
     }
 
-    InitDockerCommandResult(int status) {
+    InitDockerCommandResult(String containerName, int status) {
         super(status)
-        portBindings = new HashMap<>()
+        this.containerName = containerName
+        this.portBindings = new HashMap<>()
     }
 }

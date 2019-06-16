@@ -30,36 +30,36 @@ import static io.gitsocratic.command.config.ConfigOption.*
 @Slf4j
 @ToString(includePackage = false, includeNames = true)
 @CommandLine.Command(name = "apache_skywalking",
-        description = "Initialize Apache Skywalking service",
+        description = "Initialize Apache SkyWalking service",
         mixinStandardHelpOptions = true,
         descriptionHeading = "%nDescription:%n%n",
         parameterListHeading = "%nParameters:%n",
         optionListHeading = "%nOptions:%n")
-class ApacheSkywalking implements Callable<Integer> {
+class ApacheSkyWalking implements Callable<Integer> {
 
     @CommandLine.Parameters(index = "0", arity = "0", description = "Version to initialize")
-    private String skywalkingVersion = defaultApacheSkywalkingVersion
+    private String skywalkingVersion = defaultApacheSkyWalkingVersion
 
     @CommandLine.Option(names = ["-v", "--verbose"], description = "Verbose logging")
     boolean verbose = Init.defaultVerbose
 
-    boolean useServicePorts = Init.defaultUseServicePorts
+    private boolean useServicePorts = Init.defaultUseServicePorts
 
     @SuppressWarnings("unused")
-    protected ApacheSkywalking() {
+    protected ApacheSkyWalking() {
         //used by Picocli
     }
 
-    ApacheSkywalking(String skywalkingVersion) {
+    ApacheSkyWalking(String skywalkingVersion) {
         this.skywalkingVersion = Objects.requireNonNull(skywalkingVersion)
     }
 
-    ApacheSkywalking(String skywalkingVersion, boolean verbose) {
+    ApacheSkyWalking(String skywalkingVersion, boolean verbose) {
         this.skywalkingVersion = Objects.requireNonNull(skywalkingVersion)
         this.verbose = verbose
     }
 
-    ApacheSkywalking(String skywalkingVersion, boolean verbose, boolean useServicePorts) {
+    ApacheSkyWalking(String skywalkingVersion, boolean verbose, boolean useServicePorts) {
         this.skywalkingVersion = Objects.requireNonNull(skywalkingVersion)
         this.verbose = verbose
         this.useServicePorts = useServicePorts
@@ -91,16 +91,16 @@ class ApacheSkywalking implements Callable<Integer> {
             try {
                 def portBindings = initDockerApacheSkywalking(out)
                 if (portBindings != null) {
-                    return new InitDockerCommandResult(portBindings)
+                    return new InitDockerCommandResult("Apache_SkyWalking", portBindings)
                 }
             } catch (all) {
                 out.println "Failed to initialize service"
                 all.printStackTrace(out)
             }
-            return new InitDockerCommandResult(-1)
+            return new InitDockerCommandResult("Apache_SkyWalking", -1)
         } else {
             try {
-                def status = validateExternalApacheSkywalking(out)
+                def status = validateExternalApacheSkyWalking(out)
                 return new InitCommandResult(status)
             } catch (all) {
                 out.println "Failed to validate external service"
@@ -110,23 +110,23 @@ class ApacheSkywalking implements Callable<Integer> {
         }
     }
 
-    private static int validateExternalApacheSkywalking(PrintWriter out) {
-        out.println "Validating external Apache Skywalking installation"
+    private static int validateExternalApacheSkyWalking(PrintWriter out) {
+        out.println "Validating external Apache SkyWalking installation"
         def host = apache_skywalking_host.value
         def port = apache_skywalking_rest_port.value as int
         out.println " Host: $host"
         out.println " Port: $port"
 
-        out.println "Connecting to Apache Skywalking"
+        out.println "Connecting to Apache SkyWalking"
         Socket s1 = new Socket()
         try {
             s1.setSoTimeout(200)
             s1.connect(new InetSocketAddress(host, port), 200)
-            out.println "Successfully connected to Apache Skywalking"
+            out.println "Successfully connected to Apache SkyWalking"
             //todo: real connection test
             return 0
         } catch (all) {
-            out.println "Failed to connect to Apache Skywalking"
+            out.println "Failed to connect to Apache SkyWalking"
             all.printStackTrace(out)
             return -1
         } finally {
@@ -135,7 +135,7 @@ class ApacheSkywalking implements Callable<Integer> {
     }
 
     private Map<String, String[]> initDockerApacheSkywalking(PrintWriter out) {
-        out.println "Initializing Apache Skywalking container"
+        out.println "Initializing Apache SkyWalking container"
 
         def dockerRepository = "apache/skywalking-oap-server:$skywalkingVersion"
         def callback = new PullImageProgress(out)
@@ -152,16 +152,16 @@ class ApacheSkywalking implements Callable<Integer> {
         def containerId = null
         if (skywalkingContainer != null) {
             containerId = skywalkingContainer.id
-            out.println "Found Apache Skywalking container"
+            out.println "Found Apache SkyWalking container"
             out.println " Id: " + skywalkingContainer.id
 
             //start container (if necessary)
             if (skywalkingContainer.state != "running") {
-                out.println "Starting Apache Skywalking container"
+                out.println "Starting Apache SkyWalking container"
                 SocraticCLI.dockerClient.startContainerCmd(skywalkingContainer.id).exec()
-                out.println "Apache Skywalking container started"
+                out.println "Apache SkyWalking container started"
             } else {
-                out.println "Apache Skywalking already running"
+                out.println "Apache SkyWalking already running"
             }
         } else {
             //create container
@@ -181,6 +181,7 @@ class ApacheSkywalking implements Callable<Integer> {
                         portBindings.bind(restPort, Ports.Binding.empty())
                     }
                     CreateContainerResponse container = SocraticCLI.dockerClient.createContainerCmd(it.id)
+                            .withName("Apache_SkyWalking")
                             .withAttachStderr(true)
                             .withAttachStdout(true)
                             .withExposedPorts(grpcPort, restPort)
@@ -200,7 +201,7 @@ class ApacheSkywalking implements Callable<Integer> {
         return portBindings
     }
 
-    static String getDefaultApacheSkywalkingVersion() {
-        return "6.0.0-GA"
+    static String getDefaultApacheSkyWalkingVersion() {
+        return "6.1.0"
     }
 }

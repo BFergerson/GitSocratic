@@ -4,7 +4,7 @@ import io.gitsocratic.api.administration.builder.AddLocalRepoCommandBuilder
 import io.gitsocratic.api.administration.builder.AddRemoteRepoCommandBuilder
 import io.gitsocratic.api.administration.builder.ConfigCommandBuilder
 import io.gitsocratic.api.administration.builder.InitRequiredServicesBuilder
-import io.gitsocratic.api.administration.builder.init.InitApacheSkywalkingCommandBuilder
+import io.gitsocratic.api.administration.builder.init.InitApacheSkyWalkingCommandBuilder
 import io.gitsocratic.api.administration.builder.init.InitBabelfishCommandBuilder
 import io.gitsocratic.api.administration.builder.init.InitGraknCommandBuilder
 import io.gitsocratic.api.administration.builder.init.InitSourcePlusPlusCommandBuilder
@@ -23,8 +23,8 @@ class AdministrationAPI {
         return new InitRequiredServicesBuilder()
     }
 
-    InitApacheSkywalkingCommandBuilder initApacheSkywalking() {
-        return new InitApacheSkywalkingCommandBuilder()
+    InitApacheSkyWalkingCommandBuilder initApacheSkyWalking() {
+        return new InitApacheSkyWalkingCommandBuilder()
     }
 
     InitBabelfishCommandBuilder initBabelfish() {

@@ -50,7 +50,7 @@ class Grakn implements Callable<Integer> {
     @CommandLine.Option(names = ["-v", "--verbose"], description = "Verbose logging")
     boolean verbose = Init.defaultVerbose
 
-    boolean useServicePorts = Init.defaultUseServicePorts
+    private boolean useServicePorts = Init.defaultUseServicePorts
 
     @SuppressWarnings("unused")
     protected Grakn() {
@@ -98,13 +98,13 @@ class Grakn implements Callable<Integer> {
             try {
                 def portBindings = initDockerGrakn(out)
                 if (portBindings != null) {
-                    return new InitDockerCommandResult(portBindings)
+                    return new InitDockerCommandResult("Grakn", portBindings)
                 }
             } catch (all) {
                 out.println "Failed to initialize service"
                 all.printStackTrace(out)
             }
-            return new InitDockerCommandResult(-1)
+            return new InitDockerCommandResult("Grakn", -1)
         } else {
             try {
                 def status = validateExternalGrakn(out)

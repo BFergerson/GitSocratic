@@ -1,10 +1,7 @@
 package io.gitsocratic.command.impl.init
 
 import com.github.dockerjava.api.command.CreateContainerResponse
-import com.github.dockerjava.api.model.Container
-import com.github.dockerjava.api.model.ExposedPort
-import com.github.dockerjava.api.model.Image
-import com.github.dockerjava.api.model.Ports
+import com.github.dockerjava.api.model.*
 import groovy.io.GroovyPrintWriter
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
@@ -43,7 +40,8 @@ class SourcePlusPlus implements Callable<Integer> {
     @CommandLine.Option(names = ["-v", "--verbose"], description = "Verbose logging")
     boolean verbose = Init.defaultVerbose
 
-    boolean useServicePorts = Init.defaultUseServicePorts
+    private boolean useServicePorts = Init.defaultUseServicePorts
+    private final List<Link> containerLinks = new ArrayList<>()
 
     @SuppressWarnings("unused")
     protected SourcePlusPlus() {
@@ -63,6 +61,10 @@ class SourcePlusPlus implements Callable<Integer> {
         this.sppVersion = Objects.requireNonNull(sppVersion)
         this.verbose = verbose
         this.useServicePorts = useServicePorts
+    }
+
+    void linkContainer(String name) {
+        containerLinks.add(new Link(name, "spp-" + name + "-link"))
     }
 
     @Override
@@ -91,13 +93,13 @@ class SourcePlusPlus implements Callable<Integer> {
             try {
                 def portBindings = initDockerSourcePlusPlus(out)
                 if (portBindings != null) {
-                    return new InitDockerCommandResult(portBindings)
+                    return new InitDockerCommandResult("SourcePlusPlus", portBindings)
                 }
             } catch (all) {
                 out.println "Failed to initialize service"
                 all.printStackTrace(out)
             }
-            return new InitDockerCommandResult(-1)
+            return new InitDockerCommandResult("SourcePlusPlus", -1)
         } else {
             try {
                 def status = validateExternalSourcePlusPlus(out)
@@ -177,11 +179,13 @@ class SourcePlusPlus implements Callable<Integer> {
                         portBindings.bind(sppTcpPort, Ports.Binding.empty())
                     }
                     CreateContainerResponse container = SocraticCLI.dockerClient.createContainerCmd(it.id)
+                            .withName("SourcePlusPlus")
                             .withAttachStderr(true)
                             .withAttachStdout(true)
                             .withExposedPorts(sppTcpPort)
                             .withPortBindings(portBindings)
                             .withPublishAllPorts(true)
+                            .withLinks(containerLinks)
                             .exec()
                     SocraticCLI.dockerClient.startContainerCmd(container.getId()).exec()
                     containerId = container.id

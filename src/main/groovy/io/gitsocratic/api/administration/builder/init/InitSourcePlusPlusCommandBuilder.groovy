@@ -13,14 +13,22 @@ import io.gitsocratic.command.impl.init.SourcePlusPlus
 class InitSourcePlusPlusCommandBuilder extends InitCommandBuilder<InitSourcePlusPlusCommandBuilder, SourcePlusPlus> {
 
     private String sppVersion = SourcePlusPlus.defaultSourcePlusPlusVersion
+    private Set<String> links = new HashSet<>()
 
     InitSourcePlusPlusCommandBuilder sppVersion(String sppVersion) {
         this.sppVersion = sppVersion
         return this
     }
 
+    InitSourcePlusPlusCommandBuilder link(String containerName) {
+        links.add(containerName)
+        return this
+    }
+
     @Override
     SourcePlusPlus build() {
-        return new SourcePlusPlus(sppVersion, verbose, useServicePorts)
+        def spp = new SourcePlusPlus(sppVersion, verbose, useServicePorts)
+        links.each { spp.linkContainer(it) }
+        return spp
     }
 }

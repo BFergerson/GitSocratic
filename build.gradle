@@ -36,6 +36,7 @@ dependencies {
     implementation 'com.github.codebrig:arthur:e10b35a5c8'
     implementation "org.bblfsh:bblfsh-client:$babelfishVersion"
     implementation group: 'io.grakn.client', name: 'api', version: "$graknVersion"
+    implementation 'com.github.sourceplusplus.assistant:source-api:cb716d58df'
     compile group: 'io.vertx', name: 'vertx-core', version: '3.7.0'
 }
 
