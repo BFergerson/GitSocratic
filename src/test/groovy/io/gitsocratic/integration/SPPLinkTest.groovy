@@ -28,6 +28,8 @@ class SPPLinkTest {
             sppHost = "localhost"
         }
         def sppPort = sppBinding.substring(sppBinding.indexOf(":") + 1) as int
+
+        Thread.sleep(2000)
         def coreClient = new SourceCoreClient(sppHost, sppPort)
         def integrationInfo = coreClient.updateIntegrationInfo(IntegrationInfo.builder()
                 .id("apache_skywalking").enabled(true)
