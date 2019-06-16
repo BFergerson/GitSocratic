@@ -137,7 +137,7 @@ class SourcePlusPlus implements Callable<Integer> {
     private Map<String, String[]> initDockerSourcePlusPlus(PrintWriter out) {
         out.println "Initializing Source++ container"
 
-        def dockerRepository = "sourceplusplus/core-and-apache-skywalking:v$sppVersion"
+        def dockerRepository = "sourceplusplus/core:v$sppVersion"
         def callback = new PullImageProgress(out)
         SocraticCLI.dockerClient.pullImageCmd(dockerRepository).exec(callback)
         callback.awaitCompletion()
