@@ -241,7 +241,7 @@ version
 Example(s):
 ```
 gitsocratic init source_plus_plus
-gitsocratic init source_plus_plus 0.2.0-alpha -v
+gitsocratic init source_plus_plus 0.2.1-alpha -v
 ```
 
 ## logs
