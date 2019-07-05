@@ -202,6 +202,6 @@ class ApacheSkyWalking implements Callable<Integer> {
     }
 
     static String getDefaultApacheSkyWalkingVersion() {
-        return "6.1.0"
+        return "6.2.0"
     }
 }
