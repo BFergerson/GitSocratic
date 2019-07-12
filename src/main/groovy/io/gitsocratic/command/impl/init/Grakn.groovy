@@ -86,9 +86,20 @@ class Grakn implements Callable<Integer> {
     }
 
     InitCommandResult execute() throws Exception {
+        return execute(false)
+    }
+
+    InitCommandResult execute(boolean outputToStd) throws Exception {
         def input = new PipedInputStream()
         def output = new PipedOutputStream()
         input.connect(output)
+        if (outputToStd) {
+            Thread.startDaemon {
+                input.newReader().eachLine {
+                    log.info it
+                }
+            }
+        }
         return execute(output)
     }
 
@@ -267,6 +278,6 @@ class Grakn implements Callable<Integer> {
     }
 
     static String getDefaultGraknVersion() {
-        return "1.5.2"
+        return "1.5.7"
     }
 }

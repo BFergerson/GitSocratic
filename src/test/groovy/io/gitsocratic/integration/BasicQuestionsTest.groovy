@@ -15,7 +15,7 @@ class BasicQuestionsTest {
     void askBasicQuestions_sameProgram() {
         graknClient.resetKeyspace()
         //todo: reset config
-        assertEquals(0, SocraticAPI.administration().init().build().execute().status)
+        assertEquals(0, SocraticAPI.administration().init().build().execute(true).status)
 
         def addRepo = SocraticAPI.administration().addRemoteRepo()
                 .repoName("bfergerson/same-program").build().execute()
@@ -53,7 +53,7 @@ class BasicQuestionsTest {
         //todo: reset config
         assertEquals(true, SocraticAPI.administration()
                 .config(ConfigOption.cyclomatic_complexity, true).build().execute().newValue)
-        assertEquals(0, SocraticAPI.administration().init().build().execute().status)
+        assertEquals(0, SocraticAPI.administration().init().build().execute(true).status)
 
         def addRepo = SocraticAPI.administration().addRemoteRepo()
                 .repoName("bfergerson/method-complexity").build().execute()

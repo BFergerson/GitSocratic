@@ -20,12 +20,12 @@ repositories {
 
 ext {
     babelfishVersion = '1.11.0'
-    graknVersion = "1.5.2"
+    graknVersion = "1.5.7"
 }
 
 dependencies {
+    testCompile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.26'
     testImplementation group: 'junit', name: 'junit', version: '4.12'
-    implementation group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.25'
     implementation 'org.codehaus.groovy:groovy-all:2.4.15'
     implementation group: 'info.picocli', name: 'picocli', version: '3.7.0'
     implementation group: 'org.codehaus.gpars', name: 'gpars', version: '1.2.1'
@@ -35,9 +35,16 @@ dependencies {
     implementation 'com.github.codebrig:phenomena:ad0111531f'
     implementation 'com.github.codebrig:arthur:e10b35a5c8'
     implementation "org.bblfsh:bblfsh-client:$babelfishVersion"
-    implementation group: 'io.grakn.client', name: 'api', version: "$graknVersion"
+    //implementation group: 'io.grakn.client', name: 'api', version: "$graknVersion"
     implementation 'com.github.sourceplusplus.assistant:source-api:v0.2.1-alpha'
     compile group: 'io.vertx', name: 'vertx-core', version: '3.7.0'
+
+    //todo: remove lib folder (https://github.com/CodeBrig/GitSocratic/issues/40)
+    compile files('lib/io-grakn-client-grakn-client-1.5.7.jar')
+    compile files('lib/io-grakn-core-grakn-api-1.5.7.jar')
+    compile files('lib/io-grakn-protocol-grakn-protocol-1.5.7.jar')
+    compile files('lib/io-graql-graql-grammar-1.5.7.jar')
+    compile files('lib/io-graql-graql-lang-1.5.7.jar')
 }
 
 configurations.all {
@@ -49,6 +56,11 @@ configurations.all {
 test {
     dependsOn "composeUp"
     finalizedBy "composeDown"
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        setExceptionFormat("full")
+    }
 }
 
 dockerCompose {
