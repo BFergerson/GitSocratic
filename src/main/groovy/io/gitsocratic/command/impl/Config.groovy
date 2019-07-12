@@ -1,6 +1,7 @@
 package io.gitsocratic.command.impl
 
 import groovy.transform.ToString
+import groovy.util.logging.Slf4j
 import io.gitsocratic.command.config.ConfigOption
 import io.gitsocratic.command.result.ConfigCommandResult
 import io.vertx.core.json.JsonObject
@@ -16,6 +17,7 @@ import java.util.concurrent.Callable
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@Slf4j
 @ToString(includePackage = false, includeNames = true)
 @CommandLine.Command(name = "config",
         description = "Configure GitSocratic",
@@ -49,14 +51,13 @@ class Config<T extends ConfigCommandResult> implements Callable<Integer> {
             }
 
             if (outputLogging) {
-                println "Configuration:"
-                println configuration.encodePrettily()
+                log.info "GitSocratic Configuration: " + configuration.encodePrettily()
             }
             return (T) new ConfigCommandResult.DisplayValues(configuration)
         } else {
             if (value == null || value.isEmpty()) {
                 value = option.getValue() //get config option
-                if (outputLogging) println value
+                if (outputLogging) log.info value
 
                 if (value.toLowerCase() == "true" || value.toLowerCase() == "false") {
                     return (T) new ConfigCommandResult.GetValue(option, Boolean.parseBoolean(value))

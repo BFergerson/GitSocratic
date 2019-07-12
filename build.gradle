@@ -24,8 +24,8 @@ ext {
 }
 
 dependencies {
-    testCompile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.26'
     testImplementation group: 'junit', name: 'junit', version: '4.12'
+    implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.26'
     implementation 'org.codehaus.groovy:groovy-all:2.4.15'
     implementation group: 'info.picocli', name: 'picocli', version: '3.7.0'
     implementation group: 'org.codehaus.gpars', name: 'gpars', version: '1.2.1'
