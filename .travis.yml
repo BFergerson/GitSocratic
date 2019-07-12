@@ -16,3 +16,13 @@ before_cache:
 cache:
   - $HOME/.gradle/caches/modules-2
   - $HOME/.gradle/wrapper/
+
+deploy:
+  provider: releases
+  api_key: $GH_TOKEN
+  file:
+  - /home/travis/build/CodeBrig/GitSocratic/build/distributions/gitsocratic-0.2.tar
+  - /home/travis/build/CodeBrig/GitSocratic/build/distributions/gitsocratic-0.2.zip
+  skip_cleanup: true
+  on:
+    tags: true
