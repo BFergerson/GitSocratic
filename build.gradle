@@ -56,6 +56,11 @@ configurations.all {
 test {
     dependsOn "composeUp"
     finalizedBy "composeDown"
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        setExceptionFormat("full")
+    }
 }
 
 dockerCompose {
