@@ -20,7 +20,7 @@ repositories {
 
 ext {
     babelfishVersion = '1.11.0'
-    graknVersion = "1.5.2"
+    graknVersion = "1.5.7"
 }
 
 dependencies {
@@ -35,9 +35,16 @@ dependencies {
     implementation 'com.github.codebrig:phenomena:ad0111531f'
     implementation 'com.github.codebrig:arthur:e10b35a5c8'
     implementation "org.bblfsh:bblfsh-client:$babelfishVersion"
-    implementation group: 'io.grakn.client', name: 'api', version: "$graknVersion"
+    //implementation group: 'io.grakn.client', name: 'api', version: "$graknVersion"
     implementation 'com.github.sourceplusplus.assistant:source-api:v0.2.1-alpha'
     compile group: 'io.vertx', name: 'vertx-core', version: '3.7.0'
+
+    //todo: remove
+    compile files('lib/io-grakn-client-grakn-client-1.5.7.jar')
+    compile files('lib/io-grakn-core-grakn-api-1.5.7.jar')
+    compile files('lib/io-grakn-protocol-grakn-protocol-1.5.7.jar')
+    compile files('lib/io-graql-graql-grammar-1.5.7.jar')
+    compile files('lib/io-graql-graql-lang-1.5.7.jar')
 }
 
 configurations.all {
