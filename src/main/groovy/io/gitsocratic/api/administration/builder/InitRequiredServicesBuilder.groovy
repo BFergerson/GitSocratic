@@ -1,5 +1,6 @@
 package io.gitsocratic.api.administration.builder
 
+import groovy.util.logging.Slf4j
 import io.gitsocratic.command.impl.Init
 import io.gitsocratic.command.impl.init.Babelfish
 import io.gitsocratic.command.impl.init.Grakn
@@ -12,6 +13,7 @@ import io.gitsocratic.command.result.InitCommandResult
  * @since 0.2
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@Slf4j
 class InitRequiredServicesBuilder {
 
     private String babelfishVersion = Babelfish.defaultBabelfishVersion
@@ -57,9 +59,20 @@ class InitRequiredServicesBuilder {
         }
 
         InitCommandResult execute() throws Exception {
+            return execute(false)
+        }
+
+        InitCommandResult execute(boolean outputToStd) throws Exception {
             def input = new PipedInputStream()
             def output = new PipedOutputStream()
             input.connect(output)
+            if (outputToStd) {
+                Thread.startDaemon {
+                    input.newReader().eachLine {
+                        log.info it
+                    }
+                }
+            }
             return execute(output)
         }
 

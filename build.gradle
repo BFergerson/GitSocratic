@@ -39,7 +39,7 @@ dependencies {
     implementation 'com.github.sourceplusplus.assistant:source-api:v0.2.1-alpha'
     compile group: 'io.vertx', name: 'vertx-core', version: '3.7.0'
 
-    //todo: remove
+    //todo: remove lib folder (https://github.com/CodeBrig/GitSocratic/issues/40)
     compile files('lib/io-grakn-client-grakn-client-1.5.7.jar')
     compile files('lib/io-grakn-core-grakn-api-1.5.7.jar')
     compile files('lib/io-grakn-protocol-grakn-protocol-1.5.7.jar')
