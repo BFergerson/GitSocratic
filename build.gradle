@@ -32,16 +32,21 @@ dependencies {
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.0.1.201806211838-r'
     implementation "com.github.rholder:guava-retrying:2.0.0"
     implementation group: 'com.github.docker-java', name: 'docker-java', version: '3.1.0-rc-5'
-    implementation 'com.github.codebrig:phenomena:ad0111531f'
+    compile(group: 'com.github.codebrig', name: 'phenomena', version: 'ad0111531f') {
+        exclude group: 'io.grakn.client', module: 'api'
+    }
     implementation 'com.github.codebrig:arthur:2111b3e39e'
     implementation "org.bblfsh:bblfsh-client:$babelfishVersion"
     //implementation group: 'io.grakn.client', name: 'api', version: "$graknVersion"
-    implementation 'com.github.sourceplusplus.assistant:source-api:v0.2.1-alpha'
+    implementation 'com.github.sourceplusplus.assistant:source-api:v0.2.2-alpha'
     compile group: 'io.vertx', name: 'vertx-core', version: '3.7.0'
 
     //todo: remove lib folder (https://github.com/CodeBrig/GitSocratic/issues/40)
+    compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.1'
     compile files('lib/io-grakn-client-grakn-client-1.5.7.jar')
     compile files('lib/io-grakn-core-grakn-api-1.5.7.jar')
+    compile files('lib/io-grakn-core-grakn-common-1.5.7.jar')
+    compile files('lib/io-grakn-core-grakn-concept-1.5.7.jar')
     compile files('lib/io-grakn-protocol-grakn-protocol-1.5.7.jar')
     compile files('lib/io-graql-graql-grammar-1.5.7.jar')
     compile files('lib/io-graql-graql-lang-1.5.7.jar')

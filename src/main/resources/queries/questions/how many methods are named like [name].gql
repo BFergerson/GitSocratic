@@ -15,8 +15,6 @@ not {
 	($function) isa BODY;
 };
 (is_parent: $function, is_child: $functionName);
-($functionName) isa FUNCTION;
-($functionName) isa NAME;
 ($functionName) isa IDENTIFIER;
 $functionName has token contains "<name>";
 get $function; count;
