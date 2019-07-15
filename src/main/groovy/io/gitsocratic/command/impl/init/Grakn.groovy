@@ -78,8 +78,12 @@ class Grakn implements Callable<Integer> {
         def output = new PipedOutputStream()
         input.connect(output)
         Thread.startDaemon {
-            input.newReader().eachLine {
-                log.info it
+            try {
+                input.newReader().eachLine {
+                    log.info it
+                }
+            } catch (IOException ex) {
+                //ignore
             }
         }
         return execute(output).status
@@ -95,8 +99,12 @@ class Grakn implements Callable<Integer> {
         input.connect(output)
         if (outputToStd) {
             Thread.startDaemon {
-                input.newReader().eachLine {
-                    log.info it
+                try {
+                    input.newReader().eachLine {
+                        log.info it
+                    }
+                } catch (IOException ex) {
+                    //ignore
                 }
             }
         }
