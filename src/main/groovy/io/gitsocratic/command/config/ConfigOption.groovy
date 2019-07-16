@@ -38,7 +38,7 @@ enum ConfigOption {
     method_call("false"),
 
     //observers - metric
-    cyclomatic_complexity("false")
+    cyclomatic_complexity("true")
 
     public final String defaultValue
 
