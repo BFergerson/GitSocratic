@@ -14,7 +14,16 @@ not {
 not {
 	($function) isa BODY;
 };
-(is_parent: $function, is_child: $functionName);
-($functionName) isa IDENTIFIER;
-$functionName has token "<name>";
+
+{
+    #self-identified functions
+    ($function) isa IDENTIFIER;
+    $function has token "<name>";
+} or {
+    #child-node-identified functions
+    (is_parent: $function, is_child: $functionName);
+    ($functionName) isa IDENTIFIER;
+    $functionName has token "<name>";
+};
+
 get $function; count;
