@@ -1,6 +1,6 @@
 package io.gitsocratic.command.impl
 
-import grakn.core.concept.answer.Numeric
+import grakn.client.answer.Numeric
 import groovy.transform.ToString
 import io.gitsocratic.client.GraknClient
 import io.gitsocratic.command.question.SourceQuestion
@@ -66,7 +66,7 @@ class Question implements Callable<Integer> {
                 if (outputLogging) println questionAnswer
             } else if (!result.isEmpty()) {
                 result.each {
-                    it.forEach({ key, value ->
+                    it.map().forEach({ key, value ->
                         if (outputLogging) println key.toString() + " = " + value.asAttribute().value().toString()
                     })
                 }

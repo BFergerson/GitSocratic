@@ -1,6 +1,6 @@
 package io.gitsocratic.command.impl.query
 
-import grakn.core.concept.answer.Numeric
+import grakn.client.answer.Numeric
 import groovy.transform.ToString
 import io.gitsocratic.client.GraknClient
 import io.gitsocratic.command.result.QueryCommandResult
@@ -67,7 +67,7 @@ class Graql implements Callable<Integer> {
                 if (outputLogging) println((result.get(0) as Numeric).number())
             } else if (!result.isEmpty()) {
                 result.each {
-                    it.forEach({ key, value ->
+                    it.map().forEach({ key, value ->
                         if (outputLogging) println key.toString() + " = " + value.asAttribute().value().toString()
                     })
                 }

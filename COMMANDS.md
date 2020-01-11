@@ -203,7 +203,7 @@ version
 Example(s):
 ```
 gitsocratic init babelfish
-gitsocratic init babelfish 2.13.0-drivers -v
+gitsocratic init babelfish 2.16.1-drivers -v
 ```
 
 ### init (Grakn)
@@ -222,7 +222,7 @@ version
 Example(s):
 ```
 gitsocratic init grakn
-gitsocratic init grakn 1.5.7 -v
+gitsocratic init grakn 1.6.1 -v
 ```
 
 ### init (Source++)

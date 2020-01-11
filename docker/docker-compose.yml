@@ -2,12 +2,12 @@ version: '3.3'
 services:
   bblfshd:
     privileged: true
-    image: bblfsh/bblfshd:v2.13.0-drivers
+    image: bblfsh/bblfshd:v2.16.1-drivers-2019-10-29
     container_name: bblfshd
     ports:
     - "9432:9432"
   grakn:
-    image: graknlabs/grakn:1.5.7
+    image: graknlabs/grakn:1.6.1
     container_name: grakn
     ports:
     - "48555:48555"

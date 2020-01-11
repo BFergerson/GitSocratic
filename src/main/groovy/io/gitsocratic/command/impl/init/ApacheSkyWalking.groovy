@@ -1,10 +1,7 @@
 package io.gitsocratic.command.impl.init
 
 import com.github.dockerjava.api.command.CreateContainerResponse
-import com.github.dockerjava.api.model.Container
-import com.github.dockerjava.api.model.ExposedPort
-import com.github.dockerjava.api.model.Image
-import com.github.dockerjava.api.model.Ports
+import com.github.dockerjava.api.model.*
 import groovy.io.GroovyPrintWriter
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
@@ -204,9 +201,10 @@ class ApacheSkyWalking implements Callable<Integer> {
                             .withAttachStderr(true)
                             .withAttachStdout(true)
                             .withExposedPorts(grpcPort, restPort)
-                            .withPortBindings(portBindings)
-                            .withPublishAllPorts(true)
-                            .exec()
+                            .withHostConfig(HostConfig.newHostConfig()
+                                    .withPortBindings(portBindings)
+                                    .withPublishAllPorts(true)
+                            ).exec()
                     SocraticCLI.dockerClient.startContainerCmd(container.id).exec()
                     containerId = container.id
                 }
