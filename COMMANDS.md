@@ -222,7 +222,7 @@ version
 Example(s):
 ```
 gitsocratic init grakn
-gitsocratic init grakn 1.6.1 -v
+gitsocratic init grakn 1.6.2 -v
 ```
 
 ### init (Source++)

@@ -288,6 +288,6 @@ class Grakn implements Callable<Integer> {
     }
 
     static String getDefaultGraknVersion() {
-        return "1.6.1"
+        return "1.6.2"
     }
 }
