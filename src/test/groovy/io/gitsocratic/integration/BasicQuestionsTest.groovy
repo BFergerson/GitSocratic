@@ -1,6 +1,7 @@
 package io.gitsocratic.integration
 
 import io.gitsocratic.api.SocraticAPI
+import io.gitsocratic.client.GraknClient
 import io.gitsocratic.command.config.ConfigOption
 import org.junit.Test
 
@@ -8,7 +9,7 @@ import static org.junit.Assert.assertEquals
 
 class BasicQuestionsTest {
 
-//    private final GraknClient graknClient = new GraknClient()
+    private final GraknClient graknClient = new GraknClient()
 
 //    @Test
 //    void askBasicQuestions_sameProgram() {
@@ -52,7 +53,7 @@ class BasicQuestionsTest {
 
     @Test
     void askBasicComplexityQuestions_methodComplexity() {
-//        graknClient.resetKeyspace()
+        graknClient.resetKeyspace()
         //todo: reset config
         assertEquals(true, SocraticAPI.administration()
                 .config(ConfigOption.cyclomatic_complexity, true).build().execute().newValue)
