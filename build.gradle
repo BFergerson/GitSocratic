@@ -31,10 +31,10 @@ dependencies {
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.0.1.201806211838-r'
     implementation "com.github.rholder:guava-retrying:2.0.0"
     implementation group: 'com.github.docker-java', name: 'docker-java', version: '3.1.1'
-    compile(group: 'com.github.codebrig', name: 'phenomena', version: 'da1ffb6bba') {
+    compile(group: 'com.github.codebrig', name: 'phenomena', version: '69f6adcda') {
         exclude group: 'io.grakn.client', module: 'api'
     }
-    implementation 'com.github.codebrig:arthur:bb904b9343'
+    implementation 'com.github.codebrig:arthur:ab530522d18'
     implementation group: 'io.grakn.client', name: 'grakn-client', version: "$graknVersion"
     implementation group: 'io.graql', name: 'graql-lang', version: "1.0.5"
     implementation 'com.github.sourceplusplus.assistant:source-api:v0.2.2-alpha'
