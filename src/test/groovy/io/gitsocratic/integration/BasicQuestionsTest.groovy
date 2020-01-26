@@ -56,7 +56,7 @@ class BasicQuestionsTest {
         //todo: reset config
         assertEquals(true, SocraticAPI.administration()
                 .config(ConfigOption.cyclomatic_complexity, true).build().execute().newValue)
-        assertEquals(0, SocraticAPI.administration().init().build().execute(true).status)
+        //assertEquals(0, SocraticAPI.administration().init().build().execute(true).status)
 
         def addRepo = SocraticAPI.administration().addRemoteRepo()
                 .repoName("bfergerson/method-complexity").build().execute()
