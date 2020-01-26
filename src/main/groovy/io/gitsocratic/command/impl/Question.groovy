@@ -2,6 +2,7 @@ package io.gitsocratic.command.impl
 
 import grakn.client.answer.Numeric
 import groovy.transform.ToString
+import groovy.util.logging.Slf4j
 import io.gitsocratic.client.GraknClient
 import io.gitsocratic.command.question.SourceQuestion
 import io.gitsocratic.command.result.QuestionCommandResult
@@ -18,6 +19,7 @@ import java.util.concurrent.Callable
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@Slf4j
 @ToString(includePackage = false, includeNames = true)
 @CommandLine.Command(name = "question",
         description = "Execute a single source code question",
@@ -55,19 +57,19 @@ class Question implements Callable<Integer> {
         def tx = graknClient.makeReadSession()
 
         try {
-            if (outputLogging) println "# Question: " + question.formattedQuestion
-            if (outputLogging) println "# Result:"
+            if (outputLogging) log.info "# Question: " + question.formattedQuestion
+            if (outputLogging) log.info "# Result:"
             def result = graknClient.executeQuery(tx, query)
             def queryTimeMs = System.currentTimeMillis() - startTime
 
             def questionAnswer = null
             if (result.size() == 1 && result.get(0) instanceof Numeric) {
                 questionAnswer = (result.get(0) as Numeric).number().longValue()
-                if (outputLogging) println questionAnswer
+                if (outputLogging) log.info(questionAnswer as String)
             } else if (!result.isEmpty()) {
                 result.each {
                     it.map().forEach({ key, value ->
-                        if (outputLogging) println key.toString() + " = " + value.asAttribute().value().toString()
+                        if (outputLogging) log.info key.toString() + " = " + value.asAttribute().value().toString()
                     })
                 }
                 if (result.size() == 1) {
@@ -76,9 +78,9 @@ class Question implements Callable<Integer> {
                     questionAnswer = result.collect { it.get("name").asAttribute().value() }
                 }
             } else if (outputLogging) {
-                println "N/A"
+                log.info "N/A"
             }
-            if (outputLogging) println "\n# Query time: " + humanReadableFormat(Duration.ofMillis(queryTimeMs))
+            if (outputLogging) log.info "\n# Query time: " + humanReadableFormat(Duration.ofMillis(queryTimeMs))
             return new QuestionCommandResult(0, questionAnswer, queryTimeMs)
         } finally {
             tx.close()

@@ -3,6 +3,7 @@ package io.gitsocratic.command.console
 import com.github.dockerjava.api.command.ExecCreateCmdResponse
 import com.github.dockerjava.api.model.Container
 import com.github.dockerjava.core.command.ExecStartResultCallback
+import groovy.util.logging.Slf4j
 import io.gitsocratic.SocraticCLI
 import io.gitsocratic.GitSocraticService
 
@@ -15,6 +16,7 @@ import java.util.concurrent.Callable
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@Slf4j
 class GraqlConsole implements Callable<Integer> {
 
     private static ResourceBundle buildBundle = ResourceBundle.getBundle("gitsocratic_build")
@@ -28,7 +30,7 @@ class GraqlConsole implements Callable<Integer> {
             }
         }
         if (graknContainer == null) {
-            System.err.println "Could not find Grakn container to attach to"
+            log.error "Could not find Grakn container to attach to"
             return -1
         }
 

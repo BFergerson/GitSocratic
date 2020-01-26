@@ -11,6 +11,7 @@ import com.codebrig.phenomena.code.analysis.DependenceAnalysis
 import com.codebrig.phenomena.code.analysis.MetricAnalysis
 import com.codebrig.phenomena.code.analysis.semantic.CodeSemanticObserver
 import com.codebrig.phenomena.code.structure.CodeStructureObserver
+import groovy.util.logging.Slf4j
 import groovyx.gpars.GParsPool
 
 import java.time.Duration
@@ -25,6 +26,7 @@ import static io.gitsocratic.command.config.ConfigOption.*
  * @since 0.2
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@Slf4j
 class PhenomenaClient implements Closeable {
 
     private final String repoLocation
@@ -61,11 +63,11 @@ class PhenomenaClient implements Closeable {
         def dependenceAnalyses = new ArrayList<DependenceAnalysis>()
         if (Boolean.valueOf(identifier_access.value)) {
             dependenceAnalyses.add(DependenceAnalysis.Identifier_Access)
-            println "Observing identifier access"
+            log.info "Observing identifier access"
         }
         if (Boolean.valueOf(method_call.value)) {
             dependenceAnalyses.add(DependenceAnalysis.Method_Call)
-            println "Observing method calls"
+            log.info "Observing method calls"
         }
         codeObservers.addAll(DependenceAnalysis.getCodeObserversByAnalysis(phenomena, dependenceAnalyses))
 
@@ -73,7 +75,7 @@ class PhenomenaClient implements Closeable {
         def metricAnalyses = new ArrayList<MetricAnalysis>()
         if (Boolean.valueOf(cyclomatic_complexity.value)) {
             metricAnalyses.add(MetricAnalysis.Cyclomatic_Complexity)
-            println "Observing cyclomatic complexity"
+            log.info "Observing cyclomatic complexity"
         }
         codeObservers.addAll(MetricAnalysis.getCodeObserversByAnalysis(phenomena, metricAnalyses))
 
@@ -134,9 +136,9 @@ class PhenomenaClient implements Closeable {
                 processSourceCodeFile(file, processedCount, failCount)
             }
         }
-        println "Processed files: $processedCount"
-        println "Failed files: $failCount"
-        println "Processing time: " + humanReadableFormat(Duration.ofMillis(System.currentTimeMillis() - startTime))
+        log.info "Processed files: $processedCount"
+        log.info "Failed files: $failCount"
+        log.info "Processing time: " + humanReadableFormat(Duration.ofMillis(System.currentTimeMillis() - startTime))
     }
 
     private void processSourceCodeFile(File file, AtomicInteger processedCount, AtomicInteger failCount) {
@@ -144,19 +146,19 @@ class PhenomenaClient implements Closeable {
             def processedFile = phenomena.processSourceFile(file, SourceLanguage.getSourceLanguage(file))
             def sourceFile = processedFile.sourceFile
             if (processedFile.parseResponse.status().isOk()) {
-                println "Processed $sourceFile - Root node id: " + processedFile.rootNodeId
+                log.info "Processed $sourceFile - Root node id: " + processedFile.rootNodeId
                 processedCount.getAndIncrement()
             } else {
                 failCount.getAndIncrement()
-                System.err.println("Failed to parse file: $sourceFile - Reason: "
+                log.error("Failed to parse file: $sourceFile - Reason: "
                         + processedFile.parseResponse.errors().toString())
             }
         } catch (ParseException e) {
             failCount.getAndIncrement()
-            System.err.println("Failed to parse file: " + e.sourceFile + " - Reason: "
+            log.error("Failed to parse file: " + e.sourceFile + " - Reason: "
                     + e.parseResponse.errors().toString())
         } catch (all) {
-            System.err.println("Failed to parse file: " + file + " - Reason: " + all.message)
+            log.error("Failed to parse file: " + file + " - Reason: " + all.message)
             all.printStackTrace()
             failCount.getAndIncrement()
         }

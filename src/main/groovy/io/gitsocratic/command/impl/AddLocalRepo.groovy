@@ -1,6 +1,7 @@
 package io.gitsocratic.command.impl
 
 import groovy.transform.ToString
+import groovy.util.logging.Slf4j
 import io.gitsocratic.client.PhenomenaClient
 import io.gitsocratic.command.result.AddLocalRepoCommandResult
 import picocli.CommandLine
@@ -15,6 +16,7 @@ import java.util.concurrent.Callable
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@Slf4j
 @ToString(includePackage = false, includeNames = true)
 @CommandLine.Command(name = "add-local-repo",
         description = "Add local source code repository to the knowledge graph",
@@ -51,7 +53,7 @@ class AddLocalRepo implements Callable<Integer> {
 
     private AddLocalRepoCommandResult executeCommand(boolean outputLogging) throws Exception {
         if (!repoLocation.exists()) {
-            if (outputLogging) System.err.println "Invalid repository location: $repoLocation"
+            if (outputLogging) log.error "Invalid repository location: $repoLocation"
             return new AddLocalRepoCommandResult(-1)
         }
 
