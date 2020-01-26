@@ -19,8 +19,7 @@ repositories {
 }
 
 ext {
-    babelfishVersion = '1.11.0'
-    graknVersion = "1.6.1"
+    graknVersion = "1.6.2"
 }
 
 dependencies {
@@ -32,11 +31,10 @@ dependencies {
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.0.1.201806211838-r'
     implementation "com.github.rholder:guava-retrying:2.0.0"
     implementation group: 'com.github.docker-java', name: 'docker-java', version: '3.1.1'
-    compile(group: 'com.github.codebrig', name: 'phenomena', version: '53223cc46') {
+    compile(group: 'com.github.codebrig', name: 'phenomena', version: 'da1ffb6bba') {
         exclude group: 'io.grakn.client', module: 'api'
     }
-    implementation 'com.github.codebrig:arthur:c537343f5'
-    implementation "org.bblfsh:bblfsh-client:$babelfishVersion"
+    implementation 'com.github.codebrig:arthur:bb904b9343'
     implementation group: 'io.grakn.client', name: 'grakn-client', version: "$graknVersion"
     implementation group: 'io.graql', name: 'graql-lang', version: "1.0.5"
     implementation 'com.github.sourceplusplus.assistant:source-api:v0.2.2-alpha'
@@ -72,7 +70,6 @@ task createProperties(dependsOn: processResources) {
             Properties p = new Properties()
             p['version'] = project.version.toString()
             p['build_date'] = new Date().toInstant().toString()
-            p['babelfish_version'] = "$babelfishVersion".toString()
             p['grakn_version'] = "$graknVersion".toString()
             p.store w, null
         }

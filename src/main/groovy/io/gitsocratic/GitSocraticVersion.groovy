@@ -23,7 +23,6 @@ class GitSocraticVersion implements CommandLine.IVersionProvider {
                 + " [Build: " + buildBundle.getString("build_date") + "]")
         versionList.add(" Docker: \t" + dockerVersion)
         versionList.add(" Phenomena:\t" + Phenomena.PHENOMENA_VERSION + " [Schema: Arthur_Omnilingual_Schema]")
-        versionList.add(" Babelfish:\t" + buildBundle.getString("babelfish_version"))
         versionList.add(" Grakn:\t\t" + buildBundle.getString("grakn_version"))
         return versionList.toArray(new String[0])
     }
