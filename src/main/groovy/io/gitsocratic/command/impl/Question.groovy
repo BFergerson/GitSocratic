@@ -58,29 +58,29 @@ class Question implements Callable<Integer> {
 
         try {
             if (outputLogging) log.info "# Question: " + question.formattedQuestion
-            if (outputLogging) log.info "# Result:"
             def result = graknClient.executeQuery(tx, query)
             def queryTimeMs = System.currentTimeMillis() - startTime
 
             def questionAnswer = null
             if (result.size() == 1 && result.get(0) instanceof Numeric) {
                 questionAnswer = (result.get(0) as Numeric).number().longValue()
-                if (outputLogging) log.info(questionAnswer as String)
+                if (outputLogging) log.info("Result: " + questionAnswer as String)
             } else if (!result.isEmpty()) {
+                if (outputLogging) log.info "Result:"
                 result.each {
                     it.map().forEach({ key, value ->
-                        if (outputLogging) log.info key.toString() + " = " + value.asAttribute().value().toString()
+                        if (outputLogging) log.info "\t" + key.toString() + " = " + value.asAttribute().value().toString()
                     })
                 }
                 if (result.size() == 1) {
-                    questionAnswer = result.get(0).get("name").asAttribute().value()
+                    questionAnswer = result.get(0).get("function_name").asAttribute().value()
                 } else {
-                    questionAnswer = result.collect { it.get("name").asAttribute().value() }
+                    questionAnswer = result.collect { it.get("function_name").asAttribute().value() }
                 }
             } else if (outputLogging) {
-                log.info "N/A"
+                log.info "Result: N/A"
             }
-            if (outputLogging) log.info "\n# Query time: " + humanReadableFormat(Duration.ofMillis(queryTimeMs))
+            //if (outputLogging) log.info "# Query time: " + humanReadableFormat(Duration.ofMillis(queryTimeMs))
             return new QuestionCommandResult(0, questionAnswer, queryTimeMs)
         } finally {
             tx.close()
