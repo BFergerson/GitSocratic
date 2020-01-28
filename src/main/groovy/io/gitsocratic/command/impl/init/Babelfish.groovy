@@ -3,6 +3,7 @@ package io.gitsocratic.command.impl.init
 import com.github.dockerjava.api.command.CreateContainerResponse
 import com.github.dockerjava.api.model.Container
 import com.github.dockerjava.api.model.ExposedPort
+import com.github.dockerjava.api.model.HostConfig
 import com.github.dockerjava.api.model.Image
 import com.github.dockerjava.api.model.Ports
 import groovy.io.GroovyPrintWriter
@@ -23,7 +24,7 @@ import static io.gitsocratic.command.config.ConfigOption.*
 /**
  * Used to initialize the Babelfish service.
  *
- * @version 0.2
+ * @version 0.2.1
  * @since 0.2
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
@@ -156,7 +157,7 @@ class Babelfish implements Callable<Integer> {
     private Map<String, String[]> initDockerBabelfish(PrintWriter out) {
         out.println "Initializing Babelfish container"
 
-        def dockerRepository = "bblfsh/bblfshd:v$babelfishVersion-drivers"
+        def dockerRepository = "bblfsh/bblfshd:v$babelfishVersion-drivers-2019-10-29"
         def callback = new PullImageProgress(out)
         SocraticCLI.dockerClient.pullImageCmd(dockerRepository).exec(callback)
         callback.awaitCompletion()
@@ -196,13 +197,14 @@ class Babelfish implements Callable<Integer> {
                         portBindings.bind(babelfishTcpPort, Ports.Binding.empty())
                     }
                     CreateContainerResponse container = SocraticCLI.dockerClient.createContainerCmd(it.id)
-                            .withPrivileged(true)
                             .withAttachStderr(true)
                             .withAttachStdout(true)
                             .withExposedPorts(babelfishTcpPort)
-                            .withPortBindings(portBindings)
-                            .withPublishAllPorts(true)
-                            .exec()
+                            .withHostConfig(HostConfig.newHostConfig()
+                                    .withPortBindings(portBindings)
+                                    .withPublishAllPorts(true)
+                                    .withPrivileged(true)
+                            ).exec()
                     SocraticCLI.dockerClient.startContainerCmd(container.getId()).exec()
                     containerId = container.id
                 }
@@ -217,6 +219,6 @@ class Babelfish implements Callable<Integer> {
     }
 
     static String getDefaultBabelfishVersion() {
-        return "2.13.0"
+        return "2.16.1"
     }
 }

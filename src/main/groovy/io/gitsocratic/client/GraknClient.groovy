@@ -1,13 +1,13 @@
 package io.gitsocratic.client
 
-import grakn.core.concept.answer.ConceptMap
+import grakn.client.answer.ConceptMap
 import graql.lang.Graql
 import io.gitsocratic.command.config.ConfigOption
 
 /**
  * Used to execute queries/questions on the Grakn knowledge graph.
  *
- * @version 0.2
+ * @version 0.2.1
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */

@@ -1,6 +1,7 @@
 sudo: required
 
 language: java
+jdk: openjdk8
 
 services:
   - docker
@@ -21,8 +22,8 @@ deploy:
   provider: releases
   api_key: $GH_TOKEN
   file:
-  - /home/travis/build/CodeBrig/GitSocratic/build/distributions/gitsocratic-0.2.tar
-  - /home/travis/build/CodeBrig/GitSocratic/build/distributions/gitsocratic-0.2.zip
+  - /home/travis/build/CodeBrig/GitSocratic/build/distributions/gitsocratic-0.2.1.tar
+  - /home/travis/build/CodeBrig/GitSocratic/build/distributions/gitsocratic-0.2.1.zip
   skip_cleanup: true
   on:
     tags: true

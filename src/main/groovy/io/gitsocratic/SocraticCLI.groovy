@@ -14,7 +14,7 @@ import java.util.concurrent.Callable
 /**
  * Main entry point of the GitSocratic CLI implementation.
  *
- * @version 0.2
+ * @version 0.2.1
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */

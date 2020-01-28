@@ -1,10 +1,7 @@
 package io.gitsocratic.command.impl.init
 
 import com.github.dockerjava.api.command.CreateContainerResponse
-import com.github.dockerjava.api.model.Container
-import com.github.dockerjava.api.model.ExposedPort
-import com.github.dockerjava.api.model.Image
-import com.github.dockerjava.api.model.Ports
+import com.github.dockerjava.api.model.*
 import groovy.io.GroovyPrintWriter
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
@@ -23,7 +20,7 @@ import static io.gitsocratic.command.config.ConfigOption.*
 /**
  * Used to initialize the Apache Skywalking service.
  *
- * @version 0.2
+ * @version 0.2.1
  * @since 0.2
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
@@ -204,9 +201,10 @@ class ApacheSkyWalking implements Callable<Integer> {
                             .withAttachStderr(true)
                             .withAttachStdout(true)
                             .withExposedPorts(grpcPort, restPort)
-                            .withPortBindings(portBindings)
-                            .withPublishAllPorts(true)
-                            .exec()
+                            .withHostConfig(HostConfig.newHostConfig()
+                                    .withPortBindings(portBindings)
+                                    .withPublishAllPorts(true)
+                            ).exec()
                     SocraticCLI.dockerClient.startContainerCmd(container.id).exec()
                     containerId = container.id
                 }

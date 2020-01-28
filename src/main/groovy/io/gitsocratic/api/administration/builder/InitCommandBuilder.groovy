@@ -5,7 +5,7 @@ import io.gitsocratic.command.impl.Init
 /**
  * Used to construct the 'init <service>' command via API.
  *
- * @version 0.2
+ * @version 0.2.1
  * @since 0.2
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */

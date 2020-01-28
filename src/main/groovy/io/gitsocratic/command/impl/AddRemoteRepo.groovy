@@ -1,6 +1,7 @@
 package io.gitsocratic.command.impl
 
 import groovy.transform.ToString
+import groovy.util.logging.Slf4j
 import io.gitsocratic.client.PhenomenaClient
 import io.gitsocratic.command.result.AddRemoteRepoCommandResult
 import org.eclipse.jgit.api.Git
@@ -12,10 +13,11 @@ import java.util.concurrent.TimeUnit
  * Represents the `add-remote-repo` command.
  * Used to add remote source code repository to the knowledge graph.
  *
- * @version 0.2
+ * @version 0.2.1
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@Slf4j
 @ToString(includePackage = false, includeNames = true)
 @CommandLine.Command(name = "add-remote-repo",
         description = "Add remote source code repository to the knowledge graph",
@@ -71,7 +73,7 @@ class AddRemoteRepo extends AddLocalRepo {
     }
 
     private static void cloneRepo(String githubRepository, File outputDirectory, boolean outputLogging) {
-        if (outputLogging) println "Cloning: $githubRepository"
+        if (outputLogging) log.info "Cloning: $githubRepository"
         if (githubRepository.startsWith("http")) {
             Git.cloneRepository()
                     .setURI(githubRepository)
@@ -87,7 +89,7 @@ class AddRemoteRepo extends AddLocalRepo {
                     .setTimeout(TimeUnit.MINUTES.toSeconds(5) as int)
                     .call()
         }
-        if (outputLogging) println "Cloned: $githubRepository"
+        if (outputLogging) log.info "Cloned: $githubRepository"
     }
 
     static boolean getDefaultParallelProcessing() {

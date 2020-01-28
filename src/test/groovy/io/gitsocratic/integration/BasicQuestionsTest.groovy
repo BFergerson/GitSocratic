@@ -1,6 +1,5 @@
 package io.gitsocratic.integration
 
-import com.codebrig.arthur.SourceLanguage
 import io.gitsocratic.api.SocraticAPI
 import io.gitsocratic.client.GraknClient
 import io.gitsocratic.command.config.ConfigOption
@@ -12,45 +11,45 @@ class BasicQuestionsTest {
 
     private final GraknClient graknClient = new GraknClient()
 
-    @Test
-    void askBasicQuestions_sameProgram() {
-        graknClient.resetKeyspace()
-        //todo: reset config
-        assertEquals(0, SocraticAPI.administration().init().build().execute(true).status)
-
-        def addRepo = SocraticAPI.administration().addRemoteRepo()
-                .repoName("bfergerson/same-program").build().execute()
-        assertEquals(0, addRepo.status)
-
-        SourceLanguage.getSupportedLanguages().each {
-            def question1 = SocraticAPI.knowledge().question()
-                    .question("how many $it methods are named main").build().execute()
-            assertEquals("Language: $it", 0, question1.status)
-            assertEquals("Language: $it", 1, question1.answer)
-        }
-
-        SourceLanguage.getSupportedLanguages().each {
-            def question2 = SocraticAPI.knowledge().question()
-                    .question("how many $it methods total").build().execute()
-            assertEquals(0, question2.status)
-            assertEquals(1, question2.answer)
-        }
-
-        def question3 = SocraticAPI.knowledge().question()
-                .question("how many methods are named main").build().execute()
-        assertEquals(0, question3.status)
-        assertEquals(6, question3.answer)
-
-        def question4 = SocraticAPI.knowledge().question()
-                .question("how many methods are named like main").build().execute()
-        assertEquals(0, question4.status)
-        assertEquals(6, question4.answer)
-
-        def question5 = SocraticAPI.knowledge().question()
-                .question("how many methods total").build().execute()
-        assertEquals(0, question5.status)
-        assertEquals(6, question5.answer)
-    }
+//    @Test
+//    void askBasicQuestions_sameProgram() {
+//        graknClient.resetKeyspace()
+//        //todo: reset config
+//        assertEquals(0, SocraticAPI.administration().init().build().execute(true).status)
+//
+//        def addRepo = SocraticAPI.administration().addRemoteRepo()
+//                .repoName("bfergerson/same-program").build().execute()
+//        assertEquals(0, addRepo.status)
+//
+//        SourceLanguage.getSupportedLanguages().each {
+//            def question1 = SocraticAPI.knowledge().question()
+//                    .question("how many $it methods are named main").build().execute()
+//            assertEquals("Language: $it", 0, question1.status)
+//            assertEquals("Language: $it", 1, question1.answer)
+//        }
+//
+//        SourceLanguage.getSupportedLanguages().each {
+//            def question2 = SocraticAPI.knowledge().question()
+//                    .question("how many $it methods total").build().execute()
+//            assertEquals(0, question2.status)
+//            assertEquals(1, question2.answer)
+//        }
+//
+//        def question3 = SocraticAPI.knowledge().question()
+//                .question("how many methods are named main").build().execute()
+//        assertEquals(0, question3.status)
+//        assertEquals(6, question3.answer)
+//
+//        def question4 = SocraticAPI.knowledge().question()
+//                .question("how many methods are named like main").build().execute()
+//        assertEquals(0, question4.status)
+//        assertEquals(6, question4.answer)
+//
+//        def question5 = SocraticAPI.knowledge().question()
+//                .question("how many methods total").build().execute()
+//        assertEquals(0, question5.status)
+//        assertEquals(6, question5.answer)
+//    }
 
     @Test
     void askBasicComplexityQuestions_methodComplexity() {

@@ -1,22 +1,23 @@
 package io.gitsocratic.command.impl.query
 
-import grakn.core.concept.answer.Numeric
+import grakn.client.answer.Numeric
 import groovy.transform.ToString
+import groovy.util.logging.Slf4j
 import io.gitsocratic.client.GraknClient
 import io.gitsocratic.command.result.QueryCommandResult
 import picocli.CommandLine
 
-import java.time.Duration
 import java.util.concurrent.Callable
 
 /**
  * Represents the `graql` command.
  * Used to execute a single Graql query.
  *
- * @version 0.2
+ * @version 0.2.1
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@Slf4j
 @ToString(includePackage = false, includeNames = true)
 @CommandLine.Command(name = "graql",
         description = "Execute a single Graql query",
@@ -49,7 +50,7 @@ class Graql implements Callable<Integer> {
 
     private QueryCommandResult.GraqlResponse executeCommand(boolean outputLogging) throws Exception {
         if (query == null || query.isEmpty()) {
-            if (outputLogging) System.err.println("Missing Graql query")
+            if (outputLogging) log.error "Missing Graql query"
             return new QueryCommandResult.GraqlResponse(-1)
         }
 
@@ -57,25 +58,23 @@ class Graql implements Callable<Integer> {
         def graknClient = new GraknClient()
         def tx = graknClient.makeReadSession()
         try {
-            if (outputLogging) {
-                println "# Query: $query"
-                println "# Result:"
-            }
-
+            if (outputLogging) log.info "# Query: " + query
             def result = graknClient.executeQuery(tx, query)
+            def queryTimeMs = System.currentTimeMillis() - startTime
+
             if (result.size() == 1 && result.get(0) instanceof Numeric) {
-                if (outputLogging) println((result.get(0) as Numeric).number())
+                if (outputLogging) log.info("Result: " + (result.get(0) as Numeric).number().longValue() as String)
             } else if (!result.isEmpty()) {
+                if (outputLogging) log.info "Result:"
                 result.each {
-                    it.forEach({ key, value ->
-                        if (outputLogging) println key.toString() + " = " + value.asAttribute().value().toString()
+                    it.map().forEach({ key, value ->
+                        if (outputLogging) log.info "\t" + key.toString() + " = " + value.asAttribute().value().toString()
                     })
                 }
             } else {
-                if (outputLogging) println "N/A"
+                if (outputLogging) log.info "Result: N/A"
             }
-            if (outputLogging) println "\n# Query time: " + humanReadableFormat(Duration.ofMillis(System.currentTimeMillis() - startTime))
-            return new QueryCommandResult.GraqlResponse(0, result)
+            return new QueryCommandResult.GraqlResponse(0, result, queryTimeMs)
         } finally {
             tx.close()
             graknClient.close()
@@ -84,11 +83,5 @@ class Graql implements Callable<Integer> {
 
     String getQuery() {
         return query
-    }
-
-    static String humanReadableFormat(Duration duration) {
-        return duration.toString().substring(2)
-                .replaceAll('(\\d[HMS])(?!$)', '$1 ')
-                .toLowerCase()
     }
 }

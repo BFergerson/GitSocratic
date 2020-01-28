@@ -3,6 +3,7 @@ package io.gitsocratic.command.impl
 import com.github.dockerjava.api.model.Frame
 import com.github.dockerjava.core.command.LogContainerResultCallback
 import groovy.transform.ToString
+import groovy.util.logging.Slf4j
 import io.gitsocratic.GitSocraticService
 import picocli.CommandLine
 
@@ -14,10 +15,11 @@ import static io.gitsocratic.SocraticCLI.dockerClient
  * Represents the `logs` command.
  * Used to view logs of initialized services.
  *
- * @version 0.2
+ * @version 0.2.1
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@Slf4j
 @ToString(includePackage = false, includeNames = true)
 @CommandLine.Command(name = "logs",
         description = "View logs of initialized services",
@@ -55,7 +57,7 @@ class Logs implements Callable<Integer> {
         }
 
         if (!foundContainer) {
-            System.err.println("Couldn't find container for service: $service")
+            log.error "Couldn't find container for service: $service"
             return -1
         }
         return 0
@@ -65,7 +67,7 @@ class Logs implements Callable<Integer> {
         @Override
         void onNext(Frame item) {
             super.onNext(item)
-            println item
+            log.info(item as String)
         }
     }
 }

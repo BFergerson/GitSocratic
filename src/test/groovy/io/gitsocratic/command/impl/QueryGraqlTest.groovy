@@ -1,6 +1,6 @@
 package io.gitsocratic.command.impl
 
-import grakn.core.concept.answer.Numeric
+import grakn.client.answer.Numeric
 import io.gitsocratic.api.SocraticAPI
 import io.gitsocratic.command.SocraticCommandTest
 import org.junit.Test

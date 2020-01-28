@@ -8,6 +8,7 @@ import com.codebrig.phenomena.code.analysis.semantic.CodeSemanticObserver
 import com.github.dockerjava.api.command.CreateContainerResponse
 import com.github.dockerjava.api.model.Container
 import com.github.dockerjava.api.model.ExposedPort
+import com.github.dockerjava.api.model.HostConfig
 import com.github.dockerjava.api.model.Image
 import com.github.dockerjava.api.model.Ports
 import com.github.rholder.retry.*
@@ -30,7 +31,7 @@ import static io.gitsocratic.command.config.ConfigOption.*
 /**
  * Used to initialize the Grakn service.
  *
- * @version 0.2
+ * @version 0.2.1
  * @since 0.2
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
@@ -199,9 +200,10 @@ class Grakn implements Callable<Integer> {
                             .withAttachStderr(true)
                             .withAttachStdout(true)
                             .withExposedPorts(graknTcpPort)
-                            .withPortBindings(portBindings)
-                            .withPublishAllPorts(true)
-                            .exec()
+                            .withHostConfig(HostConfig.newHostConfig()
+                                    .withPortBindings(portBindings)
+                                    .withPublishAllPorts(true)
+                            ).exec()
                     SocraticCLI.dockerClient.startContainerCmd(container.getId()).exec()
 
                     out.println "Waiting for Grakn to start"
@@ -286,6 +288,6 @@ class Grakn implements Callable<Integer> {
     }
 
     static String getDefaultGraknVersion() {
-        return "1.5.7"
+        return "1.6.2"
     }
 }

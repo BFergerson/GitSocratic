@@ -1,23 +1,24 @@
 package io.gitsocratic.command.impl
 
-import grakn.core.concept.answer.Numeric
+import grakn.client.answer.Numeric
 import groovy.transform.ToString
+import groovy.util.logging.Slf4j
 import io.gitsocratic.client.GraknClient
 import io.gitsocratic.command.question.SourceQuestion
 import io.gitsocratic.command.result.QuestionCommandResult
 import picocli.CommandLine
 
-import java.time.Duration
 import java.util.concurrent.Callable
 
 /**
  * Represents the `question` command.
  * Used to execute a single source code question.
  *
- * @version 0.2
+ * @version 0.2.1
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@Slf4j
 @ToString(includePackage = false, includeNames = true)
 @CommandLine.Command(name = "question",
         description = "Execute a single source code question",
@@ -55,30 +56,29 @@ class Question implements Callable<Integer> {
         def tx = graknClient.makeReadSession()
 
         try {
-            if (outputLogging) println "# Question: " + question.formattedQuestion
-            if (outputLogging) println "# Result:"
+            if (outputLogging) log.info "# Question: " + question.formattedQuestion
             def result = graknClient.executeQuery(tx, query)
             def queryTimeMs = System.currentTimeMillis() - startTime
 
             def questionAnswer = null
             if (result.size() == 1 && result.get(0) instanceof Numeric) {
                 questionAnswer = (result.get(0) as Numeric).number().longValue()
-                if (outputLogging) println questionAnswer
+                if (outputLogging) log.info("Result: " + questionAnswer as String)
             } else if (!result.isEmpty()) {
+                if (outputLogging) log.info "Result:"
                 result.each {
-                    it.forEach({ key, value ->
-                        if (outputLogging) println key.toString() + " = " + value.asAttribute().value().toString()
+                    it.map().forEach({ key, value ->
+                        if (outputLogging) log.info "\t" + key.toString() + " = " + value.asAttribute().value().toString()
                     })
                 }
                 if (result.size() == 1) {
-                    questionAnswer = result.get(0).get("name").asAttribute().value()
+                    questionAnswer = result.get(0).get("function_name").asAttribute().value()
                 } else {
-                    questionAnswer = result.collect { it.get("name").asAttribute().value() }
+                    questionAnswer = result.collect { it.get("function_name").asAttribute().value() }
                 }
-            } else if (outputLogging) {
-                println "N/A"
+            } else {
+                if (outputLogging) log.info "Result: N/A"
             }
-            if (outputLogging) println "\n# Query time: " + humanReadableFormat(Duration.ofMillis(queryTimeMs))
             return new QuestionCommandResult(0, questionAnswer, queryTimeMs)
         } finally {
             tx.close()
@@ -86,10 +86,8 @@ class Question implements Callable<Integer> {
         }
     }
 
-    static String humanReadableFormat(Duration duration) {
-        return duration.toString().substring(2)
-                .replaceAll('(\\d[HMS])(?!$)', '$1 ')
-                .toLowerCase()
+    SourceQuestion getQuestion() {
+        return question
     }
 
     static class QuestionTypeConverter implements CommandLine.ITypeConverter<SourceQuestion> {

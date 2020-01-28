@@ -9,7 +9,7 @@ import io.gitsocratic.command.question.converters.SourceLanguageQualifiedNameVal
  * Represents source code questions GitSocratic understands.
  * Likely to be replaced by DialogFlow in 0.3.
  *
- * @version 0.2
+ * @version 0.2.1
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
