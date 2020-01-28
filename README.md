@@ -46,7 +46,7 @@ cd gitsocratic-0.2/bin/
 gitsocratic [-hV] [-c=<configFile>] [COMMAND]
 ```
 
-[![asciicast](https://asciinema.org/a/4uCMnG7FcG89XE01RyFxg2Pnh.svg)](https://asciinema.org/a/4uCMnG7FcG89XE01RyFxg2Pnh)
+[![asciicast](https://asciinema.org/a/xIJzdsAt82jpTipnIW8YxcsZx.svg)](https://asciinema.org/a/xIJzdsAt82jpTipnIW8YxcsZx)
 
 ### Commands
 
