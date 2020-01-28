@@ -7,7 +7,6 @@ import io.gitsocratic.client.GraknClient
 import io.gitsocratic.command.result.QueryCommandResult
 import picocli.CommandLine
 
-import java.time.Duration
 import java.util.concurrent.Callable
 
 /**
@@ -59,25 +58,23 @@ class Graql implements Callable<Integer> {
         def graknClient = new GraknClient()
         def tx = graknClient.makeReadSession()
         try {
-            if (outputLogging) {
-                log.info "# Query: $query"
-                log.info "# Result:"
-            }
-
+            if (outputLogging) log.info "# Query: " + query
             def result = graknClient.executeQuery(tx, query)
+            def queryTimeMs = System.currentTimeMillis() - startTime
+
             if (result.size() == 1 && result.get(0) instanceof Numeric) {
-                if (outputLogging) log.info((result.get(0) as Numeric).number() as String)
+                if (outputLogging) log.info("Result: " + (result.get(0) as Numeric).number().longValue() as String)
             } else if (!result.isEmpty()) {
+                if (outputLogging) log.info "Result:"
                 result.each {
                     it.map().forEach({ key, value ->
-                        if (outputLogging) log.info key.toString() + " = " + value.asAttribute().value().toString()
+                        if (outputLogging) log.info "\t" + key.toString() + " = " + value.asAttribute().value().toString()
                     })
                 }
             } else {
-                if (outputLogging) log.info "N/A"
+                if (outputLogging) log.info "Result: N/A"
             }
-            if (outputLogging) log.info "\n# Query time: " + humanReadableFormat(Duration.ofMillis(System.currentTimeMillis() - startTime))
-            return new QueryCommandResult.GraqlResponse(0, result)
+            return new QueryCommandResult.GraqlResponse(0, result, queryTimeMs)
         } finally {
             tx.close()
             graknClient.close()
@@ -86,11 +83,5 @@ class Graql implements Callable<Integer> {
 
     String getQuery() {
         return query
-    }
-
-    static String humanReadableFormat(Duration duration) {
-        return duration.toString().substring(2)
-                .replaceAll('(\\d[HMS])(?!$)', '$1 ')
-                .toLowerCase()
     }
 }

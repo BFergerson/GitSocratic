@@ -14,7 +14,8 @@ abstract class QueryCommandResult {
 
     @TupleConstructor
     static class GraqlResponse {
-        int status
-        List<ConceptMap> answer
+        final int status
+        final List<ConceptMap> answer
+        final long queryTimeMs
     }
 }

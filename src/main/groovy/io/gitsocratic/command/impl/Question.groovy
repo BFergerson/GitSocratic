@@ -8,7 +8,6 @@ import io.gitsocratic.command.question.SourceQuestion
 import io.gitsocratic.command.result.QuestionCommandResult
 import picocli.CommandLine
 
-import java.time.Duration
 import java.util.concurrent.Callable
 
 /**
@@ -77,10 +76,9 @@ class Question implements Callable<Integer> {
                 } else {
                     questionAnswer = result.collect { it.get("function_name").asAttribute().value() }
                 }
-            } else if (outputLogging) {
-                log.info "Result: N/A"
+            } else {
+                if (outputLogging) log.info "Result: N/A"
             }
-            //if (outputLogging) log.info "# Query time: " + humanReadableFormat(Duration.ofMillis(queryTimeMs))
             return new QuestionCommandResult(0, questionAnswer, queryTimeMs)
         } finally {
             tx.close()
@@ -88,10 +86,8 @@ class Question implements Callable<Integer> {
         }
     }
 
-    static String humanReadableFormat(Duration duration) {
-        return duration.toString().substring(2)
-                .replaceAll('(\\d[HMS])(?!$)', '$1 ')
-                .toLowerCase()
+    SourceQuestion getQuestion() {
+        return question
     }
 
     static class QuestionTypeConverter implements CommandLine.ITypeConverter<SourceQuestion> {
