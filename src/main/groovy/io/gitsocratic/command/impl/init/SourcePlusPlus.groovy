@@ -20,7 +20,7 @@ import static io.gitsocratic.command.config.ConfigOption.*
 /**
  * Used to initialize the Source++ service.
  *
- * @version 0.2
+ * @version 0.2.1
  * @since 0.2
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */

@@ -6,7 +6,7 @@ import com.github.dockerjava.core.command.PullImageResultCallback
 /**
  * Used to track the progress of Docker image download.
  *
- * @version 0.2
+ * @version 0.2.1
  * @since 0.2
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */

@@ -35,9 +35,9 @@ apt-get update
 apt install openjdk-8-jre-headless
 apt install unzip
 apt install docker.io
-wget https://github.com/CodeBrig/GitSocratic/releases/download/v0.2-alpha/gitsocratic-0.2.zip
-unzip gitsocratic-0.2.zip
-cd gitsocratic-0.2/bin/
+wget https://github.com/CodeBrig/GitSocratic/releases/download/v0.2.1-alpha/gitsocratic-0.2.1.zip
+unzip gitsocratic-0.2.1.zip
+cd gitsocratic-0.2.1/bin/
 ./gitsocratic init
 ```
 

@@ -15,7 +15,7 @@ import java.util.concurrent.Callable
  * Represents the `init` command.
  * Used to initialize services necessary to use GitSocratic.
  *
- * @version 0.2
+ * @version 0.2.1
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
