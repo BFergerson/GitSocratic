@@ -24,6 +24,8 @@ ext {
 
 dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.12'
+    testImplementation 'com.github.sourceplusplus.assistant:source-api:master-SNAPSHOT'
+
     implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.26'
     implementation 'org.codehaus.groovy:groovy-all:2.4.15'
     implementation group: 'info.picocli', name: 'picocli', version: '3.7.0'
@@ -37,7 +39,6 @@ dependencies {
     implementation 'com.github.codebrig:arthur:4c66a0b7ec'
     implementation group: 'io.grakn.client', name: 'grakn-client', version: "$graknVersion"
     implementation group: 'io.graql', name: 'graql-lang', version: "1.0.5"
-    implementation 'com.github.sourceplusplus.assistant:source-api:v0.2.2-alpha'
     compile group: 'io.vertx', name: 'vertx-core', version: '3.7.0'
     compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.1'
 }

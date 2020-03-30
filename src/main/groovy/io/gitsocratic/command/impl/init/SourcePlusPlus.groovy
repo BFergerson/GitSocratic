@@ -221,6 +221,6 @@ class SourcePlusPlus implements Callable<Integer> {
     }
 
     static String getDefaultSourcePlusPlusVersion() {
-        return "0.2.2-alpha"
+        return "0.2.4-alpha"
     }
 }
