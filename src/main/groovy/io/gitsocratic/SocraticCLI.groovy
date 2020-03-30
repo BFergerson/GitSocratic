@@ -65,7 +65,6 @@ class SocraticCLI implements Callable<Integer> {
 
     static DockerClient getDockerClient() {
         if (dockerClient == null) {
-            NettyDockerCmdExecFactory factory = new NettyDockerCmdExecFactory()
             def config = DefaultDockerClientConfig.createDefaultConfigBuilder()
             if (SystemUtils.IS_OS_WINDOWS) {
                 def dockerHost = ConfigOption.docker_host.value
@@ -74,9 +73,7 @@ class SocraticCLI implements Callable<Integer> {
             } else {
                 config.withDockerHost("unix:///var/run/docker.sock")
             }
-            dockerClient = DockerClientBuilder.getInstance(config.build())
-                    .withDockerCmdExecFactory(factory)
-                    .build()
+            dockerClient = DockerClientBuilder.getInstance(config.build()).build()
         }
         return dockerClient
     }
