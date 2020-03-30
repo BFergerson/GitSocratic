@@ -44,9 +44,9 @@ class Init implements Callable<Integer> {
     private InitCommandResult executeCommand(boolean outputLogging) throws Exception {
         if (cli == null || cli.fullCommand.length == 1) {
             //install base services: babelfish & grakn
-            def status = new Babelfish().call()
+            def status = new Babelfish(Babelfish.defaultBabelfishVersion).call()
             if (status == 0) {
-                status = new Grakn().call()
+                status = new Grakn(Grakn.defaultGraknVersion).call()
             }
             return new InitCommandResult(status)
         }
