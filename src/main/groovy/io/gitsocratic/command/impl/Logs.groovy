@@ -1,7 +1,7 @@
 package io.gitsocratic.command.impl
 
+import com.github.dockerjava.api.async.ResultCallback
 import com.github.dockerjava.api.model.Frame
-import com.github.dockerjava.core.command.LogContainerResultCallback
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 import io.gitsocratic.GitSocraticService
@@ -63,10 +63,10 @@ class Logs implements Callable<Integer> {
         return 0
     }
 
-    static class LogCallback extends LogContainerResultCallback {
+    static class LogCallback extends ResultCallback.Adapter<Frame> {
+
         @Override
         void onNext(Frame item) {
-            super.onNext(item)
             log.info(item as String)
         }
     }

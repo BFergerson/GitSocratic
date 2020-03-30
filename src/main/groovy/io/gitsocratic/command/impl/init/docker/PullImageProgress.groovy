@@ -1,7 +1,7 @@
 package io.gitsocratic.command.impl.init.docker
 
+import com.github.dockerjava.api.command.PullImageResultCallback
 import com.github.dockerjava.api.model.PullResponseItem
-import com.github.dockerjava.core.command.PullImageResultCallback
 
 /**
  * Used to track the progress of Docker image download.
