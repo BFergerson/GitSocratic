@@ -196,7 +196,7 @@ class ApacheSkyWalking implements Callable<Integer> {
                         portBindings.bind(grpcPort, Ports.Binding.empty())
                         portBindings.bind(restPort, Ports.Binding.empty())
                     }
-                    CreateContainerResponse container = SocraticCLI.dockerClient.createContainerCmd(it.id)
+                    def createContainerCommand = SocraticCLI.dockerClient.createContainerCmd(it.id)
                             .withName("Apache_SkyWalking")
                             .withAttachStderr(true)
                             .withAttachStdout(true)
@@ -204,7 +204,13 @@ class ApacheSkyWalking implements Callable<Integer> {
                             .withHostConfig(HostConfig.newHostConfig()
                                     .withPortBindings(portBindings)
                                     .withPublishAllPorts(true)
-                            ).exec()
+                            )
+                    if (docker_apache_skywalking_hostname.getValue() != null) {
+                        createContainerCommand = createContainerCommand
+                                .withHostName(docker_apache_skywalking_hostname.getValue())
+                    }
+
+                    def container = createContainerCommand.exec()
                     SocraticCLI.dockerClient.startContainerCmd(container.id).exec()
                     containerId = container.id
                 }

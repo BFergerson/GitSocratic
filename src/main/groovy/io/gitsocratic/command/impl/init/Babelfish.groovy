@@ -196,7 +196,7 @@ class Babelfish implements Callable<Integer> {
                     } else {
                         portBindings.bind(babelfishTcpPort, Ports.Binding.empty())
                     }
-                    CreateContainerResponse container = SocraticCLI.dockerClient.createContainerCmd(it.id)
+                    def createContainerCommand = SocraticCLI.dockerClient.createContainerCmd(it.id)
                             .withAttachStderr(true)
                             .withAttachStdout(true)
                             .withExposedPorts(babelfishTcpPort)
@@ -204,7 +204,13 @@ class Babelfish implements Callable<Integer> {
                                     .withPortBindings(portBindings)
                                     .withPublishAllPorts(true)
                                     .withPrivileged(true)
-                            ).exec()
+                            )
+                    if (docker_babelfish_hostname.getValue() != null) {
+                        createContainerCommand = createContainerCommand
+                                .withHostName(docker_babelfish_hostname.getValue())
+                    }
+
+                    def container = createContainerCommand.exec()
                     SocraticCLI.dockerClient.startContainerCmd(container.getId()).exec()
                     containerId = container.id
                 }

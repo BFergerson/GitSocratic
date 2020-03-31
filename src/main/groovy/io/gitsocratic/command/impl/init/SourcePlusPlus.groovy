@@ -197,7 +197,7 @@ class SourcePlusPlus implements Callable<Integer> {
                     } else {
                         portBindings.bind(sppTcpPort, Ports.Binding.empty())
                     }
-                    CreateContainerResponse container = SocraticCLI.dockerClient.createContainerCmd(it.id)
+                    def createContainerCommand = SocraticCLI.dockerClient.createContainerCmd(it.id)
                             .withName("SourcePlusPlus")
                             .withAttachStderr(true)
                             .withAttachStdout(true)
@@ -206,7 +206,13 @@ class SourcePlusPlus implements Callable<Integer> {
                                     .withPortBindings(portBindings)
                                     .withPublishAllPorts(true)
                                     .withLinks(containerLinks)
-                            ).exec()
+                            )
+                    if (docker_source_plus_plus_hostname.getValue() != null) {
+                        createContainerCommand = createContainerCommand
+                                .withHostName(docker_source_plus_plus_hostname.getValue())
+                    }
+
+                    def container = createContainerCommand.exec()
                     SocraticCLI.dockerClient.startContainerCmd(container.getId()).exec()
                     containerId = container.id
                 }

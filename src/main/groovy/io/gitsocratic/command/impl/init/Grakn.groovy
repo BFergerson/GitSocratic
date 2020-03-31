@@ -196,16 +196,21 @@ class Grakn implements Callable<Integer> {
                     } else {
                         portBindings.bind(graknTcpPort, Ports.Binding.empty())
                     }
-                    CreateContainerResponse container = SocraticCLI.dockerClient.createContainerCmd(it.id)
+                    def createContainerCommand = SocraticCLI.dockerClient.createContainerCmd(it.id)
                             .withAttachStderr(true)
                             .withAttachStdout(true)
                             .withExposedPorts(graknTcpPort)
                             .withHostConfig(HostConfig.newHostConfig()
                                     .withPortBindings(portBindings)
                                     .withPublishAllPorts(true)
-                            ).exec()
-                    SocraticCLI.dockerClient.startContainerCmd(container.getId()).exec()
+                            )
+                    if (docker_grakn_hostname.getValue() != null) {
+                        createContainerCommand = createContainerCommand
+                                .withHostName(docker_grakn_hostname.getValue())
+                    }
 
+                    def container = createContainerCommand.exec()
+                    SocraticCLI.dockerClient.startContainerCmd(container.getId()).exec()
                     out.println "Waiting for Grakn to start"
                     Thread.sleep(10 * 1000) //todo: smarter
                     containerId = container.id

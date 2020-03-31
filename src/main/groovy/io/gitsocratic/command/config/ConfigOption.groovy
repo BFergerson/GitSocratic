@@ -12,20 +12,28 @@ import io.gitsocratic.SocraticCLI
 enum ConfigOption {
 
     //environment
-    use_docker_grakn("true"),
     docker_host("localhost"),
     docker_port("2376"),
+    // - grakn
+    use_docker_grakn("true"),
+    docker_grakn_hostname(null),
     grakn_host("localhost"),
     grakn_port("48555"),
     grakn_keyspace("grakn"),
+    // - babelfish
     use_docker_babelfish("true"),
+    docker_babelfish_hostname(null),
     babelfish_host("localhost"),
     babelfish_port("9432"),
+    // - apache skywalking
     use_docker_apache_skywalking("true"),
+    docker_apache_skywalking_hostname(null),
     apache_skywalking_host("localhost"),
     apache_skywalking_grpc_port("11800"),
     apache_skywalking_rest_port("12800"),
+    // - source++
     use_docker_source_plus_plus("true"),
+    docker_source_plus_plus_hostname(null),
     source_plus_plus_host("localhost"),
     source_plus_plus_port("8080"),
 
