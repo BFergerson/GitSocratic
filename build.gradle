@@ -19,7 +19,7 @@ repositories {
 }
 
 ext {
-    graknVersion = "1.6.2"
+    graknVersion = "1.7.2"
 }
 
 dependencies {
