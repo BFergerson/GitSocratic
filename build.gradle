@@ -24,7 +24,7 @@ ext {
 
 dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.12'
-    testImplementation 'com.github.sourceplusplus.assistant:source-api:master-SNAPSHOT'
+//    testImplementation 'com.github.sourceplusplus.assistant:source-api:master-SNAPSHOT'
 
     implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
     implementation 'org.codehaus.groovy:groovy-all:2.4.17'
@@ -33,10 +33,10 @@ dependencies {
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.7.0.202003110725-r'
     implementation "com.github.rholder:guava-retrying:2.0.0"
     implementation group: 'com.github.docker-java', name: 'docker-java', version: '3.2.1'
-    compile(group: 'com.github.codebrig', name: 'phenomena', version: '6441ef3aa7') {
+    compile(group: 'com.github.codebrig', name: 'phenomena', version: '4b0bb3ef78') {
         exclude group: 'io.grakn.client', module: 'api'
     }
-    implementation 'com.github.codebrig:arthur:4c66a0b7ec'
+    implementation 'com.github.codebrig:arthur:3e855fddcd'
     implementation group: 'io.grakn.client', name: 'grakn-client', version: "$graknVersion"
     implementation group: 'io.graql', name: 'graql-lang', version: "1.0.6"
     compile group: 'io.vertx', name: 'vertx-core', version: '3.8.5'

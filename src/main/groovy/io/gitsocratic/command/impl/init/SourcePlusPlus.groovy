@@ -1,6 +1,5 @@
 package io.gitsocratic.command.impl.init
 
-import com.github.dockerjava.api.command.CreateContainerResponse
 import com.github.dockerjava.api.model.*
 import groovy.io.GroovyPrintWriter
 import groovy.transform.ToString
