@@ -9,17 +9,17 @@ import io.gitsocratic.command.impl.AddLocalRepo
  * @since 0.2
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
-class AddLocalRepoCommandBuilder {
+class ParseLocalRepoCommandBuilder {
 
     private File repoLocation
     private boolean parallelProcessing = AddLocalRepo.defaultParallelProcessing
 
-    AddLocalRepoCommandBuilder repoLocation(File repoLocation) {
+    ParseLocalRepoCommandBuilder repoLocation(File repoLocation) {
         this.repoLocation = repoLocation
         return this
     }
 
-    AddLocalRepoCommandBuilder parallelProcessing(boolean parallelProcessing) {
+    ParseLocalRepoCommandBuilder parallelProcessing(boolean parallelProcessing) {
         this.parallelProcessing = parallelProcessing
         return this
     }

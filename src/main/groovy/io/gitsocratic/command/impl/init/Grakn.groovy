@@ -1,16 +1,11 @@
 package io.gitsocratic.command.impl.init
 
 import com.codebrig.arthur.SourceLanguage
+import com.codebrig.phenomena.ConnectionException
 import com.codebrig.phenomena.Phenomena
 import com.codebrig.phenomena.code.analysis.DependenceAnalysis
 import com.codebrig.phenomena.code.analysis.MetricAnalysis
-import com.codebrig.phenomena.code.analysis.semantic.CodeSemanticObserver
-import com.github.dockerjava.api.command.CreateContainerResponse
-import com.github.dockerjava.api.model.Container
-import com.github.dockerjava.api.model.ExposedPort
-import com.github.dockerjava.api.model.HostConfig
-import com.github.dockerjava.api.model.Image
-import com.github.dockerjava.api.model.Ports
+import com.github.dockerjava.api.model.*
 import com.github.rholder.retry.*
 import groovy.io.GroovyPrintWriter
 import groovy.transform.ToString
@@ -229,46 +224,46 @@ class Grakn implements Callable<Integer> {
     private static void setupGraknOntology(PrintWriter out) {
         Callable<Boolean> setupOntology = new Callable<Boolean>() {
             Boolean call() throws Exception {
-                def phenomena = new Phenomena()
-                if (Boolean.valueOf(use_docker_grakn.value)) {
-                    phenomena.graknHost = docker_host.value
-                } else {
-                    phenomena.graknHost = grakn_host.value
-                }
-                phenomena.graknPort = grakn_port.value as int
-                phenomena.graknKeyspace = grakn_keyspace.value
-                phenomena.connectToGrakn()
-                out.println "Successfully connected to Grakn"
-
-                out.println "Installing base structure"
-                phenomena.setupOntology(SourceLanguage.Omnilingual.getBaseStructureSchemaDefinition())
-                out.println "Base structure installed"
-
-                if (Boolean.valueOf(semantic_roles.value)) {
-                    out.println "Installing semantic roles"
-                    phenomena.setupOntology(SourceLanguage.Omnilingual.getSemanticRolesSchemaDefinition())
-                    new CodeSemanticObserver().getRules().each {
-                        phenomena.setupOntology(it)
+                try (def phenomena = new Phenomena()) {
+                    if (Boolean.valueOf(use_docker_grakn.value)) {
+                        phenomena.graknHost = docker_host.value
+                    } else {
+                        phenomena.graknHost = grakn_host.value
                     }
-                    out.println "Semantic roles installed"
+                    phenomena.graknPort = grakn_port.value as int
+                    phenomena.graknKeyspace = grakn_keyspace.value
+                    phenomena.connectToGrakn()
+                    out.println "Successfully connected to Grakn"
+
+                    out.println "Installing base structure"
+                    phenomena.setupOntology(SourceLanguage.Omnilingual.getBaseStructureSchemaDefinition())
+                    out.println "Base structure installed"
+
+                    if (Boolean.valueOf(semantic_roles.value)) {
+                        out.println "Installing semantic roles"
+                        phenomena.setupOntology(SourceLanguage.Omnilingual.getSemanticRolesSchemaDefinition())
+//                        new CodeSemanticObserver().getRules().each {
+//                            phenomena.setupOntology(it)
+//                        }
+                        out.println "Semantic roles installed"
+                    }
+                    installObserverSchemas(out, phenomena)
                 }
-                installObserverSchemas(out, phenomena)
-                phenomena.close()
                 return true
             }
         }
         RetryerBuilder.<Boolean> newBuilder()
-                .retryIfExceptionOfType(ConnectException.class)
+                .retryIfExceptionOfType(ConnectionException.class)
                 .withWaitStrategy(WaitStrategies.fixedWait(15, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(5))
                 .withRetryListener(new RetryListener() {
-            @Override
-            void onRetry(Attempt attempt) {
-                if (attempt.hasException()) {
-                    out.println "Ontology setup failed. Retrying ontology setup in 15 seconds..."
-                }
-            }
-        }).build().call(setupOntology)
+                    @Override
+                    void onRetry(Attempt attempt) {
+                        if (attempt.hasException()) {
+                            out.println "Ontology setup failed. Retrying ontology setup in 15 seconds..."
+                        }
+                    }
+                }).build().call(setupOntology)
     }
 
     private static void installObserverSchemas(PrintWriter out, Phenomena phenomena) {

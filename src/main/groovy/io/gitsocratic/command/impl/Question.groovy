@@ -1,6 +1,8 @@
 package io.gitsocratic.command.impl
 
-import grakn.client.answer.Numeric
+import grakn.client.concept.answer.ConceptMap
+import grakn.client.concept.answer.Numeric
+import grakn.client.rpc.QueryFuture
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 import io.gitsocratic.client.GraknClient
@@ -62,19 +64,22 @@ class Question implements Callable<Integer> {
 
             def questionAnswer = null
             if (result.size() == 1 && result.get(0) instanceof Numeric) {
-                questionAnswer = (result.get(0) as Numeric).number().longValue()
+                questionAnswer = (result.get(0) as Numeric).asLong().longValue()
                 if (outputLogging) log.info("Result: " + questionAnswer as String)
+            } else if (result.size() == 1 && result.get(0) instanceof QueryFuture) {
+                result = [(result.get(0) as QueryFuture).get() as Numeric] as List<ConceptMap>
+                if (outputLogging) log.info("Result: " + (result.get(0) as Numeric).asLong().longValue() as String)
             } else if (!result.isEmpty()) {
                 if (outputLogging) log.info "Result:"
                 result.each {
                     it.map().forEach({ key, value ->
-                        if (outputLogging) log.info "\t" + key.toString() + " = " + value.asAttribute().value().toString()
+                        if (outputLogging) log.info "\t" + key.toString() + " = " + value.asAttribute().value.toString()
                     })
                 }
                 if (result.size() == 1) {
-                    questionAnswer = result.get(0).get("function_name").asAttribute().value()
+                    questionAnswer = result.get(0).get("function_name").asAttribute().value
                 } else {
-                    questionAnswer = result.collect { it.get("function_name").asAttribute().value() }
+                    questionAnswer = result.collect { it.get("function_name").asAttribute().value }
                 }
             } else {
                 if (outputLogging) log.info "Result: N/A"

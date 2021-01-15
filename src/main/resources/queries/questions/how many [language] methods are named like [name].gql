@@ -1,0 +1,29 @@
+match
+$function isa <language>SourceArtifact;
+($function) isa DECLARATION;
+($function) isa FUNCTION;
+not {
+	($function) isa ARGUMENT;
+};
+not {
+	($function) isa RETURN;
+};
+not {
+	($function) isa INCOMPLETE;
+};
+not {
+	($function) isa BODY;
+};
+
+{
+    #self-identified functions
+    #($function) isa IDENTIFIER; #prob don't need
+    $function has name contains "<name>";
+} or {
+    #child-node-identified functions
+    (is_parent: $function, is_child: $functionName);
+    ($functionName) isa IDENTIFIER;
+    $functionName has name contains "<name>";
+};
+
+get $function; count;

@@ -1,7 +1,7 @@
 package io.gitsocratic.api.administration
 
-import io.gitsocratic.api.administration.builder.AddLocalRepoCommandBuilder
-import io.gitsocratic.api.administration.builder.AddRemoteRepoCommandBuilder
+import io.gitsocratic.api.administration.builder.ProcessLocalRepoCommandBuilder
+import io.gitsocratic.api.administration.builder.ProcessRemoteRepoCommandBuilder
 import io.gitsocratic.api.administration.builder.ConfigCommandBuilder
 import io.gitsocratic.api.administration.builder.InitRequiredServicesBuilder
 import io.gitsocratic.api.administration.builder.init.InitApacheSkyWalkingCommandBuilder
@@ -55,11 +55,11 @@ class AdministrationAPI {
         return new ConfigCommandBuilder.SetValue(option, value)
     }
 
-    AddLocalRepoCommandBuilder addLocalRepo() {
-        return new AddLocalRepoCommandBuilder()
+    ProcessLocalRepoCommandBuilder processLocalRepo() {
+        return new ProcessLocalRepoCommandBuilder()
     }
 
-    AddRemoteRepoCommandBuilder addRemoteRepo() {
-        return new AddRemoteRepoCommandBuilder()
+    ProcessRemoteRepoCommandBuilder processRemoteRepo() {
+        return new ProcessRemoteRepoCommandBuilder()
     }
 }

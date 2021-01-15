@@ -30,7 +30,7 @@ class AddRemoteRepo extends AddLocalRepo {
     @CommandLine.Parameters(index = "0", description = "The repository to add")
     private String repoName
 
-    @CommandLine.Option(names = ["-p", "--parallel"], description = "Use parallel source code processing")
+    @CommandLine.Option(names = ["-p2", "--parallel2"], description = "Use parallel source code processing")
     private boolean parallelProcessing = defaultParallelProcessing
 
     @SuppressWarnings("unused")

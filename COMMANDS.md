@@ -77,7 +77,7 @@ Configuration:
  docker_host: localhost
  docker_port: 2376
  grakn_host: localhost
- grakn_port: 48555
+ grakn_port: 1729
  grakn_keyspace: grakn
  use_docker_babelfish: true
  babelfish_host: localhost

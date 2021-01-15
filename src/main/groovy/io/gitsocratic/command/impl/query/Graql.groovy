@@ -1,6 +1,8 @@
 package io.gitsocratic.command.impl.query
 
-import grakn.client.answer.Numeric
+import grakn.client.concept.answer.ConceptMap
+import grakn.client.concept.answer.Numeric
+import grakn.client.rpc.QueryFuture
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 import io.gitsocratic.client.GraknClient
@@ -63,12 +65,15 @@ class Graql implements Callable<Integer> {
             def queryTimeMs = System.currentTimeMillis() - startTime
 
             if (result.size() == 1 && result.get(0) instanceof Numeric) {
-                if (outputLogging) log.info("Result: " + (result.get(0) as Numeric).number().longValue() as String)
+                if (outputLogging) log.info("Result: " + (result.get(0) as Numeric).asLong().longValue() as String)
+            } else if (result.size() == 1 && result.get(0) instanceof QueryFuture) {
+                result = [(result.get(0) as QueryFuture).get() as Numeric] as List<ConceptMap>
+                if (outputLogging) log.info("Result: " + (result.get(0) as Numeric).asLong().longValue() as String)
             } else if (!result.isEmpty()) {
                 if (outputLogging) log.info "Result:"
                 result.each {
                     it.map().forEach({ key, value ->
-                        if (outputLogging) log.info "\t" + key.toString() + " = " + value.asAttribute().value().toString()
+                        if (outputLogging) log.info "\t" + key.toString() + " = " + value.asAttribute().value.toString()
                     })
                 }
             } else {

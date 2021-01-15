@@ -118,7 +118,49 @@ class PhenomenaClient implements Closeable {
             }
         }
         phenomena.init(codeObservers)
+        phenomena.getSchemaSession().close()
         return phenomena
+    }
+
+    void parseSourceCodeRepository(boolean parallelProcessing) {
+        long startTime = System.currentTimeMillis()
+        def parsedCount = new AtomicInteger(0)
+        def failCount = new AtomicInteger(0)
+        if (parallelProcessing) {
+            GParsPool.withPool {
+                phenomena.sourceFilesInScanPath.eachParallel { File file ->
+                    parseSourceCodeFile(file, parsedCount, failCount)
+                }
+            }
+        } else {
+            phenomena.sourceFilesInScanPath.each { File file ->
+                parseSourceCodeFile(file, parsedCount, failCount)
+            }
+        }
+        log.info "Parsed files: $parsedCount"
+        log.info "Failed files: $failCount"
+        log.info "Parsing time: " + humanReadableFormat(Duration.ofMillis(System.currentTimeMillis() - startTime))
+    }
+
+    private void parseSourceCodeFile(File file, AtomicInteger processedCount, AtomicInteger failCount) {
+        try {
+            def parsedFile = phenomena.parseSourceFile(file, SourceLanguage.getSourceLanguage(file))
+            if (parsedFile.status().isOk()) {
+                log.info "Parsed $file"
+                processedCount.getAndIncrement()
+            } else {
+                failCount.getAndIncrement()
+                log.error("Failed to parse file: $file - Reason: " + parsedFile.errors().toString())
+            }
+        } catch (ParseException e) {
+            failCount.getAndIncrement()
+            log.error("Failed to parse file: " + e.sourceFile + " - Reason: "
+                    + e.parseResponse.errors().toString())
+        } catch (all) {
+            log.error("Failed to parse file: " + file + " - Reason: " + all.message)
+            all.printStackTrace()
+            failCount.getAndIncrement()
+        }
     }
 
     void processSourceCodeRepository(boolean parallelProcessing) {

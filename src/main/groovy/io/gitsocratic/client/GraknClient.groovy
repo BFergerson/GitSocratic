@@ -1,7 +1,10 @@
 package io.gitsocratic.client
 
-import grakn.client.answer.ConceptMap
+import grakn.client.Grakn
+import grakn.client.concept.answer.ConceptMap
 import graql.lang.Graql
+import graql.lang.query.GraqlInsert
+import graql.lang.query.GraqlMatch
 import io.gitsocratic.command.config.ConfigOption
 
 /**
@@ -17,7 +20,7 @@ class GraknClient {
     private final int port
     private final String keyspace
     private grakn.client.GraknClient client
-    private grakn.client.GraknClient.Session session
+    private Grakn.Session session
 
     GraknClient() {
         if (Boolean.valueOf(ConfigOption.use_docker_grakn.value)) {
@@ -29,7 +32,9 @@ class GraknClient {
         this.keyspace = ConfigOption.grakn_keyspace.value
 
         client = new grakn.client.GraknClient("$host:$port")
-        session = client.session(keyspace)
+        if (client.databases().contains(keyspace)) client.databases().delete(keyspace) //todo: remove
+        client.databases().create(keyspace) //todo: remove
+        session = client.session(keyspace, Grakn.Session.Type.DATA)
     }
 
     GraknClient(String host, int port, String keyspace) {
@@ -38,7 +43,7 @@ class GraknClient {
         this.keyspace = keyspace
 
         client = new grakn.client.GraknClient("$host:$port")
-        session = client.session(keyspace)
+        session = client.session(keyspace, Grakn.Session.Type.DATA)
     }
 
     List<ConceptMap> executeReadQuery(String query) {
@@ -59,22 +64,29 @@ class GraknClient {
         }
     }
 
-    static List<ConceptMap> executeQuery(grakn.client.GraknClient.Transaction tx, String query) {
-        return tx.execute(Graql.parse(query)) as List<ConceptMap>
+    static List<ConceptMap> executeQuery(Grakn.Transaction tx, String query) {
+        def graqlQuery = Graql.parseQuery(query)
+        if (graqlQuery.class.toString().contains("Match")) {
+            return tx.query().match(graqlQuery).collect() as List<ConceptMap>
+        } else if (graqlQuery.class.toString().contains("Insert")) {
+            return tx.query().insert(graqlQuery).collect() as List<ConceptMap>
+        } else {
+            throw new UnsupportedOperationException(graqlQuery.toString())
+        }
     }
 
-    grakn.client.GraknClient.Transaction makeWriteSession() {
-        return session.transaction().write()
+    Grakn.Transaction makeWriteSession() {
+        return session.transaction(Grakn.Transaction.Type.WRITE)
     }
 
-    grakn.client.GraknClient.Transaction makeReadSession() {
-        return session.transaction().read()
+    Grakn.Transaction makeReadSession() {
+        return session.transaction(Grakn.Transaction.Type.READ)
     }
 
     void resetKeyspace() {
-        client.keyspaces().delete(keyspace)
-        session.close()
-        session = client.session(keyspace)
+        client.databases().delete(keyspace)
+        client.databases().create(keyspace)
+        session = client.session(keyspace, Grakn.Session.Type.DATA)
     }
 
     void close() {

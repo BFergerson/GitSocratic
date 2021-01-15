@@ -18,7 +18,7 @@ enum ConfigOption {
     use_docker_grakn("true"),
     docker_grakn_hostname(null),
     grakn_host("localhost"),
-    grakn_port("48555"),
+    grakn_port("1729"),
     grakn_keyspace("grakn"),
     // - babelfish
     use_docker_babelfish("true"),

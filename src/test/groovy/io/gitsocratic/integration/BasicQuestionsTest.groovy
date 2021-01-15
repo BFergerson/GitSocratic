@@ -17,13 +17,13 @@ class BasicQuestionsTest {
 //        //todo: reset config
 //        assertEquals(0, SocraticAPI.administration().init().build().execute(true).status)
 //
-//        def addRepo = SocraticAPI.administration().addRemoteRepo()
+//        def addRepo = SocraticAPI.administration().processRemoteRepo()
 //                .repoName("bfergerson/same-program").build().execute()
 //        assertEquals(0, addRepo.status)
 //
 //        SourceLanguage.getSupportedLanguages().each {
 //            def question1 = SocraticAPI.knowledge().question()
-//                    .question("how many $it methods are named main").build().execute()
+//                    .question("how many $it methods are named like main").build().execute()
 //            assertEquals("Language: $it", 0, question1.status)
 //            assertEquals("Language: $it", 1, question1.answer)
 //        }
@@ -31,8 +31,8 @@ class BasicQuestionsTest {
 //        SourceLanguage.getSupportedLanguages().each {
 //            def question2 = SocraticAPI.knowledge().question()
 //                    .question("how many $it methods total").build().execute()
-//            assertEquals(0, question2.status)
-//            assertEquals(1, question2.answer)
+//            assertEquals("Language: $it", 0, question2.status)
+//            assertEquals("Language: $it", 1, question2.answer)
 //        }
 //
 //        def question3 = SocraticAPI.knowledge().question()
@@ -59,7 +59,7 @@ class BasicQuestionsTest {
                 .config(ConfigOption.cyclomatic_complexity, true).build().execute().newValue)
         assertEquals(0, SocraticAPI.administration().init().build().execute(true).status)
 
-        def addRepo = SocraticAPI.administration().addRemoteRepo()
+        def addRepo = SocraticAPI.administration().processRemoteRepo()
                 .repoName("bfergerson/method-complexity").build().execute()
         assertEquals(0, addRepo.status)
 

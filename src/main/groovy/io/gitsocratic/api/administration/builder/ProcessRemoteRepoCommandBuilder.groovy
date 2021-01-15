@@ -9,17 +9,17 @@ import io.gitsocratic.command.impl.AddRemoteRepo
  * @since 0.2
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
-class AddRemoteRepoCommandBuilder {
+class ProcessRemoteRepoCommandBuilder {
 
     private String repoName
     private boolean parallelProcessing = AddRemoteRepo.defaultParallelProcessing
 
-    AddRemoteRepoCommandBuilder repoName(String repoName) {
+    ProcessRemoteRepoCommandBuilder repoName(String repoName) {
         this.repoName = repoName
         return this
     }
 
-    AddRemoteRepoCommandBuilder parallelProcessing(boolean parallelProcessing) {
+    ProcessRemoteRepoCommandBuilder parallelProcessing(boolean parallelProcessing) {
         this.parallelProcessing = parallelProcessing
         return this
     }
