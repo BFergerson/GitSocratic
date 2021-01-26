@@ -1,5 +1,6 @@
 package io.gitsocratic.api.administration.builder
 
+import io.gitsocratic.command.config.ImportMode
 import io.gitsocratic.command.impl.AddLocalRepo
 
 /**
@@ -25,6 +26,6 @@ class ParseLocalRepoCommandBuilder {
     }
 
     AddLocalRepo build() {
-        return new AddLocalRepo(repoLocation, parallelProcessing)
+        return new AddLocalRepo(repoLocation, ImportMode.PARSE, parallelProcessing)
     }
 }

@@ -3,6 +3,7 @@ package io.gitsocratic.command.impl
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 import io.gitsocratic.client.PhenomenaClient
+import io.gitsocratic.command.config.ImportMode
 import io.gitsocratic.command.result.AddLocalRepoCommandResult
 import picocli.CommandLine
 
@@ -30,15 +31,18 @@ class AddLocalRepo implements Callable<Integer> {
     private File repoLocation
 
     @CommandLine.Option(names = ["-p", "--parallel"], description = "Use parallel source code processing")
-    private boolean parallelProcessing = defaultParallelProcessing
+    protected boolean parallelProcessing = defaultParallelProcessing
+
+    protected ImportMode importMode = ImportMode.PROCESS
 
     @SuppressWarnings("unused")
     protected AddLocalRepo() {
         //used by Picocli
     }
 
-    AddLocalRepo(File repoLocation, boolean parallelProcessing) {
+    AddLocalRepo(File repoLocation, ImportMode importMode, boolean parallelProcessing) {
         this.repoLocation = Objects.requireNonNull(repoLocation)
+        this.importMode = importMode
         this.parallelProcessing = parallelProcessing
     }
 
@@ -57,9 +61,16 @@ class AddLocalRepo implements Callable<Integer> {
             return new AddLocalRepoCommandResult(-1)
         }
 
-        //import source code into grakn with phenomena
-        new PhenomenaClient(repoLocation.absolutePath).withCloseable {
-            it.processSourceCodeRepository(parallelProcessing)
+        if (importMode == ImportMode.PARSE) {
+            //parse source code
+            new PhenomenaClient(repoLocation.absolutePath).withCloseable {
+                it.parseSourceCodeRepository(parallelProcessing)
+            }
+        } else {
+            //parse & import source code into grakn
+            new PhenomenaClient(repoLocation.absolutePath).withCloseable {
+                it.processSourceCodeRepository(parallelProcessing)
+            }
         }
         return new AddLocalRepoCommandResult(0)
     }

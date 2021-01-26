@@ -3,6 +3,7 @@ package io.gitsocratic.command.impl
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 import io.gitsocratic.client.PhenomenaClient
+import io.gitsocratic.command.config.ImportMode
 import io.gitsocratic.command.result.AddRemoteRepoCommandResult
 import org.eclipse.jgit.api.Git
 import picocli.CommandLine
@@ -30,16 +31,14 @@ class AddRemoteRepo extends AddLocalRepo {
     @CommandLine.Parameters(index = "0", description = "The repository to add")
     private String repoName
 
-    @CommandLine.Option(names = ["-p2", "--parallel2"], description = "Use parallel source code processing")
-    private boolean parallelProcessing = defaultParallelProcessing
-
     @SuppressWarnings("unused")
     protected AddRemoteRepo() {
         //used by Picocli
     }
 
-    AddRemoteRepo(String repoName, boolean parallelProcessing) {
+    AddRemoteRepo(String repoName, ImportMode importMode, boolean parallelProcessing) {
         this.repoName = Objects.requireNonNull(repoName)
+        this.importMode = importMode
         this.parallelProcessing = parallelProcessing
     }
 
@@ -57,19 +56,22 @@ class AddRemoteRepo extends AddLocalRepo {
         new File("/tmp/gitsocratic/out/").deleteDir()
         cloneRepo(repoName, new File("/tmp/gitsocratic/out/"), outputLogging)
 
-        //import source code into grakn with phenomena
-        new PhenomenaClient("/tmp/gitsocratic/out/").withCloseable {
-            it.processSourceCodeRepository(parallelProcessing)
+        if (importMode == ImportMode.PARSE) {
+            //parse source code
+            new PhenomenaClient("/tmp/gitsocratic/out/").withCloseable {
+                it.parseSourceCodeRepository(parallelProcessing)
+            }
+        } else {
+            //parse & import source code into grakn
+            new PhenomenaClient("/tmp/gitsocratic/out/").withCloseable {
+                it.processSourceCodeRepository(parallelProcessing)
+            }
         }
         return new AddRemoteRepoCommandResult(0)
     }
 
     String getRepoName() {
         return repoName
-    }
-
-    boolean getParallelProcessing() {
-        return parallelProcessing
     }
 
     private static void cloneRepo(String githubRepository, File outputDirectory, boolean outputLogging) {
@@ -90,9 +92,5 @@ class AddRemoteRepo extends AddLocalRepo {
                     .call()
         }
         if (outputLogging) log.info "Cloned: $githubRepository"
-    }
-
-    static boolean getDefaultParallelProcessing() {
-        return true
     }
 }

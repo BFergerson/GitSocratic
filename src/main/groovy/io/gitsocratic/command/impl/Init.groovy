@@ -5,7 +5,6 @@ import io.gitsocratic.SocraticCLI
 import io.gitsocratic.command.impl.init.ApacheSkyWalking
 import io.gitsocratic.command.impl.init.Babelfish
 import io.gitsocratic.command.impl.init.Grakn
-import io.gitsocratic.command.impl.init.SourcePlusPlus
 import io.gitsocratic.command.result.InitCommandResult
 import picocli.CommandLine
 
@@ -26,7 +25,7 @@ import java.util.concurrent.Callable
         descriptionHeading = "%nDescription:%n%n",
         parameterListHeading = "%nParameters:%n",
         optionListHeading = "%nOptions:%n",
-        subcommands = [ApacheSkyWalking.class, Babelfish.class, Grakn.class, SourcePlusPlus.class])
+        subcommands = [ApacheSkyWalking.class, Babelfish.class, Grakn.class])
 class Init implements Callable<Integer> {
 
     @CommandLine.ParentCommand

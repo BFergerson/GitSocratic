@@ -142,12 +142,12 @@ class PhenomenaClient implements Closeable {
         log.info "Parsing time: " + humanReadableFormat(Duration.ofMillis(System.currentTimeMillis() - startTime))
     }
 
-    private void parseSourceCodeFile(File file, AtomicInteger processedCount, AtomicInteger failCount) {
+    private void parseSourceCodeFile(File file, AtomicInteger parsedCount, AtomicInteger failCount) {
         try {
             def parsedFile = phenomena.parseSourceFile(file, SourceLanguage.getSourceLanguage(file))
             if (parsedFile.status().isOk()) {
                 log.info "Parsed $file"
-                processedCount.getAndIncrement()
+                parsedCount.getAndIncrement()
             } else {
                 failCount.getAndIncrement()
                 log.error("Failed to parse file: $file - Reason: " + parsedFile.errors().toString())
@@ -192,15 +192,15 @@ class PhenomenaClient implements Closeable {
                 processedCount.getAndIncrement()
             } else {
                 failCount.getAndIncrement()
-                log.error("Failed to parse file: $sourceFile - Reason: "
+                log.error("Failed to process file: $sourceFile - Reason: "
                         + processedFile.parseResponse.errors().toString())
             }
         } catch (ParseException e) {
             failCount.getAndIncrement()
-            log.error("Failed to parse file: " + e.sourceFile + " - Reason: "
+            log.error("Failed to process file: " + e.sourceFile + " - Reason: "
                     + e.parseResponse.errors().toString())
         } catch (all) {
-            log.error("Failed to parse file: " + file + " - Reason: " + all.message)
+            log.error("Failed to process file: " + file + " - Reason: " + all.message)
             all.printStackTrace()
             failCount.getAndIncrement()
         }

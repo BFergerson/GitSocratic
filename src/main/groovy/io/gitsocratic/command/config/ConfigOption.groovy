@@ -33,11 +33,6 @@ enum ConfigOption {
     apache_skywalking_host("localhost"),
     apache_skywalking_grpc_port("11800"),
     apache_skywalking_rest_port("12800"),
-    // - source++
-    use_docker_source_plus_plus("true"),
-    docker_source_plus_plus_hostname(null),
-    source_plus_plus_host("localhost"),
-    source_plus_plus_port("8080"),
 
     //base phenomena
     source_schema("full"),

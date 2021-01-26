@@ -165,7 +165,7 @@ gitsocratic init [-bghvV] [-bv=<babelfishVersion>] [-gv=<graknVersion>]
 Options:
 ```
 service
-    - enum (apache_skywalking, babelfish, grakn, source_plus_plus)
+    - enum (apache_skywalking, babelfish, grakn)
 ```
 
 ### init (Apache Skywalking)
@@ -225,25 +225,6 @@ gitsocratic init grakn
 gitsocratic init grakn 1.7.1 -v
 ```
 
-### init (Source++)
-
-Usage:
-```
-gitsocratic init source_plus_plus [-hvV] <version>
-```
-
-Options:
-```
-version
-    - string
-```
-
-Example(s):
-```
-gitsocratic init source_plus_plus
-gitsocratic init source_plus_plus 0.2.5-alpha -v
-```
-
 ## logs
 
 View logs for initialized services
@@ -256,7 +237,7 @@ gitsocratic logs [-htV] <service>
 Param(s):
 ```
 service
-    - enum (apache_skywalking, babelfish, grakn, source_plus_plus)
+    - enum (apache_skywalking, babelfish, grakn)
 ```
 
 Options:

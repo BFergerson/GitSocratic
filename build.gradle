@@ -1,5 +1,5 @@
 plugins {
-    id "com.avast.gradle.docker-compose" version "0.6.6"
+    id "com.avast.gradle.docker-compose" version "0.9.1"
 }
 
 group 'io.gitsocratic'
@@ -19,15 +19,15 @@ repositories {
     maven {
         url "https://maven.pkg.github.com/codebrig/arthur"
         credentials {
-            username = System.getenv("GITHUB_ACTOR") ?: System.getenv("gpr.user")
-            password = System.getenv("GITHUB_TOKEN") ?: System.getenv("gpr.key")
+            username = System.getenv("GITHUB_ACTOR") ?: (System.getenv("gpr.user") ?: System.getProperty("gpr.user"))
+            password = System.getenv("GITHUB_TOKEN") ?: (System.getenv("gpr.key" ?: System.getProperty("gpr.key")))
         }
     }
     maven {
         url "https://maven.pkg.github.com/codebrig/phenomena"
         credentials {
-            username = System.getenv("GITHUB_ACTOR") ?: System.getenv("gpr.user")
-            password = System.getenv("GITHUB_TOKEN") ?: System.getenv("gpr.key")
+            username = System.getenv("GITHUB_ACTOR") ?: (System.getenv("gpr.user") ?: System.getProperty("gpr.user"))
+            password = System.getenv("GITHUB_TOKEN") ?: (System.getenv("gpr.key" ?: System.getProperty("gpr.key")))
         }
     }
 }
@@ -37,22 +37,19 @@ ext {
 }
 
 dependencies {
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
-//    testImplementation 'com.github.sourceplusplus.assistant:source-api:master-SNAPSHOT'
+    testImplementation group: 'junit', name: 'junit', version: '4.13.1'
 
     implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
     implementation 'org.codehaus.groovy:groovy-all:3.0.7'
-    implementation group: 'info.picocli', name: 'picocli', version: '4.2.0'
+    implementation group: 'info.picocli', name: 'picocli', version: '4.6.1'
     implementation group: 'org.codehaus.gpars', name: 'gpars', version: '1.2.1'
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.7.0.202003110725-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.10.0.202012080955-r'
     implementation "com.github.rholder:guava-retrying:2.0.0"
-    implementation group: 'com.github.docker-java', name: 'docker-java', version: '3.2.1'
-    compile(group: 'com.codebrig', name: 'phenomena', version: '0.3.5') {
-        exclude group: 'io.grakn.client', module: 'api'
-    }
+    implementation group: 'com.github.docker-java', name: 'docker-java', version: '3.2.7'
+    implementation 'com.codebrig:phenomena:0.3.5'
     implementation 'com.codebrig:arthur:0.4.4'
     implementation group: 'io.grakn.client', name: 'grakn-client', version: "$graknVersion"
-    compile group: 'io.vertx', name: 'vertx-core', version: '3.8.5'
+    compile group: 'io.vertx', name: 'vertx-core', version: '4.0.0'
     implementation files('lib/bblfsh-client-1.11.1.jar')
 }
 

@@ -62,6 +62,7 @@ class Question implements Callable<Integer> {
             //if (outputLogging) log.info "# Query: " + query.replace("\n", " ")
             def result = graknClient.executeQuery(tx, query)
             def queryTimeMs = System.currentTimeMillis() - startTime
+            //if (outputLogging) log.info "# Query Time: " + (queryTimeMs / 1000.0) + "s"
 
             def questionAnswer = null
             if (result.size() == 1 && result.get(0) instanceof Numeric) {

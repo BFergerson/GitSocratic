@@ -1,5 +1,7 @@
 package io.gitsocratic.api.administration.builder
 
+import io.gitsocratic.command.config.ImportMode
+import io.gitsocratic.command.impl.AddLocalRepo
 import io.gitsocratic.command.impl.AddRemoteRepo
 
 /**
@@ -12,7 +14,7 @@ import io.gitsocratic.command.impl.AddRemoteRepo
 class ProcessRemoteRepoCommandBuilder {
 
     private String repoName
-    private boolean parallelProcessing = AddRemoteRepo.defaultParallelProcessing
+    private boolean parallelProcessing = AddLocalRepo.defaultParallelProcessing
 
     ProcessRemoteRepoCommandBuilder repoName(String repoName) {
         this.repoName = repoName
@@ -25,6 +27,6 @@ class ProcessRemoteRepoCommandBuilder {
     }
 
     AddRemoteRepo build() {
-        return new AddRemoteRepo(repoName, parallelProcessing)
+        return new AddRemoteRepo(repoName, ImportMode.PROCESS, parallelProcessing)
     }
 }
