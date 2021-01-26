@@ -59,6 +59,7 @@ class Question implements Callable<Integer> {
 
         try {
             if (outputLogging) log.info "# Question: " + question.formattedQuestion
+            //if (outputLogging) log.info "# Query: " + query.replace("\n", " ")
             def result = graknClient.executeQuery(tx, query)
             def queryTimeMs = System.currentTimeMillis() - startTime
 
@@ -67,7 +68,8 @@ class Question implements Callable<Integer> {
                 questionAnswer = (result.get(0) as Numeric).asLong().longValue()
                 if (outputLogging) log.info("Result: " + questionAnswer as String)
             } else if (result.size() == 1 && result.get(0) instanceof QueryFuture) {
-                result = [(result.get(0) as QueryFuture).get() as Numeric] as List<ConceptMap>
+                def numericResult = (result.get(0) as QueryFuture).get()
+                result = [numericResult as Numeric] as List<ConceptMap>
                 if (outputLogging) log.info("Result: " + (result.get(0) as Numeric).asLong().longValue() as String)
             } else if (!result.isEmpty()) {
                 if (outputLogging) log.info "Result:"

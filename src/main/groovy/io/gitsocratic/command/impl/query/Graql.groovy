@@ -29,8 +29,11 @@ import java.util.concurrent.Callable
         optionListHeading = "%nOptions:%n")
 class Graql implements Callable<Integer> {
 
-    @CommandLine.Parameters(index = "0", description = "Query to run")
+//    @CommandLine.Parameters(index = "0", description = "Query to run")
     private String query
+
+    @CommandLine.Option(names = ["-f", "--file"], description = "Query file to run")
+    private File file
 
     @SuppressWarnings("unused")
     protected Graql() {
@@ -51,38 +54,38 @@ class Graql implements Callable<Integer> {
     }
 
     private QueryCommandResult.GraqlResponse executeCommand(boolean outputLogging) throws Exception {
+        if (file != null) query = file.text
         if (query == null || query.isEmpty()) {
             if (outputLogging) log.error "Missing Graql query"
             return new QueryCommandResult.GraqlResponse(-1)
         }
 
         def startTime = System.currentTimeMillis()
-        def graknClient = new GraknClient()
-        def tx = graknClient.makeReadSession()
-        try {
-            if (outputLogging) log.info "# Query: " + query
-            def result = graknClient.executeQuery(tx, query)
-            def queryTimeMs = System.currentTimeMillis() - startTime
 
-            if (result.size() == 1 && result.get(0) instanceof Numeric) {
-                if (outputLogging) log.info("Result: " + (result.get(0) as Numeric).asLong().longValue() as String)
-            } else if (result.size() == 1 && result.get(0) instanceof QueryFuture) {
-                result = [(result.get(0) as QueryFuture).get() as Numeric] as List<ConceptMap>
-                if (outputLogging) log.info("Result: " + (result.get(0) as Numeric).asLong().longValue() as String)
-            } else if (!result.isEmpty()) {
-                if (outputLogging) log.info "Result:"
-                result.each {
-                    it.map().forEach({ key, value ->
-                        if (outputLogging) log.info "\t" + key.toString() + " = " + value.asAttribute().value.toString()
-                    })
+        try (def graknClient = new GraknClient()) {
+            try (def tx = graknClient.makeReadSession()) {
+                //if (outputLogging) log.info "# Query: " + query
+                def result = graknClient.executeQuery(tx, query)
+                def queryTimeMs = System.currentTimeMillis() - startTime
+
+                if (result.size() == 1 && result.get(0) instanceof Numeric) {
+                    if (outputLogging) log.info("Result: " + (result.get(0) as Numeric).asLong().longValue() as String)
+                } else if (result.size() == 1 && result.get(0) instanceof QueryFuture) {
+                    def value = (result.get(0) as QueryFuture).get()
+                    result = [value as Numeric] as List<ConceptMap>
+                    if (outputLogging) log.info("Result: " + (result.get(0) as Numeric).asLong().longValue() as String)
+                } else if (!result.isEmpty()) {
+                    if (outputLogging) log.info "Result:"
+                    result.each {
+                        it.map().forEach({ key, value ->
+                            if (outputLogging) log.info "\t" + key.toString() + " = " + value.asAttribute().value.toString()
+                        })
+                    }
+                } else {
+                    if (outputLogging) log.info "Result: N/A"
                 }
-            } else {
-                if (outputLogging) log.info "Result: N/A"
+                return new QueryCommandResult.GraqlResponse(0, result, queryTimeMs)
             }
-            return new QueryCommandResult.GraqlResponse(0, result, queryTimeMs)
-        } finally {
-            tx.close()
-            graknClient.close()
         }
     }
 

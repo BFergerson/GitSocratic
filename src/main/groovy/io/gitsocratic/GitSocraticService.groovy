@@ -11,7 +11,7 @@ enum GitSocraticService {
 
     apache_skywalking("bash docker-entrypoint.sh"),
     babelfish("/tini -- bblfshd"),
-    grakn("./grakn-docker.sh"),
+    grakn("/opt/grakn-core-all-linux/grakn server"),
     source_plus_plus("source-core.sh")
 
     private String command

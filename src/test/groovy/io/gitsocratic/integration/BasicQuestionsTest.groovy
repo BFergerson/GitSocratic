@@ -11,6 +11,16 @@ class BasicQuestionsTest {
 
     private final GraknClient graknClient = new GraknClient()
 
+//    @Before
+//    void setupGrakn() {
+//        try (def graknClient = grakn.client.GraknClient.core("172.19.0.1:1729")) {
+//            if (graknClient.databases().contains("grakn")) {
+//                graknClient.databases().delete("grakn")
+//            }
+//            graknClient.databases().create("grakn")
+//        }
+//    }
+//
 //    @Test
 //    void askBasicQuestions_sameProgram() {
 //        graknClient.resetKeyspace()

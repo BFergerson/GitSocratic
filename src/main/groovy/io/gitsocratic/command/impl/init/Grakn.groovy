@@ -12,6 +12,7 @@ import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 import io.gitsocratic.GitSocraticService
 import io.gitsocratic.SocraticCLI
+import io.gitsocratic.client.GraknClient
 import io.gitsocratic.command.impl.Init
 import io.gitsocratic.command.impl.init.docker.PullImageProgress
 import io.gitsocratic.command.result.InitCommandResult
@@ -232,6 +233,15 @@ class Grakn implements Callable<Integer> {
                     }
                     phenomena.graknPort = grakn_port.value as int
                     phenomena.graknKeyspace = grakn_keyspace.value
+
+                    try (def client = new GraknClient()) {
+                        if (!client.graknClient.databases().contains(phenomena.graknKeyspace)) {
+                            out.println "Creating keyspace: " + phenomena.graknKeyspace
+                            client.graknClient.databases().create(phenomena.graknKeyspace)
+                        } else {
+                            out.println "Reusing keyspace: " + phenomena.graknKeyspace
+                        }
+                    }
                     phenomena.connectToGrakn()
                     out.println "Successfully connected to Grakn"
 
@@ -288,6 +298,6 @@ class Grakn implements Callable<Integer> {
     }
 
     static String getDefaultGraknVersion() {
-        return "1.7.1"
+        return "2.0.0-alpha-3"
     }
 }

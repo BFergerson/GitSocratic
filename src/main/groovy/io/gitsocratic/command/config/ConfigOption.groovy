@@ -1,5 +1,6 @@
 package io.gitsocratic.command.config
 
+import groovy.util.logging.Slf4j
 import io.gitsocratic.SocraticCLI
 
 /**
@@ -9,6 +10,7 @@ import io.gitsocratic.SocraticCLI
  * @since 0.1
  * @author <a href="mailto:brandon.fergerson@codebrig.com">Brandon Fergerson</a>
  */
+@Slf4j
 enum ConfigOption {
 
     //environment
@@ -63,6 +65,8 @@ enum ConfigOption {
             try {
                 if (!SocraticCLI.getConfigFile().exists()) {
                     SocraticCLI.getConfigFile().createNewFile()
+                } else {
+                    log.info "Loading configuration: " + SocraticCLI.getConfigFile()
                 }
                 input = new FileInputStream(SocraticCLI.getConfigFile())
                 configProperties.load(input)

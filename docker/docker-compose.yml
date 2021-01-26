@@ -9,7 +9,7 @@ services:
     environment:
       - JAEGER_DISABLED=1
   grakn:
-    image: graknlabs/grakn:2.0.0-alpha
+    image: graknlabs/grakn:2.0.0-alpha-3
     container_name: grakn
     ports:
       - "1729:1729"

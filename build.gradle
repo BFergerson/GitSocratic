@@ -16,10 +16,24 @@ repositories {
     maven {
         url 'https://repo.grakn.ai/repository/maven/'
     }
+    maven {
+        url "https://maven.pkg.github.com/codebrig/arthur"
+        credentials {
+            username = System.getenv("GITHUB_ACTOR") ?: System.getenv("gpr.user")
+            password = System.getenv("GITHUB_TOKEN") ?: System.getenv("gpr.key")
+        }
+    }
+    maven {
+        url "https://maven.pkg.github.com/codebrig/phenomena"
+        credentials {
+            username = System.getenv("GITHUB_ACTOR") ?: System.getenv("gpr.user")
+            password = System.getenv("GITHUB_TOKEN") ?: System.getenv("gpr.key")
+        }
+    }
 }
 
 ext {
-    graknVersion = "2.0.0-alpha-4"
+    graknVersion = "2.0.0-alpha-6"
 }
 
 dependencies {
@@ -33,10 +47,10 @@ dependencies {
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.7.0.202003110725-r'
     implementation "com.github.rholder:guava-retrying:2.0.0"
     implementation group: 'com.github.docker-java', name: 'docker-java', version: '3.2.1'
-    compile(group: 'com.github.codebrig', name: 'phenomena', version: 'c44912c9a5') {
+    compile(group: 'com.codebrig', name: 'phenomena', version: '0.3.5') {
         exclude group: 'io.grakn.client', module: 'api'
     }
-    implementation 'com.github.codebrig:arthur:d7d66a073a'
+    implementation 'com.codebrig:arthur:0.4.4'
     implementation group: 'io.grakn.client', name: 'grakn-client', version: "$graknVersion"
     compile group: 'io.vertx', name: 'vertx-core', version: '3.8.5'
     implementation files('lib/bblfsh-client-1.11.1.jar')

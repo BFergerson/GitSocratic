@@ -12,7 +12,7 @@ class InitTest extends SocraticCommandTest {
     @Test
     void "default init command"() {
         def command = SocraticAPI.administration().init().build()
-        assertEquals("1.7.1", command.graknVersion)
+        assertEquals("2.0.0-alpha-3", command.graknVersion)
         assertEquals("2.16.1", command.babelfishVersion)
         assertFalse(command.verbose)
     }
