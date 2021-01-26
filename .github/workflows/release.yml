@@ -1,0 +1,19 @@
+name: Release
+on:
+  release:
+    types: [prereleased, released]
+
+jobs:
+
+  release:
+    name: Publish Package
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Fetch Sources
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Publish Package
+        run: ./gradlew publish -Pgpr.user=$GITHUB_ACTOR -Pgpr.key=${{ secrets.GITHUB_TOKEN }} 
