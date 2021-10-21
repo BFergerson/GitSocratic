@@ -1,8 +1,8 @@
 package io.gitsocratic.command.impl.query
 
-import grakn.client.concept.answer.ConceptMap
-import grakn.client.concept.answer.Numeric
-import grakn.client.rpc.QueryFuture
+import com.vaticle.typedb.client.api.answer.ConceptMap
+import com.vaticle.typedb.client.api.answer.Numeric
+import com.vaticle.typedb.client.api.query.QueryFuture
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 import io.gitsocratic.client.GraknClient

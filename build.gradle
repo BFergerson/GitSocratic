@@ -33,7 +33,7 @@ repositories {
 }
 
 ext {
-    graknVersion = "2.0.0-alpha-6"
+    graknVersion = "2.5.0"
 }
 
 dependencies {
@@ -46,9 +46,9 @@ dependencies {
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.10.0.202012080955-r'
     implementation "com.github.rholder:guava-retrying:2.0.0"
     implementation group: 'com.github.docker-java', name: 'docker-java', version: '3.2.7'
-    implementation 'com.codebrig:phenomena:0.3.5'
-    implementation 'com.codebrig:arthur:0.4.4'
-    implementation group: 'io.grakn.client', name: 'grakn-client', version: "$graknVersion"
+    implementation 'com.codebrig:phenomena:0.3.8'
+    implementation 'com.codebrig:arthur:0.4.6'
+    implementation group: 'com.vaticle.typedb', name: 'typedb-client', version: "$graknVersion"
     compile group: 'io.vertx', name: 'vertx-core', version: '4.0.0'
     implementation files('lib/bblfsh-client-1.11.1.jar')
 }

@@ -8,8 +8,8 @@ services:
       - "9432:9432"
     environment:
       - JAEGER_DISABLED=1
-  grakn:
-    image: graknlabs/grakn:2.0.0-alpha-3
-    container_name: grakn
+  typedb:
+    image: vaticle/typedb:2.5.0
+    container_name: typedb
     ports:
       - "1729:1729"

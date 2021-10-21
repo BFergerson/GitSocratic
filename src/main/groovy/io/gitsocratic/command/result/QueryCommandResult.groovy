@@ -1,6 +1,6 @@
 package io.gitsocratic.command.result
 
-import grakn.client.concept.answer.ConceptMap
+import com.vaticle.typedb.client.api.answer.ConceptMap
 import groovy.transform.TupleConstructor
 
 /**
